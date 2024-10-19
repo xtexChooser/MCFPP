@@ -35,21 +35,6 @@ class JavaVar : Var<JavaVar>, MCFPPValue<Any?> {
     override var type: MCFPPType = MCFPPConcreteType.JavaVar
 
     /**
-     * 创建一个固定的JavaVar
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: Any?,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
-        this.value = value
-    }
-
-    /**
      * 创建一个固定的JavaVar。它的标识符和mc名一致
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
@@ -111,7 +96,7 @@ class JavaVar : Var<JavaVar>, MCFPPValue<Any?> {
         //获取value中的一个成员变量
         if(value == null) {
             LogProcessor.error("Cannot access properties in $identifier because its value is null")
-            throw NullPointerException()
+            UnknownVar("error_null")
         }
         val member = value!!::class.memberProperties.find { it.name == key } as KProperty1<Any, *>?
         if(member != null){
@@ -140,7 +125,7 @@ class JavaVar : Var<JavaVar>, MCFPPValue<Any?> {
         }
         try{
             val member = value!!::class.java.getDeclaredMethod(key, *getTypeArray(normalArgs.map { it.type }))
-            return Pair(JavaFunction(member, this), member.canAccess(Any()))
+            return Pair(JavaFunction(member, this), true)
         }catch (e: NoSuchMethodException){
             LogProcessor.error("No method '$key' in $identifier}")
             throw e

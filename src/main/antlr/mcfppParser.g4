@@ -377,9 +377,14 @@ castExpression
     ;
 
 basicExpression
-    :   primary
+    :   jvmAccessExpression
     |   varWithSelector
     ;
+
+jvmAccessExpression
+    :   primary (COLONCOLON Identifier)?
+    ;
+
 //初级表达式
 primary
     :   range
@@ -391,7 +396,7 @@ primary
     ;
 
 varWithSelector
-    : primary selector+
+    : jvmAccessExpression selector+
     | type selector+
     ;
 
@@ -416,6 +421,7 @@ functionCall
 identifierSuffix
     :   '[' conditionalExpression ']'
     |   '[' objectInitializer  (',' objectInitializer)* ']'
+    |   '[' ']' //empty bucket
     ;
 
 objectInitializer

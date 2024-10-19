@@ -9,7 +9,10 @@ class MNITest {
     fun baseMNITest(){
         val test =
             """
-                func base(){
+                func main(){
+                    int qwq = 1;
+                    print(qwq::jvm.identifier);
+                    print(qwq::jvm.sbObject.toString());
                 }
             """.trimIndent()
         MCFPPStringTest.readFromString(test)

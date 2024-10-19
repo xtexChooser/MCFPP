@@ -52,9 +52,9 @@ open class MCFPPConcreteType(objectData: CompoundData = CompoundData("unknown", 
             get() = "JavaVar"
 
         override fun build(identifier: String, container: FieldContainer): Var<*> =
-            JavaVar(container, null, identifier)
+            JavaVar(null, identifier)
         override fun build(identifier: String): Var<*> = JavaVar(null, identifier)
-        override fun build(identifier: String, clazz: Class): Var<*> = JavaVar(clazz, null, identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> = JavaVar(null, identifier)
  }
 
 }

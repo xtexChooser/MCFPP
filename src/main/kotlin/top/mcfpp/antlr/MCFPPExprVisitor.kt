@@ -260,8 +260,8 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitBasicExpression(ctx: mcfppParser.BasicExpressionContext): Var<*> {
         Project.ctx = ctx
-        return if (ctx.primary() != null) {
-            visit(ctx.primary())
+        return if (ctx.jvmAccessExpression() != null) {
+            visitJvmAccessExpression(ctx.jvmAccessExpression())
         } else {
             visit(ctx.varWithSelector())
         }
@@ -276,11 +276,11 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitVarWithSelector(ctx: mcfppParser.VarWithSelectorContext): Var<*> {
         Project.ctx = ctx
-        if(ctx.primary() != null){
-            currSelector = visit(ctx.primary())
+        if(ctx.jvmAccessExpression() != null){
+            currSelector = visitJvmAccessExpression(ctx.jvmAccessExpression())
         }
         if(currSelector is UnknownVar){
-            val typeStr = ctx.primary()?.text?:ctx.type().text
+            val typeStr = ctx.jvmAccessExpression()?.text?:ctx.type().text
             val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
             if(type == null){
                 if(ctx.selector().size == 0){
@@ -297,6 +297,15 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             visit(selector)
         }
         return currSelector!!
+    }
+
+    override fun visitJvmAccessExpression(ctx: mcfppParser.JvmAccessExpressionContext): Var<*> {
+        val re = visitPrimary(ctx.primary())
+        if(ctx.Identifier() != null){
+            return re.getJVM(ctx.Identifier().text)
+        }else{
+            return re
+        }
     }
 
     @Override

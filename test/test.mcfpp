@@ -1,7 +1,7 @@
 namespace test;
 
 func main(){
-    var qwq = 1;
+    int qwq = 1;
     print(qwq::identifier)
     print(qwq::sbObject.toString())
     ::top.mcfpp.model.function$Function.addCommand(::top.mcfpp.command$Command.build("say hello"))

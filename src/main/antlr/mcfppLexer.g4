@@ -33,7 +33,7 @@ MOD_ASSIGNMENT: '%=' ;
 ARROW: '->' ;
 DOUBLE_ARROW: '=>' ;
 RANGE: '..' ;
-//COLONCOLON: '::' ;
+COLONCOLON: '::' ;
 //DOUBLE_SEMICOLON: ';;' ;
 HASH: '#' ;
 AT: '@' ;

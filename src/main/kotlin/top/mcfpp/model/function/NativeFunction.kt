@@ -49,7 +49,6 @@ class NativeFunction : Function, Native {
      *
      * @param name mcfpp方法的名字
      * @param javaMethod java方法
-     * @param returnType 返回值的类型
      * @param namespace 命名空间
      */
     constructor(name: String, namespace: String = Project.currNamespace, javaMethod: Method = Companion::defaultNativeFunction.javaMethod!!) : super(name, namespace, context = null) {
@@ -219,7 +218,7 @@ class NativeFunction : Function, Native {
             primitiveTypes["void"] = Void::class.java
         }
 
-        fun defaultNativeFunction(vararg args: Any?){
+        private fun defaultNativeFunction(vararg args: Any?){
             throw Exception("A nativeFunction hadn't linked to a java method.")
         }
 

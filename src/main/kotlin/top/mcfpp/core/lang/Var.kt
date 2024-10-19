@@ -514,6 +514,21 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
         }
     }
 
+    fun getJVM(key: String): Var<*>{
+        return when(key){
+            "jvm" -> {
+                JavaVar(this,identifier + "_jvm")
+            }
+            else -> {
+                LogProcessor.error("Unknown jvm key: $key")
+                UnknownVar("error_jvm_" + UUID.randomUUID().toString())
+            }
+        }.apply {
+            isConst = true
+            hasAssigned = true
+        }
+    }
+
     companion object {
 
         fun buildCastErrorVar(type: MCFPPType): Var<*>{

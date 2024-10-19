@@ -22,8 +22,8 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
 
     override fun visitBasicExpression(ctx: mcfppParser.BasicExpressionContext): Var<*> {
         Project.ctx = ctx
-        return if (ctx.primary() != null) {
-            visit(ctx.primary())
+        return if (ctx.jvmAccessExpression() != null) {
+            visit(ctx.jvmAccessExpression())
         } else {
             visit(ctx.varWithSelector())
         }
@@ -31,11 +31,11 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
 
     override fun visitVarWithSelector(ctx: mcfppParser.VarWithSelectorContext): Var<*> {
         Project.ctx = ctx
-        if(ctx.primary() != null){
-            currSelector = visit(ctx.primary())
+        if(ctx.jvmAccessExpression() != null){
+            currSelector = visit(ctx.jvmAccessExpression())
         }
         if(currSelector is UnknownVar){
-            val typeStr = ctx.primary()?.text?:ctx.type().text
+            val typeStr = ctx.jvmAccessExpression()?.text?:ctx.type().text
             val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
             if(type == null){
                 LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(typeStr))
@@ -48,6 +48,16 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
             visit(selector)
         }
         return currSelector as Var<*>
+    }
+
+    override fun visitJvmAccessExpression(ctx: mcfppParser.JvmAccessExpressionContext): Var<*> {
+        Project.ctx = ctx
+        val re = visit(ctx.primary())
+        if(ctx.Identifier() != null){
+            return re.getJVM(ctx.Identifier().text)
+        }else{
+            return re
+        }
     }
 
     override fun visitSelector(ctx: mcfppParser.SelectorContext?): Var<*> {
