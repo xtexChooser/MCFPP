@@ -477,7 +477,16 @@ executeExpression
     ;
 
 orgCommand
-    :   OrgCommand
+    :   DIV orgCommandContent+ OrgCommandEnd
+    ;
+
+orgCommandContent
+    :   orgCommandExpression
+    |   OrgCommandText
+    ;
+
+orgCommandExpression
+    :   OrgCommandExprStart expression '}'
     ;
 
 controlStatement

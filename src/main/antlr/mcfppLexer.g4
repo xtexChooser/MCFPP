@@ -14,7 +14,7 @@ LCURL: '{' -> pushMode(DEFAULT_MODE);
 RCURL: '}' -> popMode;
 MULT: '*' ;
 MOD: '%' ;
-DIV: '/' ;
+DIV: '/'  -> pushMode(OrgCommand);
 ADD: '+' ;
 SUB: '-' ;
 INCR: '++' ;
@@ -213,10 +213,6 @@ BooleanConstant
 
 LineString: ('"' .*? '"' )|( '\'' .*? '\'' );
 
-OrgCommand
-    :   '/' [a-z]* ([ ][a-z:._{}\\[0-9A-Z\]]*)+
-    ;
-
 WS  :  [ \t\r\n\u000C]+ -> skip
     ;
 
@@ -232,8 +228,19 @@ LINE_COMMENT
     :   '#' ~[\r\n]* -> skip
     ;
 
+mode OrgCommand ;
 
+OrgCommandText
+    :  ~('$'|[\r\n])+ | '$'
+    ;
 
+OrgCommandExprStart
+    :   '${' -> pushMode(DEFAULT_MODE)
+    ;
+
+OrgCommandEnd
+    :   ('\r\n' | '\n') -> popMode
+    ;
 
 mode MultiLineString ;
 

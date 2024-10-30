@@ -13,6 +13,9 @@ class MNITest {
                     int qwq = 1;
                     print(qwq::jvm.identifier);
                     print(qwq::jvm.sbObject.toString());
+                    /say ${'$'}{qwq}
+                    /say ${'$'}{qwq::jvm.identifier}
+                    /say ${'$'}{qwq::jvm.sbObject}
                 }
             """.trimIndent()
         MCFPPStringTest.readFromString(test)

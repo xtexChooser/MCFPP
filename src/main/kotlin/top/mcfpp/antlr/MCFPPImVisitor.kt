@@ -914,11 +914,26 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
 //endregion
 
-    
+    /**
+     * 使用原版命令
+     */
     @InsertCommand
     override fun visitOrgCommand(ctx: mcfppParser.OrgCommandContext):Any? {
         Project.ctx = ctx
-        Function.addCommand(ctx.text.substring(1))
+        val sb = StringBuilder()
+        for (content in ctx.orgCommandContent()){
+            if(content.OrgCommandText() != null){
+                sb.append(content.OrgCommandText().text)
+            }else{
+                val exp = MCFPPExprVisitor().visit(content.orgCommandExpression().expression())
+                if(exp is MCFPPValue<*>){
+                    sb.append(exp.value)
+                }else{
+                    sb.append(exp)
+                }
+            }
+        }
+        Function.addCommand(sb.toString())
         return null
     }
 

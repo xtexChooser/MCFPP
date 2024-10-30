@@ -1,4 +1,5 @@
 ![](https://user-images.githubusercontent.com/90548686/236462051-b901f99c-bdef-435c-8ca2-0dda37b25285.png)
+[![Stargazers over time](https://starchart.cc/MinecraftFunctionPlusPlus/MCFPP.svg?variant=adaptive)](https://starchart.cc/MinecraftFunctionPlusPlus/MCFPP)
 [English](./README.md)
 ------------
 
