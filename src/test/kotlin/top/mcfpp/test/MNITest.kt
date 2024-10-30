@@ -14,7 +14,9 @@ class MNITest {
                     print(qwq::jvm.identifier);
                     print(qwq::jvm.sbObject.toString());
                     /say ${'$'}{qwq}
+                    /say ${'$'}{qwq::jvm.toString()}
                     /say ${'$'}{qwq::jvm.identifier}
+                    /say ${'$'}{qwq::jvm.name}
                     /say ${'$'}{qwq::jvm.sbObject}
                 }
             """.trimIndent()

@@ -124,7 +124,7 @@ class JavaVar : Var<JavaVar>, MCFPPValue<Any?> {
             throw NullPointerException()
         }
         try{
-            val member = value!!::class.java.getDeclaredMethod(key, *getTypeArray(normalArgs.map { it.type }))
+            val member = value!!::class.java.getMethod(key, *getTypeArray(normalArgs.map { it.type }))
             return Pair(JavaFunction(member, this), true)
         }catch (e: NoSuchMethodException){
             LogProcessor.error("No method '$key' in $identifier}")
