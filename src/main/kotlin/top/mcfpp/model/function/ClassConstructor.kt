@@ -42,7 +42,7 @@ open class ClassConstructor
     @Override
     @InsertCommand
     override fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
-        addCommand("execute in minecraft:overworld positioned 0 1 0 summon marker run function " + leadFunction.namespaceID)
+        addCommand("execute in minecraft:overworld positioned 0 1 0 summon ${target.baseEntity} run function " + leadFunction.namespaceID)
         leadFunction.runInFunction {
             //获取所有函数
             val funcs = StringBuilder("functions:{")
@@ -53,7 +53,16 @@ open class ClassConstructor
             }
             funcs.append("}")
             //对象实体创建
-            addCommand("data merge entity @s {Tags:[${callerClassP.tag}],data:{$funcs}}")
+            if(target.baseEntity == Class.ENTITY_MARKER){
+                addCommand("data merge entity @s {Tags:[${callerClassP.tag},${callerClassP.tag}_data,just],data:{$funcs}}")
+            }else if(target.baseEntity == Class.ENTITY_ITEM_DISPLAY){
+                addCommand("data modify entity @s item.components.\"minecraft:custom_data\".mcfppData set value {Tags:[${callerClassP.tag},${callerClassP.tag}_data,just],data:{$funcs}}")
+            }else{
+                addCommand("tag @s add ${callerClassP.tag}")
+                addCommand("execute summon marker run data merge entity @s {Tags:[${callerClassP.tag}_data,just],data:{$funcs}}")
+                addCommand("ride @n[tag=just, type=marker] mount @s")
+                addCommand("tag @n[tag=just, type=marker] remove just")
+            }
             //初始指针
             addCommand(Command("data modify").build(callerClassP.nbtPath.toCommandPart()).build("set from entity @s UUID"))
             //初始化

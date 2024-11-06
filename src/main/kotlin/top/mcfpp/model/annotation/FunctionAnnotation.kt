@@ -9,7 +9,7 @@ abstract class FunctionAnnotation(identifier: String, namespace: String) : Annot
         throw Exception("Cannot use function annotation on class")
     }
 
-    final override fun forDataObject(data: DataTemplate) {
+    final override fun forDataTemplate(data: DataTemplate) {
         LogProcessor.error("Cannot use class annotation on data template")
     }
 }

@@ -16,7 +16,7 @@ public class From extends DataTemplateAnnotation {
     }
 
     @Override
-    public void forDataObject(@NotNull DataTemplate data) {
+    public void forDataTemplate(@NotNull DataTemplate data) {
         try {
             data.getNativeFromClass(Class.forName(className));
         } catch (ClassNotFoundException e) {

@@ -7,6 +7,7 @@ import top.mcfpp.lib.SbObject
 import top.mcfpp.mni.DataObjectData
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.mni.MinecraftData
+import top.mcfpp.mni.annotation.Base
 import top.mcfpp.mni.annotation.ConcreteOnly
 import top.mcfpp.mni.annotation.From
 import top.mcfpp.mni.annotation.NoInstance
@@ -103,6 +104,7 @@ object GlobalField : FieldContainer, IField {
         stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("ConcreteOnly", ConcreteOnly::class.java)
         stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("NoInstance", NoInstance::class.java)
         stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("To", To::class.java)
+        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("Base", Base::class.java)
 
         return this
     }

@@ -77,7 +77,7 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
             throw UndefinedException("Template should have been defined: $id")
         }
         annotationCache.forEach {
-            it.forDataObject(template)
+            it.forDataTemplate(template)
         }
         template.annotations.addAll(annotationCache)
         annotationCache.clear()
@@ -92,7 +92,7 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
             throw UndefinedException("Template should have been defined: $id")
         }
         annotationCache.forEach {
-            it.forDataObject(objectTemplate)
+            it.forDataTemplate(objectTemplate)
         }
         objectTemplate.annotations.addAll(annotationCache)
         annotationCache.clear()

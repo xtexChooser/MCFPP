@@ -12,5 +12,5 @@ public class NoInstance extends DataTemplateAnnotation {
     }
 
     @Override
-    public void forDataObject(@NotNull DataTemplate data){}
+    public void forDataTemplate(@NotNull DataTemplate data){}
 }

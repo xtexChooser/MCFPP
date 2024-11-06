@@ -15,7 +15,7 @@ public class To extends DataTemplateAnnotation {
     }
 
     @Override
-    public void forDataObject(@NotNull DataTemplate data) {
+    public void forDataTemplate(@NotNull DataTemplate data) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

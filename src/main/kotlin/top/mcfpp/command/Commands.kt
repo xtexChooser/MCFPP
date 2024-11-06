@@ -10,6 +10,7 @@ import top.mcfpp.core.lang.bool.ScoreBool
 import top.mcfpp.type.MCFPPClassType
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.CanSelectMember
+import top.mcfpp.model.Class
 import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
@@ -199,33 +200,9 @@ object Commands {
      * @return 生成的命令。数组的最后一个命令为`execute`命令
      */
     fun selectRun(a : CanSelectMember, command: Command, hasExecuteRun: Boolean = true) : Array<Command>{
-        val final = when(a){
-            is ClassPointer -> {
-                if(a.identifier == "this"){
-                    return arrayOf(command)
-                }
-                val qwq = arrayOf(
-                    Command.build("data modify storage entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
-                    Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin")
-                )
-                if(hasExecuteRun) {
-                    qwq.last().build("run","run").build(command)
-                }else{
-                    qwq.last().build(command)
-                }
-                qwq
-            }
-            is ObjectVar -> selectRun(a.value, command, hasExecuteRun)
-            is MCFPPClassType -> {
-                if(hasExecuteRun){
-                    arrayOf(Command.build("execute as ${(a.cls as ObjectClass).uuid} run").build(command))
-                }else{
-                    arrayOf(Command.build("execute as ${(a.cls as ObjectClass).uuid}").build(command))
-                }
-            }
-            else -> TODO()
-        }
-        return final
+        val qwq = selectRun(a, hasExecuteRun)
+        qwq.last().build(command)
+        return qwq
     }
 
     /**
@@ -240,12 +217,26 @@ object Commands {
         val final = when(a){
             is ClassPointer -> {
                 if(a.identifier == "this"){
+                    if(a.clazz.baseEntity != Class.ENTITY_MARKER && a.clazz.baseEntity != Class.ENTITY_ITEM_DISPLAY){
+                        val qwq = arrayOf(Command.build("execute on passengers as entity @n[tag=${a.tag}_data]"))
+                        if(hasExecuteRun){
+                            qwq.last().build("run", "run")
+                        }
+                        return qwq
+                    }
                     return arrayOf(Command())
                 }
-                val qwq = arrayOf(
-                    Command.build("data modify storage entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
-                    Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin")
-                )
+                val qwq = if(a.clazz.baseEntity != Class.ENTITY_MARKER && a.clazz.baseEntity != Class.ENTITY_ITEM_DISPLAY){
+                    arrayOf(
+                        Command.build("data modify storage entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
+                        Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin on passengers as entity @n[tag=${a.tag}_data]")
+                    )
+                }else{
+                    arrayOf(
+                        Command.build("data modify storage entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
+                        Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin")
+                    )
+                }
                 if(hasExecuteRun) {
                     qwq.last().build("run","run")
                 }

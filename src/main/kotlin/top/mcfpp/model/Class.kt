@@ -75,6 +75,17 @@ open class Class : CompoundData {
     var objectClass : ObjectClass? = null
 
     /**
+     * 这个类的基本实体。默认为marker
+     */
+    var baseEntity: String = ENTITY_MARKER
+        set(value) {
+            if(invalidBaseEntity.contains(value)){
+                LogProcessor.error("Invalid base entity: $value")
+            }
+        }
+    private val invalidBaseEntity = listOf("player", "leash_knot", "lightning_bolt", "fishing_bobber", "creaking_transient")
+
+    /**
      * 生成一个类，它拥有指定的标识符和命名空间
      * @param identifier 类的标识符
      * @param namespace 类的命名空间
@@ -176,6 +187,9 @@ open class Class : CompoundData {
     companion object {
 
         val baseClass = Class("Object","mcfpp.lang")
+
+        val ENTITY_MARKER = "marker"
+        val ENTITY_ITEM_DISPLAY = "item_display"
 
         class UndefinedClassOrInterface(identifier: String, namespace: String?)
             : Class(identifier, namespace?:Project.currNamespace) {

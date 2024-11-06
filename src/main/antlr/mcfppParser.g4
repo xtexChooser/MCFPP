@@ -602,7 +602,7 @@ normalType
     ;
 
 functionReturnType
-    :   type
+    :   type EXCL?
     |   VOID
     ;
 
