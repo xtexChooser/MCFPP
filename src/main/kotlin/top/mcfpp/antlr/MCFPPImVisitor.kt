@@ -249,7 +249,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
     fun enterExtensionFunctionDeclaration(ctx: mcfppParser.ExtensionFunctionDeclarationContext) {
         val f: Function
-        val data: CompoundData = if (ctx.type().className() == null) {
+        val data: CompoundData = if (ctx.type().typeWithoutExcl().className() == null) {
             when (ctx.type().text) {
                 "int" -> MCInt.data
                 else -> {
@@ -257,7 +257,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                 }
             }
         } else {
-            val clsStr = ctx.type().className().text.split(":")
+            val clsStr = ctx.type().typeWithoutExcl().className().text.split(":")
             val id: String
             val nsp: String?
             if (clsStr.size == 1) {
@@ -271,7 +271,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             if (owo == null) {
                 val pwp = GlobalField.getTemplate(nsp, id)
                 if (pwp == null) {
-                    LogProcessor.error("Undefined class or struct:" + ctx.type().className().text)
+                    LogProcessor.error("Undefined class or struct:" + ctx.type().typeWithoutExcl().className().text)
                     f = UnknownFunction(ctx.Identifier().text)
                     Function.currFunction = f
                     return

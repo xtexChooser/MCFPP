@@ -573,6 +573,10 @@ expressionList
     ;
 
 type
+    :   typeWithoutExcl EXCL?
+    ;
+
+typeWithoutExcl
     :   normalType
     |   VecType
     |   LIST '<' type '>'
@@ -602,7 +606,7 @@ normalType
     ;
 
 functionReturnType
-    :   type EXCL?
+    :   type
     |   VOID
     ;
 

@@ -16,6 +16,7 @@ import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.model.*
 import top.mcfpp.model.field.FunctionField
 import top.mcfpp.model.generic.Generic
+import top.mcfpp.type.MCFPPDeclaredConcreteType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
@@ -717,6 +718,10 @@ open class Function : Member, FieldContainer, Serializable {
     open fun assignReturnVar(v: Var<*>){
         if(returnType == MCFPPBaseType.Void){
             LogProcessor.error("Function $identifier has no return value but tried to return a ${v.type}")
+            return
+        }
+        if((returnVar.hasAssigned || v !is MCFPPValue<*>) && returnVar.type is MCFPPDeclaredConcreteType){
+            LogProcessor.error("Function $namespaceID must return a concrete value")
             return
         }
         returnVar = returnVar.assignedBy(v)

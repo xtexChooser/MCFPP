@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.CommonTokenStream
 import top.mcfpp.antlr.MCFPPExprVisitor
 import top.mcfpp.antlr.mcfppLexer
 import top.mcfpp.antlr.mcfppParser
+import top.mcfpp.antlr.mcfppParser.TypeContext
+import top.mcfpp.antlr.mcfppParser.TypeWithoutExclContext
 import top.mcfpp.core.lang.Var
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.field.IFieldWithType
@@ -298,6 +300,10 @@ open class MCFPPType(
          * 根据类型标识符中获取一个类型
          */
         fun parseFromIdentifier(identifier: String, typeScope: IFieldWithType): MCFPPType? {
+            if(identifier.last() == '!'){
+                val qwq = parseFromIdentifier(identifier.substring(0, identifier.length - 1), typeScope)
+                return qwq?.let { MCFPPDeclaredConcreteType(qwq) }
+            }
             if(identifier.contains("<")){
                 val charStream: CharStream = CharStreams.fromString(identifier)
                 val tokens = CommonTokenStream(mcfppLexer(charStream))
@@ -355,7 +361,16 @@ open class MCFPPType(
             return null
         }
 
-        fun parseFromContext(ctx: mcfppParser.TypeContext, typeScope: IFieldWithType): MCFPPType? {
+        fun parseFromContext(ctx: TypeContext, typeScope: IFieldWithType): MCFPPType?{
+            val qwq = parseFromContext(ctx.typeWithoutExcl(), typeScope)
+            return if(ctx.EXCL() != null){
+                 qwq?.let { MCFPPDeclaredConcreteType(it) }
+            }else{
+                qwq
+            }
+        }
+
+        private fun parseFromContext(ctx: TypeWithoutExclContext, typeScope: IFieldWithType): MCFPPType? {
             if(ctx.normalType() != null){
                 return typeCache[ctx.text]!!
             }
@@ -377,12 +392,12 @@ open class MCFPPType(
                 val clazz = GlobalField.getClass(nspID.first, nspID.second)
                 if(clazz != null) {
                     if(clazz is GenericClass){
-                        if(clazz.readOnlyParams.size != ctx.type().readOnlyArgs()?.expressionList()?.expression()?.size){
+                        if(clazz.readOnlyParams.size != ctx.readOnlyArgs()?.expressionList()?.expression()?.size){
                             LogProcessor.error("Generic class ${clazz.identifier} requires ${clazz.readOnlyParams.size} type arguments, but ${ctx.readOnlyArgs().expressionList().expression().size} were provided")
                             return MCFPPBaseType.Any
                         }
                         val expr = MCFPPExprVisitor()
-                        val readOnlyArgs = ctx.type().readOnlyArgs()?.expressionList()?.expression()?.map { expr.visit(it)!! } ?: listOf()
+                        val readOnlyArgs = ctx.readOnlyArgs()?.expressionList()?.expression()?.map { expr.visit(it)!! } ?: listOf()
                         return clazz.compile(readOnlyArgs).getType()
                     }else{
                         return clazz.getType()

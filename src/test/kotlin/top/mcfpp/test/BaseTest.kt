@@ -96,4 +96,16 @@ class BaseTest {
         MCFPPStringTest.readFromString(test)
     }
 
+    @Test
+    fun concreteTest(){
+        val test =
+            """
+                func test() -> int!{
+                    dynamic int a = 1;
+                    return a;
+                }
+            """.trimIndent()
+        MCFPPStringTest.readFromString(test)
+    }
+
 }

@@ -175,6 +175,10 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
         if(v.isError){
             v = b
         }
+        if(type is MCFPPDeclaredConcreteType && v !is MCFPPValue<*>){
+            LogProcessor.error("Cannot assign a non-value variable to a declared-concrete variable.")
+            return this as Self
+        }
         val re = doAssignedBy(v)
         re.isDynamic = isDynamic
         re.hasAssigned = true
@@ -499,6 +503,10 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
     override fun replaceMemberVar(v: Var<*>){}
 
     open fun replacedBy(v : Var<*>){
+        if(this.type is MCFPPDeclaredConcreteType && v !is MCFPPValue<*>){
+            LogProcessor.error("Cannot assign a non-value variable to a declared-concrete variable.")
+            return
+        }
         if(v == this) return
         if(v is MCInt && this is MCInt && holder != null){
             holder!!.replaceScore(v)

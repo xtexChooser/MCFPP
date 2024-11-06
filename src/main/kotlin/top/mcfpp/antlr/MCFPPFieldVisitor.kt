@@ -117,7 +117,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             null
         )
         f.returnType = ctx.functionReturnType()?.type()?.let {
-            MCFPPType.parseFromContext(it.type(), typeScope)?:  run {
+            MCFPPType.parseFromContext(it.typeWithoutExcl().type(), typeScope)?:  run {
                 LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(it.text))
                 MCFPPBaseType.Any
             }
@@ -678,7 +678,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         Project.ctx = ctx!!
         val ownerType : Function.Companion.OwnerType
         //获取被拓展的类
-        val data : CompoundData = if(ctx.type().className() == null){
+        val data : CompoundData = if(ctx.type().typeWithoutExcl().className() == null){
             ownerType = Function.Companion.OwnerType.BASIC
             when(ctx.type().text){
                 "int" -> MCInt.data
@@ -688,12 +688,12 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 }
             }
         }else{
-            val (nsp, id) = StringHelper.splitNamespaceID(ctx.type().className().text)
+            val (nsp, id) = StringHelper.splitNamespaceID(ctx.type().typeWithoutExcl().className().text)
             val qwq: Class? = GlobalField.getClass(nsp, id)
             if (qwq == null) {
                 val pwp = GlobalField.getTemplate(nsp, id)
                 if(pwp == null){
-                    LogProcessor.error("Undefined class or struct:" + ctx.type().className().text)
+                    LogProcessor.error("Undefined class or struct:" + ctx.type().typeWithoutExcl().className().text)
                     return null
                 }else{
                     ownerType = Function.Companion.OwnerType.TEMPLATE
