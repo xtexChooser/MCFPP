@@ -342,8 +342,35 @@ object Project {
                 }
             }
         }
+        //向load中添加类的load函数
+        for (n in GlobalField.localNamespaces.values){
+            n.field.forEachClass { c -> mcfppLoad.runInFunction {
+                val qwq = c.field.getFunction("load",ArrayList(), ArrayList())
+                Function.addCommand("execute as @e[tag=${c.tag}] at @s run function ${qwq.namespaceID}")
+            }  }
+            n.field.forEachObject { o -> mcfppLoad.runInFunction {
+                if(o !is ObjectClass) return@runInFunction
+                val qwq = o.field.getFunction("load",ArrayList(), ArrayList())
+                Function.addCommand("execute as ${o.uuid} at @s run function ${qwq.namespaceID}")
+            } }
+        }
+
+        //向tick中添加类的tick函数
+        for (n in GlobalField.localNamespaces.values){
+            n.field.forEachClass { c -> mcfppTick.runInFunction {
+                val qwq = c.field.getFunction("tick",ArrayList(), ArrayList())
+                Function.addCommand("execute as @e[tag=${c.tag}] at @s run function ${qwq.namespaceID}")
+            }  }
+            n.field.forEachObject { o -> mcfppTick.runInFunction {
+                if(o !is ObjectClass) return@runInFunction
+                val qwq = o.field.getFunction("tick",ArrayList(), ArrayList())
+                Function.addCommand("execute as ${o.uuid} at @s run function ${qwq.namespaceID}")
+            } }
+        }
+
         //浮点数临时marker实体
         Function.addCommand("summon marker 0 0 0 {Tags:[\"mcfpp:float_marker\"],UUID:${MCFloat.tempFloatEntityUUIDNBT}}")
+
 
         //浮点数的
         //寻找入口函数

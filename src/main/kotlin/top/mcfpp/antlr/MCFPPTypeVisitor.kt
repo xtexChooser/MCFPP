@@ -203,7 +203,7 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
             }
         }else{
             //继承Any类
-            cls.extends(MCAny.data)
+            cls.extends(Class.baseClass)
         }
         cls.isStaticClass = ctx.STATIC() != null
         cls.isAbstract = ctx.ABSTRACT() != null
@@ -252,7 +252,7 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
             }
         }else{
             //继承Any类
-            objectClass.extends(MCAny.data)
+            objectClass.extends(Class.baseClass)
         }
         nsp.field.addObject(objectClass.identifier, objectClass)
     }

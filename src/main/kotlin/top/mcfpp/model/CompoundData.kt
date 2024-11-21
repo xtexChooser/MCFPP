@@ -3,6 +3,7 @@ package top.mcfpp.model
 import top.mcfpp.Project
 import top.mcfpp.annotations.MNIFunction
 import top.mcfpp.core.lang.Var
+import top.mcfpp.doc.Document
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPType
@@ -20,7 +21,7 @@ import java.io.Serializable
 import java.lang.Class
 import java.lang.reflect.Modifier
 
-open class CompoundData : FieldContainer, Serializable {
+open class CompoundData : FieldContainer, Serializable, WithDocument {
 
     /**
      * 父结构
@@ -56,6 +57,8 @@ open class CompoundData : FieldContainer, Serializable {
      * 注解
      */
     val annotations = ArrayList<Annotation>()
+
+    override var document: Document = Document()
 
     constructor(identifier: String, namespace: String = Project.currNamespace){
         this.identifier = identifier

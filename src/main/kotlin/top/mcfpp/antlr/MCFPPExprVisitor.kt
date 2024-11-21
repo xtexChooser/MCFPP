@@ -9,15 +9,11 @@ import top.mcfpp.type.MCFPPEnumType
 import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.core.lang.MCFPPValue
-import top.mcfpp.core.lang.bool.BaseBool
-import top.mcfpp.core.lang.bool.FunctionBool
-import top.mcfpp.core.lang.bool.ScoreBool
-import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.Class
 import top.mcfpp.model.DataTemplate
-import top.mcfpp.model.Namespace
 import top.mcfpp.model.field.GlobalField
+import top.mcfpp.model.field.MCFPPFuncGetter
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.model.function.NoStackFunction
@@ -430,7 +426,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             if(p.first != null){
                 LogProcessor.warn("Invalid namespace usage ${p.first} in function call ")
             }
-            MCFPPFuncManager().getFunction(currSelector!!,p.second, readOnlyArgs, normalArgs)
+            MCFPPFuncGetter().getFunction(currSelector!!,p.second, readOnlyArgs, normalArgs)
         }
         //调用函数
         if (func !is UnknownFunction) {

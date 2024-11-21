@@ -7,6 +7,7 @@ import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.model.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.field.GlobalField
+import top.mcfpp.model.field.MCFPPFuncGetter
 import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.model.generic.Generic
@@ -155,7 +156,7 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
             if(p.first != null){
                 LogProcessor.warn("Invalid namespace usage ${p.first} in function call ")
             }
-            MCFPPFuncManager().getFunction(currSelector!!,p.second, readOnlyArgs, normalArgs)
+            MCFPPFuncGetter().getFunction(currSelector!!,p.second, readOnlyArgs, normalArgs)
         }
         //调用函数
         if (func !is UnknownFunction) {

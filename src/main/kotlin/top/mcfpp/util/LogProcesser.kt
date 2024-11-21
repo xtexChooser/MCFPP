@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package top.mcfpp.util
 
 import org.antlr.v4.runtime.CharStream

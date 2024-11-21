@@ -1,9 +1,5 @@
 namespace test;
 
 func main(){
-    int qwq = 1;
-    print(qwq::identifier)
-    print(qwq::sbObject.toString())
-    ::top.mcfpp.model.function$Function.addCommand(::top.mcfpp.command$Command.build("say hello"))
-    /say ${qwq::name}
+    prints("Hello Minecraft");
 }

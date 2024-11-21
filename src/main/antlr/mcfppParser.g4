@@ -706,7 +706,6 @@ multiLineStringExpression
 // Whitespace and comments
 //
 
-
 doc_comment
     :   DOC_COMMENT
     ;

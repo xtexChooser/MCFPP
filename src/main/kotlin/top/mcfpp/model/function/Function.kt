@@ -1,3 +1,5 @@
+@file:Suppress("LeakingThis", "MUST_BE_INITIALIZED_OR_FINAL_OR_ABSTRACT_WARNING")
+
 package top.mcfpp.model.function
 
 import top.mcfpp.CompileSettings
@@ -13,8 +15,10 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.type.UnresolvedType
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.doc.Document
 import top.mcfpp.model.*
 import top.mcfpp.model.field.FunctionField
+import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.generic.Generic
 import top.mcfpp.type.MCFPPDeclaredConcreteType
 import top.mcfpp.util.LogProcessor
@@ -25,7 +29,7 @@ import java.io.Serializable
 import java.lang.NullPointerException
 import java.lang.reflect.Method
 
-open class Function : Member, FieldContainer, Serializable {
+open class Function : Member, FieldContainer, Serializable, WithDocument {
 
     /**
      * 一个minecraft中的命令函数。
@@ -313,6 +317,10 @@ open class Function : Member, FieldContainer, Serializable {
 
     val staticRefValue: HashMap<String, Var<*>> = HashMap()
 
+    override var isFinal: Boolean = false
+
+    override var document: Document = Document()
+
     /**
      * 创建一个全局函数，它有指定的命名空间
      * @param identifier 函数的标识符
@@ -406,6 +414,20 @@ open class Function : Member, FieldContainer, Serializable {
      */
     fun getID(): String {
         return identifier
+    }
+
+    fun addTag(namespace: String, identifier: String): Function{
+        val nID = "$namespace:$identifier"
+        if(GlobalField.functionTags[nID] == null){
+            GlobalField.functionTags[nID] = FunctionTag(namespace, identifier)
+        }
+        val qwq = GlobalField.functionTags[nID]!!
+        if(qwq.functions.contains(this)){
+            LogProcessor.warn("Function $identifier already has tag $nID")
+        }else{
+            qwq.functions.add(this)
+        }
+        return this
     }
 
     /**
@@ -890,10 +912,12 @@ open class Function : Member, FieldContainer, Serializable {
                 return ret
             }
 
+        @Suppress("unused")
         fun replaceCommand(command: String, index: Int){
             replaceCommand(Command(command),index)
         }
 
+        @Suppress("MemberVisibilityCanBePrivate")
         fun replaceCommand(command: Command, index: Int){
             if(CompileSettings.isDebug){
                 //检查当前方法是否有InsertCommand注解
@@ -943,22 +967,9 @@ open class Function : Member, FieldContainer, Serializable {
                 val methodName = stackTrace[2].methodName
                 //调用此方法的代码行数
                 val lineNumber = stackTrace[2].lineNumber
-                val methods: Array<Method> = java.lang.Class.forName(className).declaredMethods
                 if(command.toString().startsWith("#")){
                     LogProcessor.warn("(JVM)Should use addComment() to add a Comment instead of addCommand(). at $className.$methodName:$lineNumber\"")
                 }
-//                for (method in methods) {
-//                    if (cache.contains(method.toGenericString())){
-//                        break
-//                    }
-//                    cache.add(method.toGenericString())
-//                    if (method.name == methodName) {
-//                        if (!method.isAnnotationPresent(InsertCommand::class.java)) {
-//                            LogProcessor.warn("(JVM)Function.addCommand() was called in a method without the @InsertCommand annotation. at $className.$methodName:$lineNumber\"")
-//                        }
-//                        break
-//                    }
-//                }
             }
             if(this.equals(nullFunction)){
                 LogProcessor.error("Unexpected command added to NullFunction")
@@ -1006,8 +1017,6 @@ open class Function : Member, FieldContainer, Serializable {
              */
             NONE
         }
-
-        val cache = ArrayList<String>()
     }
 }
 

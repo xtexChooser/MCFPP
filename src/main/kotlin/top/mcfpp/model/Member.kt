@@ -9,7 +9,25 @@ package top.mcfpp.model
 interface Member {
 
     enum class AccessModifier {
-        PUBLIC, PROTECTED, PRIVATE
+        /**
+         * 公开的，所有类都可以访问
+         */
+        PUBLIC,
+
+        /**
+         * 保护的，只有子类可以访问
+         */
+        PROTECTED,
+
+        /**
+         * 私有的，只有本类可以访问
+         */
+        PRIVATE,
+
+        /**
+         * 编译器私有的，只有编译器可以访问。此访问等级不能通过mcfpp代码定义。
+         */
+        COMPILE_PRIVATE
     }
 
     /**
@@ -21,6 +39,11 @@ interface Member {
      * 这个成员是否是静态的
      */
     var isStatic: Boolean
+
+    /**
+     * 这个成员是否不可被继承
+     */
+    var isFinal: Boolean
 
     /**
      * 获取这个成员的父类，可能不存在

@@ -110,6 +110,8 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
 
     var hasStoredInStack = false
 
+    override var isFinal: Boolean = false
+
     /**
      * 复制一个变量
      */

@@ -2,7 +2,6 @@
 
 ## In Progress
 These tasks are currently underway:
-* [ ] Code optimization
 * [ ] Garbage collection mechanism
 * [ ] Interfaces
 * [ ] Class inheritance

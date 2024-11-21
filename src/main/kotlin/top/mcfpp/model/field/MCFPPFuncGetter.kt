@@ -1,4 +1,4 @@
-package top.mcfpp.antlr
+package top.mcfpp.model.field
 
 import top.mcfpp.core.lang.*
 import top.mcfpp.model.CanSelectMember
@@ -10,7 +10,7 @@ import top.mcfpp.util.LogProcessor
 /**
  * 获取函数用的visitor
  */
-class MCFPPFuncManager{
+class MCFPPFuncGetter{
 
     /**
      * 获取成员函数

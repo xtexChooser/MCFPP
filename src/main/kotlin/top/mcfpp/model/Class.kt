@@ -1,7 +1,10 @@
+@file:Suppress("ConvertSecondaryConstructorToPrimary", "LeakingThis")
+
 package top.mcfpp.model
 
 import top.mcfpp.Project
 import top.mcfpp.core.lang.ClassPointer
+import top.mcfpp.core.lang.MCAny
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.type.MCFPPClassType
 import top.mcfpp.type.MCFPPType
@@ -13,7 +16,7 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.util.LogProcessor
 
 /**
- * 一个类。在mcfpp中一个类通常类似下面的样子
+ * 一个类，即实体模板。在mcfpp中一个类通常类似下面的样子
  * ```java
  * class People{
  *      entity target;
@@ -93,7 +96,10 @@ open class Class : CompoundData {
     constructor(identifier: String, namespace: String = Project.currNamespace) {
         this.identifier = identifier
         this.namespace = namespace
-        classPreInit = Function("_class_preinit_$identifier", this, false, context = null)
+        classPreInit = Function("_class_preinit_$identifier", this, false, context = null).apply {
+            accessModifier = Member.AccessModifier.COMPILE_PRIVATE
+            isFinal = true
+        }
         field.addFunction(classPreInit,true)
     }
 
@@ -117,6 +123,7 @@ open class Class : CompoundData {
      * 根据参数列表获取一个类的构造函数
      * @return 返回这个类的参数
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun getConstructorByType(normalParams: List<MCFPPType>): ClassConstructor? {
         for (f in constructors) {
             if(f.isSelf(this, normalParams)){
@@ -186,10 +193,14 @@ open class Class : CompoundData {
 
     companion object {
 
-        val baseClass = Class("Object","mcfpp.lang")
+        val baseClass = Class("Object","mcfpp.lang").apply {
+            addMember(Function("tick", this, false, context = null))
+            addMember(Function("load", this, false, context = null))
+            extends(MCAny.data)
+        }
 
-        val ENTITY_MARKER = "marker"
-        val ENTITY_ITEM_DISPLAY = "item_display"
+        const val ENTITY_MARKER = "marker"
+        const val ENTITY_ITEM_DISPLAY = "item_display"
 
         class UndefinedClassOrInterface(identifier: String, namespace: String?)
             : Class(identifier, namespace?:Project.currNamespace) {
@@ -210,7 +221,6 @@ open class Class : CompoundData {
     }
 }
 
+@Suppress("unused")
 class CompiledGenericClass(identifier: String, namespace: String = Project.currNamespace,
-                           var originClass: GenericClass) : Class(identifier, namespace) {
-
-}
+                           var originClass: GenericClass) : Class(identifier, namespace)

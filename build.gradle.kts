@@ -32,7 +32,7 @@ dependencies {
     implementation("org.openjdk.nashorn:nashorn-core:15.4")
     implementation("com.github.Querz:NBT:6.1")
     implementation("com.mojang:brigadier:1.0.18")
-    implementation("org.commonmark:commonmark:0.20.0")
+    implementation("org.commonmark:commonmark:0.24.0")
     implementation("org.commonmark:commonmark-ext-heading-anchor:0.21.0")
     implementation("org.commonmark:commonmark-ext-gfm-tables:0.20.0")
     implementation("org.commonmark:commonmark-ext-task-list-items:0.21.0")

@@ -42,7 +42,7 @@ open class ClassConstructor
     @Override
     @InsertCommand
     override fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
-        addCommand("execute in minecraft:overworld positioned 0 1 0 summon ${target.baseEntity} run function " + leadFunction.namespaceID)
+        addCommand("execute in minecraft:overworld summon ${target.baseEntity} run function " + leadFunction.namespaceID)
         leadFunction.runInFunction {
             //获取所有函数
             val funcs = StringBuilder("functions:{")
