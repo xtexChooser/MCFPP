@@ -3,11 +3,11 @@ import java.nio.file.Files
 import java.util.Optional
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.9.20"
     groovy
     application
     antlr
-    id("org.jetbrains.dokka") version "1.8.10"
+    id("org.jetbrains.dokka") version "1.9.20"
     java
     cpp
 }
@@ -135,11 +135,11 @@ tasks.register<Exec>("compileCpp") {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = "21"
     dependsOn(tasks.generateGrammarSource)
 }
 

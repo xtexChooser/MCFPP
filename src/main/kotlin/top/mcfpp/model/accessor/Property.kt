@@ -24,6 +24,8 @@ import top.mcfpp.util.LogProcessor
  */
 data class Property(val identifier: String, val accessor: AbstractAccessor?, val mutator: AbstractMutator?): Member {
 
+    override var isFinal: Boolean = false
+
     var parent: Var<*>? = null
 
     override var accessModifier: Member.AccessModifier = Member.AccessModifier.PUBLIC
