@@ -12,14 +12,12 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("../build/repo")
-    }
+    mavenLocal()
 }
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    implementation("top.mcfpp:mcfpp-gradle:1.0-SNAPSHOT")
+    implementation("top.mcfpp:mcfpp:1.0-SNAPSHOT")
 }
 
 tasks.test {
@@ -33,5 +31,5 @@ kotlin {
 mcfpp {
     version = "1.21"
     description = "qwq"
-    targetPath = Path("")
+    targetPath = Path("./build/datapack")
 }

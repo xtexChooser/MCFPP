@@ -13,7 +13,6 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.20"
     java
     cpp
-    id("java-gradle-plugin")
     id("maven-publish")
     id("com.gradleup.shadow") version "8.3.5"
 }
@@ -55,31 +54,6 @@ dependencies {
 
 tasks.shadowJar {
     minimize()
-}
-
-gradlePlugin {
-    plugins {
-        create("mcfpp") {
-            id = "top.mcfpp.gradle"
-            implementationClass = "top.mcfpp.gradle.MCFPPGradlePlugin"
-        }
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            groupId = GROUP
-            artifactId = "mcfpp-gradle"
-            version = VERSION
-        }
-    }
-    repositories {
-        maven {
-            url = Paths.get("${layout.buildDirectory.get().asFile.absolutePath}/repo").toUri()
-        }
-    }
 }
 
 tasks.test {
@@ -195,6 +169,20 @@ tasks.withType<JavaCompile>{
 
 application {
     mainClass.set("top.mcfpp.MCFPPKt")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = GROUP
+            artifactId = "mcfpp"
+            version = VERSION
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
 
 enum class OperatingSystem {

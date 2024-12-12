@@ -2,9 +2,7 @@ rootProject.name = "Example"
 
 pluginManagement {
     repositories {
-        maven {
-            url = uri("../build/repo")
-        }
+        mavenLocal()
         gradlePluginPortal()
         maven("https://jitpack.io/")
         maven("https://libraries.minecraft.net")
