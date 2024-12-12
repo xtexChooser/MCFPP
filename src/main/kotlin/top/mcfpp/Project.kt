@@ -104,6 +104,15 @@ object Project {
         compileStage++
         //全局缓存初始化
         GlobalField.init()
+        ctx = null
+        trees.clear()
+        currNamespace = config.rootNamespace
+        errorCount = 0
+        warningCount = 0
+        constants.clear()
+        macroFunction.clear()
+        classLoader = Thread.currentThread().contextClassLoader
+        files.clear()
         stageProcessor[compileStage].forEach { it() }
     }
 

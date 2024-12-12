@@ -64,6 +64,13 @@ object GlobalField : FieldContainer, IField {
 
     fun init(): GlobalField {
 
+        localNamespaces.clear()
+        importedLibNamespaces.clear()
+        libNamespaces.clear()
+        stdNamespaces.clear()
+        functionTags.clear()
+        scoreboards.clear()
+
         functionTags["minecraft:tick"] = FunctionTag.TICK
         functionTags["minecraft:load"] = FunctionTag.LOAD
 
