@@ -243,7 +243,7 @@ class NativeFunction : Function, Native {
                 methodSignature.substring(paramStart + 1, paramEnd).split(",".toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()
 
-            val clazz = Class.forName(className)
+            val clazz = Project.classLoader.loadClass(className)
             val paramTypes: Array<Class<*>?> = arrayOfNulls(paramTypeNames.size)
             for (i in paramTypeNames.indices) {
                 paramTypes[i] = primitiveTypes.getOrDefault(paramTypeNames[i], Class.forName(paramTypeNames[i]))

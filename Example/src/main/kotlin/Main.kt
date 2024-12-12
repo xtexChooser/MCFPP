@@ -1,7 +1,7 @@
 package org.example
 
-import top.mcfpp.main
+import top.mcfpp.MCFPP
 
-fun main() {
-    println("Hello World!")
+fun main(){
+    println(MCFPP.version)
 }

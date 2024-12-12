@@ -40,7 +40,7 @@ class MCFPPFile(path : String) : File(path) {
     val importedNamespace = ArrayList<NamespaceField>()
 
     init {
-        val n = Project.config.sourcePath.toAbsolutePath().relativize(this.toPath().toAbsolutePath().parent).toString()
+        val n = Project.config.sourcePath!!.toAbsolutePath().relativize(this.toPath().toAbsolutePath().parent).toString()
         namespace = Project.config.rootNamespace + "." + StringHelper.toLegalIdentifier(n.replace("\\",".").replace("/","."))
     }
 

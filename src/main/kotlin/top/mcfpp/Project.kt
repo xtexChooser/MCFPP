@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
 import org.apache.logging.log4j.*
 import top.mcfpp.annotations.InsertCommand
-import top.mcfpp.command.CommentType
 import top.mcfpp.io.LibReader
 import top.mcfpp.io.LibWriter
 import top.mcfpp.io.MCFPPFile
@@ -18,12 +17,14 @@ import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
 import java.io.*
+import java.net.URLClassLoader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 import java.util.jar.JarFile
 import kotlin.collections.ArrayList
-import kotlin.io.path.name
+import kotlin.io.path.*
 
 
 /**
@@ -34,7 +35,7 @@ object Project {
 
     private var logger: Logger = LogManager.getLogger("mcfpp")
 
-    val config = ProjectConfig()
+    var config = ProjectConfig()
 
     var ctx: ParserRuleContext? = null
 
@@ -76,20 +77,25 @@ object Project {
 
     var compileStage = 0
 
-    const val READ_PROJECT = 1
-    const val READ_LIB = 2
-    const val INIT = 3
-    const val INDEX_TYPE = 4
-    const val RESOLVE_FIELD = 5
-    const val COMPILE = 6
-    const val OPTIMIZATION = 7
-    const val GEN_INDEX = 8
-    const val GEN_DATAPACK = 9
+    const val PRE_INIT = 0
+    const val INIT = PRE_INIT + 1
+    const val READ_LIB = INIT + 1
+    const val INDEX_TYPE = READ_LIB + 1
+    const val RESOLVE_FIELD = INDEX_TYPE + 1
+    const val RUN_ANNOTATION = RESOLVE_FIELD + 1
+    const val COMPILE = RUN_ANNOTATION + 1
+    const val OPTIMIZATION = COMPILE + 1
+    const val GEN_INDEX = OPTIMIZATION + 1
+    const val GEN_DATAPACK = GEN_INDEX + 1
 
     /**
      * 编译阶段处理器。每个阶段的处理器都会在对应的阶段被调用。
      */
-    val stageProcessor = Array(10) { ArrayList<()->Unit>() }
+    val stageProcessor = Array(GEN_DATAPACK + 1) { ArrayList<()->Unit>() }
+
+    var classLoader: ClassLoader = Thread.currentThread().contextClassLoader
+
+    val files = ArrayList<MCFPPFile>()
 
     /**
      * 初始化
@@ -101,12 +107,8 @@ object Project {
         stageProcessor[compileStage].forEach { it() }
     }
 
-    /**
-     * 读取工程
-     * @param path 工程的json文件的路径
-     */
-    fun readProject(path: String) {
-        compileStage++
+    fun readConfig(path: String): ProjectConfig{
+        val config = ProjectConfig()
         //工程信息读取
         try {
             //读取json
@@ -132,10 +134,6 @@ object Project {
             //默认命名空间
             config.rootNamespace = jsonObject.getString("namespace")?: "default"
 
-            CompileSettings.ignoreStdLib = jsonObject.getBooleanValue("ignoreStdLib")
-
-            CompileSettings.isLib = jsonObject.getBooleanValue("isLib")
-
             //调用库
             val includesJson: JSONArray = jsonObject.getJSONArray("includes")?: JSONArray()
             for (i in 0 until includesJson.size) {
@@ -143,32 +141,38 @@ object Project {
             }
 
             //输出目录
-            config.targetPath = jsonObject.getString("targetPath")?: "lib/"
+            config.targetPath = Path(jsonObject.getString("targetPath")?: "lib/")
 
             //是否生成数据包
             config.noDatapack = jsonObject.getBooleanValue("noDatapack")
 
-            //代码文件
-            config.files = ArrayList()
-            val filesJson: JSONArray = jsonObject.getJSONArray("files")
-            for (o in filesJson) {
-                MCFPPFile.findFiles(o.toString()).forEach {
-                    config.files.add(MCFPPFile(it.toFile()))
-                }
-            }
 
         } catch (e: Exception) {
             LogProcessor.error("Error while reading project from file \"$path\"")
             e.printStackTrace()
         }
-        stageProcessor[compileStage].forEach { it() }
+
+        return config
+    }
+
+    fun checkConfig(){
+        //TODO
     }
 
     /**
      * 读取库文件，并将库写入缓存
      */
-    fun readLib(){
+    fun readProject(){
         compileStage++
+        //读取所有jar
+        for (jar in config.jars){
+            if(Paths.get(jar).notExists()){
+                LogProcessor.error("Cannot find jar at: $jar")
+                continue
+            }
+            val url = Paths.get(jar).toUri().toURL()
+            classLoader = URLClassLoader(arrayOf(url), classLoader)
+        }
         //默认的
         if(!CompileSettings.ignoreStdLib){
             val inputStream = ResourceReader::class.java.classLoader.getResourceAsStream("lib/.mclib")
@@ -235,6 +239,10 @@ object Project {
         }
         //函数参数解析
         GlobalField.importedLibNamespaces.clear()
+        //读取所有文件
+        MCFPPFile.findFiles(config.sourcePath!!.absolutePathString()).forEach {
+            files.add(MCFPPFile(it.toFile()))
+        }
         stageProcessor[compileStage].forEach { it() }
     }
 
@@ -245,7 +253,7 @@ object Project {
         compileStage++
         logger.debug("Generate Type Index...")
         //解析文件
-        for (file in config.files) {
+        for (file in files) {
             try {
                 file.indexType()
             } catch (e: IOException) {
@@ -266,7 +274,7 @@ object Project {
         compileStage++
         logger.debug("Generate Function Index...")
         //解析文件
-        for (file in config.files) {
+        for (file in files) {
             try {
                 file.resolveField()
             } catch (e: IOException) {
@@ -283,7 +291,7 @@ object Project {
         compileStage++
         logger.debug("Run Annotation...")
         //解析文件
-        for (file in config.files) {
+        for (file in files) {
             try {
                 file.runAnnotation()
             } catch (e: IOException) {
@@ -303,7 +311,7 @@ object Project {
         compileStage++
         //工程文件编译
         //解析文件
-        for (file in config.files) {
+        for (file in files) {
             LogProcessor.debug("Compiling mcfpp code in \"$file\"")
             try {
                 file.compile()
@@ -326,7 +334,7 @@ object Project {
         logger.debug("Adding scoreboards declare in mcfpp:load function")
 
         //向load函数中添加记分板初始化命令
-        Function.currFunction = GlobalField.stdNamespaces["mcfpp"]!!.field.getFunction("load", ArrayList(), ArrayList())!!
+        Function.currFunction = GlobalField.stdNamespaces["mcfpp"]!!.field.getFunction("load", ArrayList(), ArrayList())
         for (scoreboard in GlobalField.scoreboards.values){
             Function.addCommand("scoreboard objectives add ${scoreboard.name} ${scoreboard.criterion}")
         }
@@ -392,7 +400,7 @@ object Project {
             logger.warn("No valid entrance function in Project ${config.rootNamespace}")
             warningCount++
         }
-        logger.info("Complete compiling project " + config.root.name + " with [$errorCount] error and [$warningCount] warning")
+        logger.info("Complete compiling project " + config.root!!.name + " with [$errorCount] error and [$warningCount] warning")
         stageProcessor[compileStage].forEach { it() }
     }
 
@@ -402,75 +410,8 @@ object Project {
      */
     fun genIndex() {
         compileStage++
-        LibWriter.write(config.targetPath)
+        LibWriter.write(config.targetPath!!.absolutePathString())
         stageProcessor[compileStage].forEach { it() }
     }
 }
 
-//TODO 标准库引用逻辑优化
-data class ProjectConfig(
-    /**
-     * 工程对应的mc版本
-     */
-    var version: String? = null,
-
-    /**
-     * 工程的默认命名空间
-     */
-    var rootNamespace: String = "default",
-
-    /**
-     * 数据包输出的文件夹
-     */
-    var targetPath : String = "lib/",
-
-    /**
-     * 标准库列表
-     */
-    val stdLib: List<String> = listOf("%std"),
-
-    /**
-     * 默认命名空间注册
-     */
-    val stdNamespace: List<String> = listOf("mcfpp.lang","mcfpp.sys","mcfpp"),
-
-    /**
-     * 注释输出等级
-     */
-    var commentLevel : CommentType = CommentType.DEBUG,
-
-    /**
-     * 工程的根目录
-     */
-    var root: Path = Path.of("."),
-
-    /**
-     * 工程包含的所有文件
-     */
-    var files: ArrayList<MCFPPFile> = ArrayList(),
-
-    /**
-     * 工程的名字
-     */
-    var name: String = "new_mcfpp_project",
-
-    /**
-     * 数据包的描述。原始Json文本 TODO
-     */
-    var description: String? = null,
-
-    /**
-     * 工程包含的所有引用
-     */
-    var includes: ArrayList<String> = ArrayList(),
-
-    /**
-     * mcfpp源代码根目录
-     */
-    var sourcePath: Path = Path.of("."),
-
-    /**
-     * 不生成数据包
-     */
-    var noDatapack: Boolean = false
-)

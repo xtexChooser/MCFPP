@@ -413,7 +413,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             //根据JavaRefer找到类
             val refer = ctx.javaRefer().text
             val clsName = refer.substring(0,refer.lastIndexOf('.'))
-            val clazz = java.lang.Class.forName(clsName)
+            val clazz = Project.classLoader.loadClass(clsName)
             val methods = clazz.methods
             var hasFind = false
             for(method in methods){
@@ -754,7 +754,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             //根据JavaRefer找到类
             val refer = ctx.javaRefer().text
             val clsName = refer.substring(0,refer.lastIndexOf('.'))
-            val clazz = java.lang.Class.forName(clsName)
+            val clazz = Project.classLoader.loadClass(clsName)
             val methods = clazz.methods
             var hasFind = false
             for(method in methods){

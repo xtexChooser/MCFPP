@@ -85,7 +85,7 @@ object Utils {
 
             else -> {
                 LogProcessor.warn("Unknown version: \"$version\". Using 1.21.1 (48)")
-                13
+                48
             }
         }
     }

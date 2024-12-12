@@ -19,12 +19,19 @@ import top.mcfpp.util.SerializableClassBodyContext
 import top.mcfpp.util.SerializableFunctionBodyContext
 import top.mcfpp.util.Utils
 import java.io.FileWriter
+import java.nio.file.Files
+import java.nio.file.Paths
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.name
 
 object LibWriter {
     fun write(path: String) : JSONObject{
         val json = GlobalWriter.toJson(GlobalField)
         if(path == "null") return json
-        val writer = FileWriter("$path\\.mclib")
+        val libPath = Paths.get("$path/.mclib")
+        Files.createDirectories(libPath.parent)
+        if(Files.notExists(libPath)) Files.createFile(libPath)
+        val writer = FileWriter(libPath.absolutePathString())
         writer.write(json.toJSONString(JSONWriter.Feature.PrettyFormat))
         writer.flush()
         writer.close()

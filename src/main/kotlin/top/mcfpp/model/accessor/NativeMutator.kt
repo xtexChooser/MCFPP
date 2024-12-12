@@ -1,5 +1,6 @@
 package top.mcfpp.model.accessor
 
+import top.mcfpp.Project
 import top.mcfpp.annotations.MNIAccessor
 import top.mcfpp.annotations.MNIMutator
 import top.mcfpp.core.lang.Var
@@ -21,7 +22,7 @@ class NativeMutator(javaRefer: String, d: CompoundData, field: Var<*>): Abstract
         try {
             //根据JavaRefer找到类
             val clsName = javaRefer.substring(0,javaRefer.lastIndexOf('.'))
-            val clazz = Class.forName(clsName)
+            val clazz = Project.classLoader.loadClass(clsName)
             val methods = clazz.methods
             var hasFind = false
             for(method in methods){

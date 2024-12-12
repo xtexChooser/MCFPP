@@ -1,5 +1,8 @@
 import org.gradle.kotlin.dsl.cpp
+import org.jetbrains.kotlin.fir.declarations.builder.buildScript
 import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.Optional
 
 plugins {
@@ -10,16 +13,21 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.20"
     java
     cpp
+    id("java-gradle-plugin")
+    id("maven-publish")
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
-group = "top.mcfpp"
-version = "1.0-SNAPSHOT"
+val GROUP = "top.mcfpp"
+val VERSION = "1.0-SNAPSHOT"
+
+group = GROUP
+version = VERSION
 
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
     maven("https://maven.aliyun.com/nexus/content/groups/public/")
-    maven("https://jitpack.io/")
     maven("https://libraries.minecraft.net")
 }
 
@@ -29,6 +37,7 @@ dependencies {
     implementation("com.alibaba.fastjson2:fastjson2:2.0.28")
     implementation("org.apache.logging.log4j:log4j-api:2.20.0")
     implementation("org.apache.logging.log4j:log4j-core:2.20.0")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.20.0")
     implementation("org.openjdk.nashorn:nashorn-core:15.4")
     implementation("com.github.Querz:NBT:6.1")
     implementation("com.mojang:brigadier:1.0.18")
@@ -44,8 +53,41 @@ dependencies {
     implementation("com.google.guava:guava:33.2.0-jre")
 }
 
+tasks.shadowJar {
+    minimize()
+}
+
+gradlePlugin {
+    plugins {
+        create("mcfpp") {
+            id = "top.mcfpp.gradle"
+            implementationClass = "top.mcfpp.gradle.MCFPPGradlePlugin"
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = GROUP
+            artifactId = "mcfpp-gradle"
+            version = VERSION
+        }
+    }
+    repositories {
+        maven {
+            url = Paths.get("${layout.buildDirectory.get().asFile.absolutePath}/repo").toUri()
+        }
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.compileTestKotlin {
+    dependsOn("generateTestGrammarSource")
 }
 
 tasks.generateGrammarSource {
@@ -67,6 +109,10 @@ tasks.jar{
         into("native")
         include("**/*.dll")
     }
+
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+
+    isZip64 = true
 }
 
 val jniSourceDir = file("src/main/java/top/mcfpp/jni")

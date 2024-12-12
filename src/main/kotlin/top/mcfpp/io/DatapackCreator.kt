@@ -83,8 +83,8 @@ object DatapackCreator {
         //生成
         val datapackMcMeta = DatapackMcMeta(
             DatapackMcMeta.Pack(
-                Utils.getVersion(Project.config.version!!),
-                Project.config.description!!
+                Utils.getVersion(Project.config.version),
+                Project.config.description
             )
         )
         val datapackMcMetaJson: String = JSON.toJSONString(datapackMcMeta)

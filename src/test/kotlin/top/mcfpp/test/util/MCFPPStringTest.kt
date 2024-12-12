@@ -15,9 +15,11 @@ import top.mcfpp.util.LogProcessor
 import java.io.File
 import java.io.FileInputStream
 import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 
 object MCFPPStringTest {
-    fun readFromString(str: String, args: Array<String> = arrayOf(), targetPath: String = "null"){
+    fun readFromString(str: String, args: Array<String> = arrayOf(), targetPath: String? = null){
         val source = ConfigurationSource(FileInputStream("log4j2.xml"))
         Configurator.initialize(null,source)
         //编译参数
@@ -39,9 +41,9 @@ object MCFPPStringTest {
         //默认命名空间
         Project.config.rootNamespace = "default"
         //输出目录
-        Project.config.targetPath = targetPath
+        Project.config.targetPath = targetPath?.let { Path(it) }
         Project.init() //初始化
-        Project.readLib() //读取引用的库的索引
+        Project.readProject() //读取引用的库的索引
         //解析文件
         val charStream: CharStream = CharStreams.fromString(str)
         val tokens = CommonTokenStream(mcfppLexer(charStream))
@@ -59,9 +61,9 @@ object MCFPPStringTest {
         Project.optimization() //优化
         Project.genIndex() //生成索引
         Project.ctx = null
-        if(Project.config.targetPath != "null"){
+        if(Project.config.targetPath != null){
             try{
-                DatapackCreator.createDatapack(Project.config.targetPath) //生成数据包
+                DatapackCreator.createDatapack(Project.config.targetPath!!.absolutePathString()) //生成数据包
             }catch (e: Exception){
                 LogProcessor.error("Cannot create datapack in path: ${Project.config.targetPath}")
             }
@@ -92,8 +94,8 @@ object MCFPPStringTest {
             //默认命名空间
             Project.config.rootNamespace = "default"
             //输出目录
-            Project.config.targetPath = "null"
-            Project.readLib() //读取引用的库的索引
+            Project.config.targetPath = null
+            Project.readProject() //读取引用的库的索引
             Project.init() //初始化
             LogProcessor.debug("Analysing project...")
             //解析文件

@@ -1,7 +1,4 @@
 {
-  "files": [
-    "test/**"
-  ],
   "description": "",
   "namespace": "mcfpp",
   "targetPath": ".",
