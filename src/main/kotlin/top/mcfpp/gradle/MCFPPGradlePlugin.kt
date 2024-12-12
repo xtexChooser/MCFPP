@@ -38,16 +38,28 @@ class MCFPPGradlePlugin: Plugin<Project> {
 
         val config = project.extensions.create("mcfpp", ProjectConfig::class.java)
 
-        if(config.root == null) config.root = project.rootDir.toPath()
-        if(config.sourcePath == null) config.sourcePath = Path(config.root!!.absolutePathString(), "src/main/mcfpp")
-        if(config.targetPath == null) config.targetPath = project.layout.buildDirectory.get().dir("datapack").asFile.toPath()
-
         // 自定义任务来调用MCFPP
         project.tasks.register("mcfppCompile") {
             it.group = "build"
             it.description = "Compile mcfpp files"
 
             it.dependsOn("jar")
+
+            if(config.root == null) config.root = project.rootDir.toPath()
+
+            if(config.sourcePath == null) {
+                config.sourcePath = Path(config.root!!.absolutePathString(), "src/main/mcfpp")
+            }
+            else if(config.sourcePath?.isAbsolute == false) {
+                config.sourcePath = config.root!!.resolve(config.sourcePath!!)
+            }
+
+            if(config.targetPath == null) {
+                config.targetPath = project.layout.buildDirectory.get().dir("datapack").asFile.toPath()
+            }
+            else if(config.targetPath?.isAbsolute == false) {
+                config.targetPath = config.root!!.resolve(config.targetPath!!)
+            }
 
             val jars = (project.tasks.named("jar").get() as org.gradle.api.tasks.bundling.Jar).destinationDirectory.get().files()
 
