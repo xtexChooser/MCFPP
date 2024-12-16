@@ -161,7 +161,7 @@
 				},
 				{
 					"id":"print",
-					"javaMethod":"top.mcfpp.mni.System#print(top.mcfpp.core.lang.MCString)",
+					"javaMethod":"top.mcfpp.mni.System#print(top.mcfpp.core.lang.nbt.MCString)",
 					"normalParams":[
 						{
 							"id":"s",
@@ -209,7 +209,7 @@
 				},
 				{
 					"id":"print",
-					"javaMethod":"top.mcfpp.mni.System#print(top.mcfpp.core.lang.NBTBasedData)",
+					"javaMethod":"top.mcfpp.mni.System#print(top.mcfpp.core.lang.nbt.NBTBasedData)",
 					"normalParams":[
 						{
 							"id":"n",

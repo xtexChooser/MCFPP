@@ -9,10 +9,7 @@ import top.mcfpp.type.MCFPPEnumType
 import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.core.lang.MCFPPValue
-import top.mcfpp.core.lang.nbt.MCStringConcrete
-import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
-import top.mcfpp.core.lang.nbt.NBTDictionaryConcrete
-import top.mcfpp.core.lang.nbt.NBTListConcrete
+import top.mcfpp.core.lang.nbt.*
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.Class
 import top.mcfpp.model.DataTemplate
@@ -27,6 +24,11 @@ import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.util.BoolTag
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.NBTUtil.toNBTByte
+import top.mcfpp.util.NBTUtil.toNBTDouble
+import top.mcfpp.util.NBTUtil.toNBTFloat
+import top.mcfpp.util.NBTUtil.toNBTLong
+import top.mcfpp.util.NBTUtil.toNBTShort
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -639,23 +641,25 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
 
     private lateinit var path : NBTPath
 
+
     override fun visitNbtValue(ctx: mcfppParser.NbtValueContext): Var<*> {
+        val qwq: Byte = 1;
         if(ctx.LineString() != null) {
             return NBTBasedDataConcrete(StringTag(ctx.LineString().text))
         }else if(ctx.nbtBool() != null){
             return NBTBasedDataConcrete(BoolTag(ctx.nbtBool().text == "true"))
         }else if(ctx.nbtByte() != null){
-            return NBTBasedDataConcrete(ByteTag(ctx.nbtByte().text.toByte()))
+            return MCByteConcrete(ctx.nbtByte().text.toNBTByte())
         }else if(ctx.nbtShort() != null){
-            return NBTBasedDataConcrete(ShortTag(ctx.nbtShort().text.toShort()))
+            return MCShortConcrete(ctx.nbtShort().text.toNBTShort())
         }else if(ctx.nbtInt() != null) {
-            return NBTBasedDataConcrete(IntTag(ctx.nbtInt().text.toInt()))
+            return MCIntConcrete(ctx.nbtInt().text.toInt())
         }else if(ctx.nbtLong() != null){
-            return NBTBasedDataConcrete(LongTag(ctx.nbtLong().text.toLong()))
+            return MCLongConcrete(LongTag(ctx.nbtLong().text.toNBTLong()))
         }else if(ctx.nbtFloat() != null){
-            return NBTBasedDataConcrete(FloatTag(ctx.nbtFloat().text.toFloat()))
+            return MCFloatConcrete(ctx.nbtFloat().text.toNBTFloat())
         }else if(ctx.nbtDouble() != null) {
-            return NBTBasedDataConcrete(DoubleTag(ctx.nbtDouble().text.toDouble()))
+            return MCDoubleConcrete(DoubleTag(ctx.nbtDouble().text.toNBTDouble()))
         }else if(ctx.nbtCompound() != null){
             val compound = NBTDictionaryConcrete(HashMap())
             for (kv in ctx.nbtCompound().nbtKeyValuePair()){

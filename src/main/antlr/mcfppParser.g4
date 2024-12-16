@@ -593,6 +593,9 @@ normalType
     :   INT
     |   ENTITY
     |   BOOL
+    |   BYTE
+    |   SHORT
+    |   LONG
     |   FLOAT
     |   DOUBLE
     |   SELECTOR

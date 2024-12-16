@@ -33,7 +33,7 @@ open class MCByte: MCInt {
     override fun doAssignedBy(b: Var<*>) : MCByte {
         return when (b) {
             is MCByte -> {
-                MCByte(assignCommand(b))
+                assignCommand(b)
             }
 
             is CommandReturn -> {
@@ -52,6 +52,44 @@ open class MCByte: MCInt {
                 this
             }
         }
+    }
+
+    //this = a
+    @InsertCommand
+    override fun assignCommand(a: MCNumber<*>) : MCByte {
+        return assignCommandLambda(a,
+            ifThisIsClassMemberAndAIsConcrete =  { b, final ->
+                //对类中的成员的值进行修改
+                if(final.size == 2){
+                    Function.addCommand(final[0])
+                }
+                Function.addCommand(final.last().build(Commands.sbPlayerSet(this, (b as MCIntConcrete).value)))
+                this
+            },
+            ifThisIsClassMemberAndAIsNotConcrete = { b, final ->
+                //对类中的成员的值进行修改
+                if(final.size == 2){
+                    Function.addCommand(final[0])
+                }
+                Function.addCommand(final.last().build(Commands.sbPlayerOperation(this,"=",b as MCInt)))
+                this
+            },
+            ifThisIsNormalVarAndAIsConcrete = { b, _ ->
+                MCByteConcrete(this, (b as MCByteConcrete).value)
+            },
+            ifThisIsNormalVarAndAIsClassMember = { c, cmd ->
+                if(cmd.size == 2){
+                    Function.addCommand(cmd[0])
+                }
+                Function.addCommand(cmd.last().build(Commands.sbPlayerOperation(this, "=", c as MCInt)))
+                MCByte(this)
+            },
+            ifThisIsNormalVarAndAIsNotConcrete = { c, _ ->
+                //变量进栈
+                Function.addCommand(Commands.sbPlayerOperation(this, "=", c as MCInt))
+                MCByte(this)
+            }
+        ) as MCByte
     }
 
     override fun canAssignedBy(b: Var<*>): Boolean {
@@ -88,7 +126,7 @@ class MCByteConcrete: MCByte, MCFPPValue<Byte> {
         curr: FieldContainer,
         value: Byte,
         identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+    ) : super(curr, identifier) {
         this.value = value
     }
 

@@ -30,7 +30,7 @@ open class MCDouble: NBTBasedData {
     constructor(
         curr: FieldContainer,
         identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+    ) : super(curr, identifier) {
         this.identifier = identifier
     }
 

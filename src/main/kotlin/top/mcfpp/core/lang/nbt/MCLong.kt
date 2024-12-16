@@ -200,7 +200,7 @@ class MCLongConcrete: MCLong, MCFPPValue<LongTag> {
         curr: FieldContainer,
         value: LongTag,
         identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+    ) : super(curr, identifier) {
         this.value = value
     }
 

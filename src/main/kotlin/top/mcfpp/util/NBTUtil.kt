@@ -5,8 +5,7 @@ import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.core.lang.*
 import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
-import top.mcfpp.core.lang.nbt.MCStringConcrete
-import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
+import top.mcfpp.core.lang.nbt.*
 
 object NBTUtil {
 
@@ -19,9 +18,13 @@ object NBTUtil {
             //is JsonString -> TODO()
             is MCAnyConcrete -> varToNBT(v.value)
             is ScoreBoolConcrete -> ByteTag(v.value)
-            is MCFloatConcrete -> FloatTag(v.value)
-            is MCFPPTypeVar -> TODO()
+            is MCByteConcrete -> ByteTag(v.value)
+            is MCShortConcrete -> ShortTag(v.value)
             is MCIntConcrete -> IntTag(v.value)
+            is MCLongConcrete -> v.value
+            is MCFloatConcrete -> FloatTag(v.value)
+            is MCDoubleConcrete -> v.value
+            is MCFPPTypeVar -> TODO()
             is MCStringConcrete -> v.value
             is NBTBasedDataConcrete -> v.value
             is UnionTypeVarConcrete -> valueToNBT(v.value)
@@ -130,6 +133,46 @@ object NBTUtil {
             is LongArrayTag -> value
             is CompoundTag -> toMap()
             else -> throw VariableConverseException()
+        }
+    }
+
+    fun String.toNBTByte(): Byte{
+        return if(endsWith("b") || endsWith("B")){
+            substring(0, length - 1).toByte()
+        }else{
+            toByte()
+        }
+    }
+
+    fun String.toNBTShort(): Short{
+        return if(endsWith("s") || endsWith("S")){
+            substring(0, length - 1).toShort()
+        }else{
+            toShort()
+        }
+    }
+
+    fun String.toNBTLong(): Long{
+        return if(endsWith("l") || endsWith("L")){
+            substring(0, length - 1).toLong()
+        }else{
+            toLong()
+        }
+    }
+
+    fun String.toNBTFloat(): Float{
+        return if(endsWith("f") || endsWith("F")){
+            substring(0, length - 1).toFloat()
+        }else{
+            toFloat()
+        }
+    }
+
+    fun String.toNBTDouble(): Double{
+        return if(endsWith("d") || endsWith("D")){
+            substring(0, length - 1).toDouble()
+        }else{
+            toDouble()
         }
     }
 }

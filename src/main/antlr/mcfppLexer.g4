@@ -120,6 +120,9 @@ VEC:        'vec';
 INT:        'int';
 ENTITY:     'entity';
 BOOL:       'bool';
+BYTE:       'byte';
+SHORT:      'short';
+LONG:       'long';
 FLOAT:      'float';
 DOUBLE:     'double';
 SELECTOR:   'selector';
@@ -188,7 +191,7 @@ NBTByte: IntConstant NBTByteSuffix;
 NBTShort: IntConstant NBTShortSuffix;
 NBTInt: IntConstant;
 NBTLong: IntConstant NBTLongSuffix;
-NBTFloat: FractionalConstant ExponentPart?;
+NBTFloat: (FractionalConstant ExponentPart? NBTFloatSuffix?) | (IntConstant NBTFloatSuffix?);
 NBTDouble: (DigitSequence|FractionalConstant) ExponentPart? NBTDoubleSuffix;
 NBTBool: BooleanConstant;
 

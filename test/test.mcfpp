@@ -1,6 +1,6 @@
 namespace test;
 
 func main(){
-    print("Hello Minecraft");
-    print([I;1,2,3,4]::jvm.toString());
+    byte i = 5b;
+    print(i);
 }

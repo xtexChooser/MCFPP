@@ -2,6 +2,7 @@ package top.mcfpp.core.lang.nbt
 
 import net.querz.nbt.tag.ByteTag
 import net.querz.nbt.tag.ShortTag
+import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
@@ -54,6 +55,45 @@ open class MCShort: MCInt {
         }
     }
 
+
+    //this = a
+    @InsertCommand
+    override fun assignCommand(a: MCNumber<*>) : MCShort {
+        return assignCommandLambda(a,
+            ifThisIsClassMemberAndAIsConcrete =  { b, final ->
+                //对类中的成员的值进行修改
+                if(final.size == 2){
+                    Function.addCommand(final[0])
+                }
+                Function.addCommand(final.last().build(Commands.sbPlayerSet(this, (b as MCIntConcrete).value)))
+                this
+            },
+            ifThisIsClassMemberAndAIsNotConcrete = { b, final ->
+                //对类中的成员的值进行修改
+                if(final.size == 2){
+                    Function.addCommand(final[0])
+                }
+                Function.addCommand(final.last().build(Commands.sbPlayerOperation(this,"=",b as MCInt)))
+                this
+            },
+            ifThisIsNormalVarAndAIsConcrete = { b, _ ->
+                MCShortConcrete(this, (b as MCShortConcrete).value)
+            },
+            ifThisIsNormalVarAndAIsClassMember = { c, cmd ->
+                if(cmd.size == 2){
+                    Function.addCommand(cmd[0])
+                }
+                Function.addCommand(cmd.last().build(Commands.sbPlayerOperation(this, "=", c as MCInt)))
+                MCByte(this)
+            },
+            ifThisIsNormalVarAndAIsNotConcrete = { c, _ ->
+                //变量进栈
+                Function.addCommand(Commands.sbPlayerOperation(this, "=", c as MCInt))
+                MCByte(this)
+            }
+        ) as MCShort
+    }
+
     override fun canAssignedBy(b: Var<*>): Boolean {
         if(!b.implicitCast(type).isError) return true
         return when(b){
@@ -78,7 +118,7 @@ class MCShortConcrete: MCShort, MCFPPValue<Short> {
         curr: FieldContainer,
         value: Short,
         identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+    ) : super(curr, identifier) {
         this.value = value
     }
 
@@ -91,7 +131,7 @@ class MCShortConcrete: MCShort, MCFPPValue<Short> {
         this.value = value
     }
 
-    constructor(v: MCByte, value: Short) : super(v) {
+    constructor(v: MCShort, value: Short) : super(v) {
         this.value = value
     }
 
@@ -105,7 +145,7 @@ class MCShortConcrete: MCShort, MCFPPValue<Short> {
 
     override fun toDynamic(replace: Boolean): Var<*> {
         MCIntConcrete(this, value.toInt()).toDynamic(replace)
-        return MCByte(this)
+        return MCShort(this)
     }
 
     override fun plus(a: Var<*>): Var<*>? {
