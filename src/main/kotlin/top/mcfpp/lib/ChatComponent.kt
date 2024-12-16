@@ -3,8 +3,8 @@ package top.mcfpp.lib
 import net.querz.nbt.tag.IntArrayTag
 import top.mcfpp.command.Command
 import top.mcfpp.core.lang.MCInt
-import top.mcfpp.core.lang.NBTBasedData
-import top.mcfpp.core.lang.NBTBasedDataConcrete
+import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.core.lang.resource.EntityTypeConcrete
 import top.mcfpp.util.LogProcessor
 

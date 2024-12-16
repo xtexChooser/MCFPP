@@ -1,11 +1,11 @@
 package top.mcfpp.core.lang.resource
 
-import net.querz.nbt.tag.StringTag
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.function.Function

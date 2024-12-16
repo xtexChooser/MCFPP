@@ -3,7 +3,7 @@ package top.mcfpp.mni;
 import org.jetbrains.annotations.NotNull;
 import top.mcfpp.annotations.MNIFunction;
 import top.mcfpp.core.lang.JsonTextConcrete;
-import top.mcfpp.core.lang.NBTBasedData;
+import top.mcfpp.core.lang.nbt.NBTBasedData;
 import top.mcfpp.lib.ListChatComponent;
 import top.mcfpp.lib.NBTChatComponent;
 import top.mcfpp.util.ValueWrapper;

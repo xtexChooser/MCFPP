@@ -4,6 +4,8 @@ import top.mcfpp.annotations.MNIFunction;
 import top.mcfpp.command.Command;
 import top.mcfpp.command.Commands;
 import top.mcfpp.core.lang.*;
+import top.mcfpp.core.lang.nbt.MCString;
+import top.mcfpp.core.lang.nbt.MCStringConcrete;
 import top.mcfpp.core.lang.resource.Advancement;
 import top.mcfpp.core.lang.resource.AdvancementConcrete;
 import top.mcfpp.core.minecraft.PlayerVar;

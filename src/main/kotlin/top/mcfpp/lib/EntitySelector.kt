@@ -4,6 +4,10 @@ import net.querz.nbt.tag.CompoundTag
 import net.querz.nbt.tag.StringTag
 import top.mcfpp.command.Command
 import top.mcfpp.core.lang.*
+import top.mcfpp.core.lang.nbt.MCString
+import top.mcfpp.core.lang.nbt.MCStringConcrete
+import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.core.lang.resource.EntityTypeConcrete
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.core.lang.resource.Advancement

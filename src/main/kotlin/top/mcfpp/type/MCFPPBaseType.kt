@@ -6,6 +6,10 @@ import top.mcfpp.model.Class
 import top.mcfpp.core.lang.*
 import top.mcfpp.core.lang.bool.ScoreBool
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
+import top.mcfpp.core.lang.nbt.MCDouble
+import top.mcfpp.core.lang.nbt.MCDoubleConcrete
+import top.mcfpp.core.lang.nbt.MCString
+import top.mcfpp.core.lang.nbt.MCStringConcrete
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 

@@ -1,7 +1,5 @@
 package top.mcfpp.doc
 
-import top.mcfpp.DocumentTag
-
 class Document {
 
     /**

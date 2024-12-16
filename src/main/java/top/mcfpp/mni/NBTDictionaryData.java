@@ -3,8 +3,11 @@ package top.mcfpp.mni;
 import top.mcfpp.annotations.MNIFunction;
 import top.mcfpp.command.Command;
 import top.mcfpp.command.Commands;
-import top.mcfpp.core.lang.*;
 import top.mcfpp.core.lang.bool.ScoreBool;
+import top.mcfpp.core.lang.nbt.MCString;
+import top.mcfpp.core.lang.nbt.MCStringConcrete;
+import top.mcfpp.core.lang.nbt.NBTDictionary;
+import top.mcfpp.core.lang.nbt.NBTDictionaryConcrete;
 import top.mcfpp.model.function.Function;
 import top.mcfpp.util.ValueWrapper;
 

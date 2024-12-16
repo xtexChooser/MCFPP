@@ -5,6 +5,9 @@ import net.querz.nbt.tag.Tag
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
+import top.mcfpp.core.lang.nbt.MCStringConcrete
+import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.mni.minecraft.EntityVarData
 import top.mcfpp.type.MCFPPEntityType.Entity
 import top.mcfpp.type.MCFPPType

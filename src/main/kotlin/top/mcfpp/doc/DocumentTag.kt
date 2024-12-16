@@ -1,4 +1,4 @@
-package top.mcfpp
+package top.mcfpp.doc
 
 import top.mcfpp.util.LogProcessor
 
@@ -7,7 +7,7 @@ abstract class DocumentTag {
     abstract val content: String
 
     companion object{
-        fun parse(input: String): DocumentTag{
+        fun parse(input: String): DocumentTag {
             val part = input.split(" ", limit = 2)
             when(part[0]){
                 "since" -> return SinceTag(part[1])

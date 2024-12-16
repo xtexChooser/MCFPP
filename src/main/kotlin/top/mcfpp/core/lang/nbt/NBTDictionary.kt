@@ -1,7 +1,8 @@
-package top.mcfpp.core.lang
+package top.mcfpp.core.lang.nbt
 
 import net.querz.nbt.tag.CompoundTag
 import top.mcfpp.command.Commands
+import top.mcfpp.core.lang.*
 import top.mcfpp.mni.NBTDictionaryData
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
@@ -164,7 +165,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
                 if (type.generic == (this.type as MCFPPDictType).generic) {
                     this
                 } else {
-                    buildCastErrorVar(type)
+                    Var.buildCastErrorVar(type)
                 }
             }
 
@@ -177,7 +178,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
             }
 
             MCFPPBaseType.Any -> this
-            else -> buildCastErrorVar(type)
+            else -> Var.buildCastErrorVar(type)
         }
     }
 
@@ -191,7 +192,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
                 if(type.generic == (this.type as MCFPPDictType).generic){
                     this
                 }else{
-                    buildCastErrorVar(type)
+                    Var.buildCastErrorVar(type)
                 }
             }
             is MCFPPDataTemplateType -> {
@@ -202,7 +203,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
                         DataTemplateObject(type.template, identifier)
                     }
                 }else{
-                    buildCastErrorVar(type)
+                    Var.buildCastErrorVar(type)
                 }
             }
             MCFPPNBTType.NBT -> {
@@ -215,7 +216,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
             MCFPPBaseType.Any -> this
             else -> {
                 LogProcessor.error(TextTranslator.CAST_ERROR.translate(this.type.typeName, type.typeName))
-                buildCastErrorVar(type)
+                Var.buildCastErrorVar(type)
             }
         }
     }

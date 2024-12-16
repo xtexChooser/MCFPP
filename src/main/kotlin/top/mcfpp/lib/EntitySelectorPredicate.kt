@@ -2,6 +2,10 @@ package top.mcfpp.lib
 
 import top.mcfpp.command.Command
 import top.mcfpp.core.lang.*
+import top.mcfpp.core.lang.nbt.MCString
+import top.mcfpp.core.lang.nbt.MCStringConcrete
+import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.core.lang.resource.*
 
 interface EntitySelectorPredicate {
@@ -109,7 +113,7 @@ class ScoresPredicate(val scores: Map<String, RangeVar>): EntitySelectorPredicat
     override fun isConcrete(): Boolean = scores.all { it.value is RangeVarConcrete }
 }
 
-class TagPredicate(val tag: MCString,val reverse: Boolean): EntitySelectorPredicate {
+class TagPredicate(val tag: MCString, val reverse: Boolean): EntitySelectorPredicate {
     override fun toCommandPart(): Command {
         val re = Command.build("tag=")
         if(reverse) re.build("!", false)
@@ -123,7 +127,7 @@ class TagPredicate(val tag: MCString,val reverse: Boolean): EntitySelectorPredic
     override fun isConcrete(): Boolean = tag is MCStringConcrete
 }
 
-class TeamPredicate(val team: MCString,val reverse: Boolean): EntitySelectorPredicate {
+class TeamPredicate(val team: MCString, val reverse: Boolean): EntitySelectorPredicate {
     override fun toCommandPart(): Command {
         val re = Command.build("team=")
         if(reverse) re.build("!", false)
@@ -137,7 +141,7 @@ class TeamPredicate(val team: MCString,val reverse: Boolean): EntitySelectorPred
     override fun isConcrete(): Boolean = team is MCStringConcrete
 }
 
-class NamePredicate(val name: MCString,val reverse: Boolean): EntitySelectorPredicate {
+class NamePredicate(val name: MCString, val reverse: Boolean): EntitySelectorPredicate {
     override fun toCommandPart(): Command {
         val re = Command.build("name=")
         if(reverse) re.build("!", false)

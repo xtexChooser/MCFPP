@@ -3,6 +3,8 @@ package top.mcfpp.core.lang
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.bool.ScoreBool
+import top.mcfpp.core.lang.nbt.MCString
+import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.lib.ChatComponent
 import top.mcfpp.lib.NBTChatComponent
 import top.mcfpp.model.CompoundData

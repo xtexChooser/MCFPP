@@ -1,111 +1,59 @@
-package top.mcfpp.core.lang
+package top.mcfpp.core.lang.nbt
 
 import net.querz.nbt.io.SNBTUtil
-import net.querz.nbt.tag.StringTag
+import net.querz.nbt.tag.DoubleTag
 import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
+import top.mcfpp.core.lang.MCAnyConcrete
+import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.Var
 import top.mcfpp.exception.VariableConverseException
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.FieldContainer
+import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
-import top.mcfpp.model.Member
-import top.mcfpp.model.function.Function
-import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.TextTranslator
-import top.mcfpp.util.TextTranslator.translate
 import java.util.*
 
-/**
- * string表示一个字符串。要声明一个字符串，应该使用string类型，例如string abc = "abc"。
- *
- * string重写了+运算符，因此能够对字符串进行加运算。例如string ps = "abc" + "def"，结果
- *得到ps为”abcdef”。
- *
- * 和MCFPP中所有变量一样，string类型有编译时静态和动态两种方式。类似上文中的声明方式，编译器
- *能发现自己能够跟踪到这个字符串的内容，因此在编译过程中会进行简单的替换。而动态则不同，动态字符
- *串通常是由于将一个jstring转换成string类型而导致的。动态字符串储存在nbt中，以供操作。
- *
- * 得益于宏和data string命令，让字符串的动态操作成为了可能。在1.19.4-的版本中，MCFPP只支持静
- *态的字符串和原始JSON文本功能。
- *
- */
-open class MCString : NBTBasedData {
+open class MCDouble: NBTBasedData {
 
-    override var type: MCFPPType = MCFPPBaseType.String
-
+    override var type: MCFPPType = MCFPPNBTType.Double
+    
     /**
-     * 创建一个string类型的变量。它的mc名和变量所在的域容器有关。
+     * 创建一个double类型的变量。它的mc名和变量所在的域容器有关。
      *
      * @param identifier 标识符。默认为
      */
     constructor(
         curr: FieldContainer,
         identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
+    ) : super(curr.prefix + identifier) {
         this.identifier = identifier
-
     }
 
     /**
-     * 创建一个string值。它的标识符和mc名相同。
+     * 创建一个double值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+        isTemp = true
+    }
 
     /**
-     * 复制一个string
-     * @param b 被复制的string值
+     * 复制一个int
+     * @param b 被复制的int值
      */
-    constructor(b: MCString) : super(b)
-
-    override fun getMemberVar(key: String, accessModifier: Member.AccessModifier): Pair<Var<*>?, Boolean> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getMemberFunction(
-        key: String,
-        readOnlyArgs: List<Var<*>>,
-        normalArgs: List<Var<*>>,
-        accessModifier: Member.AccessModifier
-    ): Pair<Function, Boolean> {
-        TODO("Not yet implemented")
-    }
-
-    @Override
-    @Throws(VariableConverseException::class)
-    override fun doAssignedBy(b: Var<*>): MCString {
-        when (b) {
-            is MCString -> return assignCommand(b)
-            is NBTBasedDataConcrete -> {
-                if(b.nbtType == NBTBasedData.Companion.NBTTypeWithTag.STRING){
-                    return assignCommand(b)
-                }else{
-                    LogProcessor.error(TextTranslator.ASSIGN_ERROR.translate(b.type.typeName, type.typeName))
-                }
-            }
-            else -> LogProcessor.error(TextTranslator.ASSIGN_ERROR.translate(b.type.typeName, type.typeName))
-        }
-        return this
-    }
-
-    override fun canAssignedBy(b: Var<*>): Boolean {
-        if(!b.implicitCast(type).isError) return true
-        if(b is NBTBasedDataConcrete){
-            return b.nbtType == NBTBasedData.Companion.NBTTypeWithTag.STRING
-        }
-        return false
-    }
+    constructor(b: MCDouble) : super(b)
 
     @InsertCommand
-    override fun assignCommand(a: NBTBasedData) : MCString{
+    override fun assignCommand(a: NBTBasedData) : MCDouble {
         nbtType = a.nbtType
         return assignCommandLambda(a,
             ifThisIsClassMemberAndAIsConcrete = {b, final ->
-                b as MCStringConcrete
+                b as MCDoubleConcrete
                 //对类中的成员的值进行修改
                 if(final.size == 2){
                     Function.addCommand(final[0])
@@ -116,7 +64,7 @@ open class MCString : NBTBasedData {
                 }else{
                     Function.addCommand(final.last())
                 }
-                MCString(this)
+                MCDouble(this)
             },
             ifThisIsClassMemberAndAIsNotConcrete = {b, final ->
                 //对类中的成员的值进行修改
@@ -129,10 +77,10 @@ open class MCString : NBTBasedData {
                 }else{
                     Function.addCommand(final.last())
                 }
-                MCString(this)
+                MCDouble(this)
             },
             ifThisIsNormalVarAndAIsConcrete = {b, _ ->
-                MCStringConcrete(this, (b as MCStringConcrete).value)
+                MCDoubleConcrete(this, (b as MCDoubleConcrete).value)
             },
             ifThisIsNormalVarAndAIsClassMember = {b, final ->
                 if(final.size == 2){
@@ -144,24 +92,26 @@ open class MCString : NBTBasedData {
                 }else{
                     Function.addCommand(final.last())
                 }
-                MCString(this)
+                MCDouble(this)
             },
             ifThisIsNormalVarAndAIsNotConcrete = {b, _ ->
                 Function.addCommand(Commands.dataSetFrom(nbtPath, b.nbtPath))
                 NBTBasedData(this)
-            }) as MCString
+            }) as MCDouble
     }
-
 
     companion object {
-        val data = CompoundData("string","mcfpp")
-    }
 
+        val data by lazy {
+            CompoundData("double","mcfpp")
+        }
+    }
 }
 
-class MCStringConcrete: MCString, MCFPPValue<StringTag> {
 
-    override var value: StringTag
+class MCDoubleConcrete: MCDouble, MCFPPValue<DoubleTag> {
+
+    override var value: DoubleTag
 
     /**
      * 创建一个固定的string
@@ -172,7 +122,7 @@ class MCStringConcrete: MCString, MCFPPValue<StringTag> {
      */
     constructor(
         curr: FieldContainer,
-        value: StringTag,
+        value: DoubleTag,
         identifier: String = UUID.randomUUID().toString()
     ) : super(curr.prefix + identifier) {
         this.value = value
@@ -183,20 +133,20 @@ class MCStringConcrete: MCString, MCFPPValue<StringTag> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: StringTag, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: DoubleTag, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
         this.value = value
     }
 
-    constructor(v: MCString, value: StringTag): super(v){
+    constructor(v: MCDouble, value: DoubleTag): super(v){
         this.value = value
     }
 
-    constructor(v: MCStringConcrete) : super(v){
+    constructor(v: MCDoubleConcrete) : super(v){
         this.value = v.value
     }
 
-    override fun clone(): MCStringConcrete {
-        return MCStringConcrete(this)
+    override fun clone(): MCDoubleConcrete {
+        return MCDoubleConcrete(this)
     }
 
     override fun toDynamic(replace: Boolean): Var<*> {
@@ -210,7 +160,7 @@ class MCStringConcrete: MCString, MCFPPValue<StringTag> {
             )
             Function.addCommand(cmd)
         }
-        val re = MCString(this)
+        val re = MCDouble(this)
         if(replace){
             Function.currFunction.field.putVar(identifier, re, true)
         }
@@ -220,7 +170,7 @@ class MCStringConcrete: MCString, MCFPPValue<StringTag> {
     @Override
     override fun explicitCast(type: MCFPPType): Var<*> {
         return when(type){
-            MCFPPBaseType.String -> this
+            MCFPPBaseType.Double -> this
             MCFPPNBTType.NBT -> NBTBasedDataConcrete(value)
             MCFPPBaseType.Any -> MCAnyConcrete(this)
             else -> throw VariableConverseException()

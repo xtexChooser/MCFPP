@@ -1,7 +1,6 @@
 {
   "description": "",
   "namespace": "mcfpp",
-  "targetPath": ".",
   "noDatapack": true,
   "ignoreStdLib": false,
   "isLib": false

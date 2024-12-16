@@ -2,6 +2,8 @@ package top.mcfpp.core.lang
 
 import net.querz.nbt.tag.StringTag
 import top.mcfpp.command.Command
+import top.mcfpp.core.lang.nbt.MCString
+import top.mcfpp.core.lang.nbt.MCStringConcrete
 import top.mcfpp.model.CanSelectMember
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer

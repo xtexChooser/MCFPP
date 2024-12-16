@@ -12,7 +12,7 @@ import top.mcfpp.model.function.Function
 
 class LineCompiler {
 
-    val COMMAND_COLOR = "\u001b[38;5;7m"
+    val COMMAND_COLOR = "\u001B[38;5;7m"
     val OUTPUT_COLOR = "\u001B[38;5;15m"
     val RESET_COLOR = "\u001B[0m"
 

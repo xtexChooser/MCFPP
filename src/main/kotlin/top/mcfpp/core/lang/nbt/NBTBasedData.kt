@@ -1,10 +1,11 @@
-package top.mcfpp.core.lang
+package top.mcfpp.core.lang.nbt
 
 import net.querz.nbt.io.SNBTUtil
 import net.querz.nbt.tag.*
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
+import top.mcfpp.core.lang.*
 import top.mcfpp.mni.NBTBasedDataData
 import top.mcfpp.model.*
 import top.mcfpp.model.accessor.Property
@@ -24,7 +25,7 @@ import java.util.*
  *
  * @constructor Create empty Nbt
  */
-open class NBTBasedData : Var<NBTBasedData>, Indexable{
+open class NBTBasedData : Var<NBTBasedData>, Indexable {
 
     open var nbtType: NBTTypeWithTag = NBTTypeWithTag.ANY
 
@@ -76,7 +77,7 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable{
     override fun canAssignedBy(b: Var<*>): Boolean = true
 
     @InsertCommand
-    protected open fun assignCommand(a: NBTBasedData) : NBTBasedData{
+    protected open fun assignCommand(a: NBTBasedData) : NBTBasedData {
         nbtType = a.nbtType
         return assignCommandLambda(a,
             ifThisIsClassMemberAndAIsConcrete = {b, final ->
@@ -206,7 +207,7 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable{
         return PropertyVar(Property.buildSimpleProperty(v), v,this)
     }
 
-    protected fun getByNBTIndex(index: NBTBasedData): NBTBasedData{
+    protected fun getByNBTIndex(index: NBTBasedData): NBTBasedData {
         if(nbtType != NBTTypeWithTag.LIST && nbtType != NBTTypeWithTag.ANY){
             LogProcessor.error("Invalid nbt type")
         }
@@ -331,7 +332,7 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable{
         }
 
         val data by lazy { CompoundData("nbt","mcfpp").apply {
-            extends(top.mcfpp.core.lang.MCAny.data)
+            extends(MCAny.data)
             getNativeFromClass(NBTBasedDataData::class.java)
         } }
 
@@ -392,7 +393,7 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable{
             }
 
             companion object{
-                fun getTagType(tag: Tag<*>): NBTTypeWithTag{
+                fun getTagType(tag: Tag<*>): NBTTypeWithTag {
                     return when(tag){
                         is ByteTag -> BYTE
                         is ShortTag -> SHORT

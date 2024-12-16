@@ -1,9 +1,9 @@
-package top.mcfpp.core.lang
+package top.mcfpp.core.lang.nbt
 
-import net.querz.nbt.tag.CompoundTag
-import net.querz.nbt.tag.ListTag
 import net.querz.nbt.tag.StringTag
-import top.mcfpp.exception.VariableConverseException
+import top.mcfpp.core.lang.MCAny
+import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.Var
 import top.mcfpp.mni.NBTMapData
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
@@ -13,7 +13,7 @@ import top.mcfpp.type.MCFPPType
 import java.util.*
 import kotlin.collections.ArrayList
 
-open class NBTMap : NBTDictionary{
+open class NBTMap : NBTDictionary {
 
     var keyList : NBTList
     var valueList : NBTList

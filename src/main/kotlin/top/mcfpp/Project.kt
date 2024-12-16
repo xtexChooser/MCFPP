@@ -16,6 +16,7 @@ import top.mcfpp.model.*
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.Utils
 import java.io.*
 import java.net.URLClassLoader
 import java.nio.charset.StandardCharsets
@@ -132,7 +133,7 @@ object Project {
             val jsonObject: JSONObject = JSONObject.parse(json) as JSONObject
 
             //源代码根目录
-            config.sourcePath = Path.of(jsonObject.getString("sourcePath")?: ".")
+            config.sourcePath = jsonObject.getString("sourcePath")?.let { Path(it) }
 
             //版本
             config.version = jsonObject.getString("version")?:"1.21"
@@ -145,12 +146,12 @@ object Project {
 
             //调用库
             val includesJson: JSONArray = jsonObject.getJSONArray("includes")?: JSONArray()
-            for (i in 0 until includesJson.size) {
+            for (i in 0..<includesJson.size) {
                 config.includes.add(includesJson.getString(i))
             }
 
             //输出目录
-            config.targetPath = Path(jsonObject.getString("targetPath")?: "lib/")
+            config.targetPath = jsonObject.getString("targetPath")?.let { Path(it) }
 
             //是否生成数据包
             config.noDatapack = jsonObject.getBooleanValue("noDatapack")
@@ -165,7 +166,18 @@ object Project {
     }
 
     fun checkConfig(){
-        //TODO
+        if (!Utils.version.contains(config.version)){
+            LogProcessor.warn("Unsupported version: ${config.version}")
+            config.version = Utils.version[0]
+        }
+        if(config.targetPath == null){
+            LogProcessor.warn("Set target path default to \"${config.root.pathString}/build/\"")
+            config.targetPath = Path(config.root.pathString,"build/")
+        }
+        if(config.sourcePath == null){
+            LogProcessor.warn("Set source path default to \"${config.root.pathString}\"")
+            config.sourcePath = Path(config.root.pathString)
+        }
     }
 
     /**

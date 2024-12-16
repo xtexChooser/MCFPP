@@ -1,10 +1,11 @@
-package top.mcfpp.core.lang
+package top.mcfpp.core.lang.nbt
 
 import net.querz.nbt.tag.*
 import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
+import top.mcfpp.core.lang.*
 import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.lib.StorageSource
@@ -111,7 +112,7 @@ open class NBTList : NBTBasedData {
 
 
     @InsertCommand
-    override fun assignCommand(a: NBTBasedData) : NBTList{
+    override fun assignCommand(a: NBTBasedData) : NBTList {
         nbtType = a.nbtType
         if (parentClass() != null){
             val b = if(a.parentClass() != null){

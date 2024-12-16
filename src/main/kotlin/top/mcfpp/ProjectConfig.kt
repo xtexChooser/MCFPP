@@ -3,6 +3,7 @@ package top.mcfpp
 import top.mcfpp.command.CommentType
 import top.mcfpp.io.MCFPPFile
 import java.nio.file.Path
+import kotlin.io.path.Path
 
 //TODO 标准库引用逻辑优化
 open class ProjectConfig(
@@ -39,7 +40,7 @@ open class ProjectConfig(
     /**
      * 工程的根目录
      */
-    var root: Path? = null,
+    var root: Path = Path("."),
 
     /**
      * 工程的名字

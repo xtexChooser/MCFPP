@@ -141,6 +141,15 @@ object Commands {
     }
 
     /**
+     * `data get <a>`
+     */
+    fun dataGet(a: NBTPath, double: Double = 1.0): Command{
+        return Command("data get")
+            .build(a.toCommandPart())
+            .build(double.toString())
+    }
+
+    /**
      * `data modify <a> set value <value>`
      *
      * @param a 被设置的nbt的路径

@@ -1,9 +1,11 @@
 package top.mcfpp.core.lang
 
+import top.mcfpp.MCFPP
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.bool.*
+import top.mcfpp.core.lang.nbt.MCLong
 import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.mni.MCIntData
 import top.mcfpp.type.MCFPPBaseType
@@ -12,6 +14,7 @@ import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
+import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -91,6 +94,12 @@ open class MCInt : MCNumber<Int> {
                 MCInt("inp").assignedBy(this)
                 Function.addCommand("function math:hpo/float/_scoreto")
                 return MCFloat().assignedBy(MCFloat.ssObj)
+            }
+            MCFPPNBTType.Long -> {
+                storeToStack()
+                val ret = MCLong()
+                Function.addCommand(Commands.dataSetFrom(ret.nbtPath, nbtPath))
+                ret
             }
             else -> re
         }
@@ -255,90 +264,90 @@ open class MCInt : MCNumber<Int> {
     }
 
     @InsertCommand
-    override fun isBigger(a: Var<*>): Var<*> {
+    override fun isBigger(a: Var<*>): Var<*>? {
         //re = t > a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
+        if (a !is MCInt) return null
         val re = ExecuteBool()
-        if (qwq is MCIntConcrete) {
+        if (a is MCIntConcrete) {
             //execute store success score qwq qwq if score qwq qwq matches a+1..
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ${qwq.value + 1}..")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ${a.value + 1}..")))
         } else {
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject > ${qwq.name} ${qwq.sbObject}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject > ${a.name} ${a.sbObject}")))
         }
         re.isTemp = true
         return re
     }
 
     @InsertCommand
-    override fun isSmaller(a: Var<*>): Var<*> {
+    override fun isSmaller(a: Var<*>): Var<*>? {
         //re = t < a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
+        if (a !is MCInt) return null
         val re = ExecuteBool()
-        if (qwq is MCIntConcrete) {
+        if (a is MCIntConcrete) {
             //execute store success score qwq qwq if score qwq qwq matches a+1..
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ..${qwq.value - 1}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ..${a.value - 1}")))
         } else {
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject < ${qwq.name} ${qwq.sbObject}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject < ${a.name} ${a.sbObject}")))
         }
         re.isTemp = true
         return re
     }
 
     @InsertCommand
-    override fun isSmallerOrEqual(a: Var<*>): Var<*> {
+    override fun isSmallerOrEqual(a: Var<*>): Var<*>? {
         //re = t <= a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
+        if (a !is MCInt) return null
         val re = ExecuteBool()
-        if (qwq is MCIntConcrete) {
+        if (a is MCIntConcrete) {
             //execute store success score qwq qwq if score qwq qwq matches a+1..
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ..${qwq.value}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ..${a.value}")))
         } else {
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject <= ${qwq.name} ${qwq.sbObject}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject <= ${a.name} ${a.sbObject}")))
         }
         re.isTemp = true
         return re
     }
 
     @InsertCommand
-    override fun isBiggerOrEqual(a: Var<*>): Var<*> {
+    override fun isBiggerOrEqual(a: Var<*>): Var<*>? {
         //re = t <= a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
+        if (a !is MCInt) return null
         val re = ExecuteBool()
-        if (qwq is MCIntConcrete) {
+        if (a is MCIntConcrete) {
             //execute store success score qwq qwq if score qwq qwq matches a+1..
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ${qwq.value}..")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ${a.value}..")))
         } else {
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject >= ${qwq.name} ${qwq.sbObject}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject >= ${a.name} ${a.sbObject}")))
         }
         re.isTemp = true
         return re
     }
 
     @InsertCommand
-    override fun isEqual(a: Var<*>): Var<*> {
+    override fun isEqual(a: Var<*>): Var<*>? {
         //re = t == a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
+        if (a !is MCInt) return null
         val re = ExecuteBool()
-        if (qwq is MCIntConcrete) {
+        if (a is MCIntConcrete) {
             //execute store success score qwq qwq if score qwq qwq = owo owo
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ${qwq.value}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject matches ${a.value}")))
         } else {
-            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject = ${qwq.name} ${qwq.sbObject}")))
+            re.value.add(CommandBoolPart(false, Command("if score $name $sbObject = ${a.name} ${a.sbObject}")))
         }
         re.isTemp = true
         return re
     }
 
     @InsertCommand
-    override fun isNotEqual(a: Var<*>): Var<*> {
+    override fun isNotEqual(a: Var<*>): Var<*>? {
         //re = t != a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
+        if (a !is MCInt) return null
         val re = ExecuteBool()
-        if(qwq is MCIntConcrete){
+        if(a is MCIntConcrete){
             //execute store success score qwq qwq if score qwq qwq matches owo owo
-            re.value.add(CommandBoolPart(false, Command("unless score $name $sbObject matches ${qwq.value}")))
+            re.value.add(CommandBoolPart(false, Command("unless score $name $sbObject matches ${a.value}")))
         }else{
-            re.value.add(CommandBoolPart(false, Command("unless score $name $sbObject = ${qwq.name} ${qwq.sbObject}")))
+            re.value.add(CommandBoolPart(false, Command("unless score $name $sbObject = ${a.name} ${a.sbObject}")))
         }
         re.isTemp = true
         return re
@@ -577,74 +586,74 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
 
     @Override
     @InsertCommand
-    override fun isBigger(a: Var<*>): Var<*> {
+    override fun isBigger(a: Var<*>): Var<*>? {
         //re = t > a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
-        return if (qwq is MCIntConcrete) {
-            ScoreBoolConcrete(value > qwq.value)
+        if (a !is MCInt) return null
+        return if (a is MCIntConcrete) {
+            ScoreBoolConcrete(value > a.value)
         } else {
             //注意大小于换符号！
-            qwq.isSmaller(this)
+            a.isSmaller(this)
         }
     }
 
     @Override
     @InsertCommand
-    override fun isSmaller(a: Var<*>): Var<*> {
+    override fun isSmaller(a: Var<*>): Var<*>? {
         //re = t < a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
-        return if (qwq is MCIntConcrete) {
-            ScoreBoolConcrete(value < qwq.value)
+        if (a !is MCInt) return null
+        return if (a is MCIntConcrete) {
+            ScoreBoolConcrete(value < a.value)
         } else {
-            qwq.isBigger(this)
+            a.isBigger(this)
         }
     }
 
     @Override
     @InsertCommand
-    override fun isSmallerOrEqual(a: Var<*>): Var<*> {
+    override fun isSmallerOrEqual(a: Var<*>): Var<*>? {
         //re = t <= a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
-        return if (qwq is MCIntConcrete) {
-            ScoreBoolConcrete(value <= qwq.value)
+        if (a !is MCInt) return null
+        return if (a is MCIntConcrete) {
+            ScoreBoolConcrete(value <= a.value)
         } else {
-            qwq.isBiggerOrEqual(this)
+            a.isBiggerOrEqual(this)
         }
     }
 
     @Override
     @InsertCommand
-    override fun isBiggerOrEqual(a: Var<*>): Var<*> {
+    override fun isBiggerOrEqual(a: Var<*>): Var<*>? {
         //re = t <= a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
-        return if (qwq is MCIntConcrete) {
-            ScoreBoolConcrete(value >= qwq.value)
+        if (a !is MCInt) return null
+        return if (a is MCIntConcrete) {
+            ScoreBoolConcrete(value >= a.value)
         } else {
-            qwq.isSmallerOrEqual(this)
+            a.isSmallerOrEqual(this)
         }
     }
 
     @Override
     @InsertCommand
-    override fun isEqual(a: Var<*>): Var<*> {
+    override fun isEqual(a: Var<*>): Var<*>? {
         //re = t == a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
-        return if (qwq is MCIntConcrete) {
-            ScoreBoolConcrete(value == qwq.value)
+        if (a !is MCInt) return null
+        return if (a is MCIntConcrete) {
+            ScoreBoolConcrete(value == a.value)
         } else {
-            qwq.isEqual(this)
+            a.isEqual(this)
         }
     }
 
     @Override
     @InsertCommand
-    override fun isNotEqual(a: Var<*>): Var<*> {
+    override fun isNotEqual(a: Var<*>): Var<*>? {
         //re = t != a
-        val qwq: MCInt = if (a !is MCInt) a.explicitCast(MCFPPBaseType.Int) as MCInt else a
-        return if (qwq is MCIntConcrete) {
-            ScoreBoolConcrete(value != qwq.value)
+        if (a !is MCInt) return null
+        return if (a is MCIntConcrete) {
+            ScoreBoolConcrete(value != a.value)
         } else {
-            qwq.isNotEqual(this)
+            a.isNotEqual(this)
         }
     }
 

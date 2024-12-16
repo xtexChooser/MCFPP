@@ -54,8 +54,10 @@ object LogProcessor {
                         MCFPPFile.currFile!!.absolutePath + ":" + Project.ctx!!.getStart().line + ">>" + msg
                         + Project.ctx?.let { "\n" + getLineInfo(it) }
             )
+            Function.addComment(msg, CommentType.WARN)
+        }else{
+            logger.warn(msg)
         }
-        Function.addComment(msg, CommentType.WARN)
         Project.warningCount++
         if(CompileSettings.isDebug){
             val stackTrace = Thread.currentThread().stackTrace
@@ -94,8 +96,10 @@ object LogProcessor {
                         MCFPPFile.currFile!!.absolutePath + ":" + Project.ctx!!.getStart().line + ">>" + msg
                         + Project.ctx?.let { "\n" + getLineInfo(it) }
             )
+            Function.addComment(msg, CommentType.ERROR)
+        }else{
+            logger.warn(msg)
         }
-        Function.addComment(msg, CommentType.ERROR)
         Project.errorCount++
         if(CompileSettings.isDebug){
             val stackTrace = Thread.currentThread().stackTrace

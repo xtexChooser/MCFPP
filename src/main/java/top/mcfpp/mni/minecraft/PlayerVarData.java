@@ -3,19 +3,15 @@ package top.mcfpp.mni.minecraft;
 import org.jetbrains.annotations.NotNull;
 import top.mcfpp.annotations.MNIFunction;
 import top.mcfpp.annotations.MNIMember;
-import top.mcfpp.command.Command;
-import top.mcfpp.command.Commands;
 import top.mcfpp.core.lang.*;
+import top.mcfpp.core.lang.nbt.MCString;
 import top.mcfpp.core.lang.resource.Advancement;
-import top.mcfpp.core.lang.resource.AdvancementConcrete;
 import top.mcfpp.core.minecraft.PlayerVar;
 import top.mcfpp.mni.hidden.AttributeData;
 import top.mcfpp.model.CompoundData;
-import top.mcfpp.model.function.Function;
 import top.mcfpp.util.ValueWrapper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

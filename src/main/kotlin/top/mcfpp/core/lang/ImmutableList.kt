@@ -6,6 +6,9 @@ import net.querz.nbt.tag.ListTag
 import top.mcfpp.Project
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
+import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
+import top.mcfpp.core.lang.nbt.NBTList
 import top.mcfpp.model.accessor.SimpleAccessor
 import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.mni.NBTListData
@@ -22,7 +25,7 @@ import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import java.util.*
 
-open class ImmutableList : NBTList{
+open class ImmutableList : NBTList {
 
     /**
      * 创建一个list类型的变量。它的mc名和变量所在的域容器有关。

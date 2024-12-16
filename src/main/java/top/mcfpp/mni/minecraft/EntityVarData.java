@@ -7,6 +7,7 @@ import top.mcfpp.annotations.MNIMember;
 import top.mcfpp.command.Command;
 import top.mcfpp.command.Commands;
 import top.mcfpp.core.lang.*;
+import top.mcfpp.core.lang.nbt.MCStringConcrete;
 import top.mcfpp.mni.hidden.AttributeData;
 import top.mcfpp.model.CompoundData;
 import top.mcfpp.model.Member;

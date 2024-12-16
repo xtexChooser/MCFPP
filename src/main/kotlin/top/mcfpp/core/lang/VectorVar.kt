@@ -1,5 +1,6 @@
 package top.mcfpp.core.lang
 
+import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.type.MCFPPVectorType
 import top.mcfpp.model.CanSelectMember

@@ -1,13 +1,12 @@
 package top.mcfpp.type
 
-import net.querz.nbt.tag.CompoundTag
-import net.querz.nbt.tag.IntTag
-import net.querz.nbt.tag.ListTag
-import net.querz.nbt.tag.Tag
+import net.querz.nbt.tag.*
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.core.lang.*
+import top.mcfpp.core.lang.nbt.*
+import top.mcfpp.core.lang.nbt.ByteArray
 
 /**
  * 以NBT为底层的类型，包括普通的NBT类型，以及由nbt实现的map，list和dict
@@ -35,6 +34,161 @@ class MCFPPNBTType {
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTBasedData(clazz, identifier)
 
     }
+
+    object Byte: MCFPPType(parentType = listOf(MCFPPBaseType.Int)){
+
+        override val objectData: CompoundData
+            get() = NBTBasedData.data
+
+        override val typeName: String
+            get() = "byte"
+
+        override fun build(identifier: String, container: FieldContainer): Var<*> =
+            MCByteConcrete(container, 0, identifier)
+
+        override fun build(identifier: String): Var<*> = MCByteConcrete(0, identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> =
+            MCByteConcrete(clazz, 0, identifier)
+
+        override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
+            MCByte(container, identifier)
+
+        override fun buildUnConcrete(identifier: String): Var<*> = MCByte(identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCByte(clazz, identifier)
+    }
+
+    object Short: MCFPPType(parentType = listOf(MCFPPBaseType.Int)){
+
+        override val objectData: CompoundData
+            get() = NBTBasedData.data
+
+        override val typeName: String
+            get() = "short"
+
+        override fun build(identifier: String, container: FieldContainer): Var<*> =
+            MCShortConcrete(container, 0, identifier)
+
+        override fun build(identifier: String): Var<*> = MCShortConcrete(0, identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> =
+            MCShortConcrete(clazz, 0, identifier)
+
+        override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
+            MCShort(container, identifier)
+
+        override fun buildUnConcrete(identifier: String): Var<*> = MCShort(identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCShort(clazz, identifier)
+    }
+
+    object Long: MCFPPType(parentType = listOf(NBT)){
+
+        override val objectData: CompoundData
+            get() = NBTBasedData.data
+
+        override val typeName: String
+            get() = "long"
+
+        override fun build(identifier: String, container: FieldContainer): Var<*> =
+            MCLongConcrete(container, LongTag(0), identifier)
+
+        override fun build(identifier: String): Var<*> = MCLongConcrete(LongTag(0), identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> =
+            MCLongConcrete(clazz, LongTag(0), identifier)
+
+        override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
+            MCLong(container, identifier)
+
+        override fun buildUnConcrete(identifier: String): Var<*> = MCLong(identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCLong(clazz, identifier)
+    }
+
+    object Double: MCFPPType(parentType = listOf(NBT)){
+
+        override val objectData: CompoundData
+            get() = NBTBasedData.data
+
+        override val typeName: String
+            get() = "double"
+
+        override fun build(identifier: String, container: FieldContainer): Var<*> =
+            MCDoubleConcrete(container, DoubleTag(0.0), identifier)
+
+        override fun build(identifier: String): Var<*> = MCDoubleConcrete(DoubleTag(0.0), identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> =
+            MCDoubleConcrete(clazz, DoubleTag(0.0), identifier)
+
+        override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
+            MCDouble(container, identifier)
+
+        override fun buildUnConcrete(identifier: String): Var<*> = MCLong(identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCLong(clazz, identifier)
+    }
+
+    object ByteArray: MCFPPType(parentType = listOf(NBT)){
+
+        override val objectData: CompoundData
+            get() = NBTBasedData.data
+
+        override val typeName: String
+            get() = "ByteArray"
+
+        override fun build(identifier: String, container: FieldContainer): Var<*> =
+            ByteArrayConcrete(container, ByteArrayTag(), identifier)
+
+        override fun build(identifier: String): Var<*> = ByteArrayConcrete(ByteArrayTag(), identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> =
+            ByteArrayConcrete(clazz, ByteArrayTag(), identifier)
+
+        override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
+            ByteArray(container, identifier)
+
+        override fun buildUnConcrete(identifier: String): Var<*> = ByteArray(identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ByteArray(clazz, identifier)
+    }
+
+    object IntArray: MCFPPType(parentType = listOf(NBT)){
+
+        override val objectData: CompoundData
+            get() = NBTBasedData.data
+
+        override val typeName: String
+            get() = "IntArray"
+
+        override fun build(identifier: String, container: FieldContainer): Var<*> =
+            IntArrayConcrete(container, IntArrayTag(), identifier)
+
+        override fun build(identifier: String): Var<*> = IntArrayConcrete(IntArrayTag(), identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> =
+            IntArrayConcrete(clazz, IntArrayTag(), identifier)
+
+        override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
+            IntArray(container, identifier)
+
+        override fun buildUnConcrete(identifier: String): Var<*> = IntArray(identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = IntArray(clazz, identifier)
+    }
+
+    object LongArray: MCFPPType(parentType = listOf(NBT)){
+
+        override val objectData: CompoundData
+            get() = NBTBasedData.data
+
+        override val typeName: String
+            get() = "LongArray"
+
+        override fun build(identifier: String, container: FieldContainer): Var<*> =
+            LongArrayConcrete(container, LongArrayTag(), identifier)
+
+        override fun build(identifier: String): Var<*> = LongArrayConcrete(LongArrayTag(), identifier)
+        override fun build(identifier: String, clazz: Class): Var<*> =
+            LongArrayConcrete(clazz, LongArrayTag(), identifier)
+
+        override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
+            LongArray(container, identifier)
+
+        override fun buildUnConcrete(identifier: String): Var<*> = LongArray(identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LongArray(clazz, identifier)
+    }
+
 }
 
 class MCFPPListType(

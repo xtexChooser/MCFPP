@@ -1,9 +1,12 @@
 package top.mcfpp.mni;
 
 import top.mcfpp.annotations.MNIFunction;
-import top.mcfpp.core.lang.*;
 import top.mcfpp.core.lang.bool.ScoreBool;
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete;
+import top.mcfpp.core.lang.nbt.MCString;
+import top.mcfpp.core.lang.nbt.MCStringConcrete;
+import top.mcfpp.core.lang.nbt.NBTDictionary;
+import top.mcfpp.core.lang.nbt.NBTDictionaryConcrete;
 import top.mcfpp.util.ValueWrapper;
 
 public class NBTDictionaryConcreteData {

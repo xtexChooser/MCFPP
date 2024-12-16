@@ -4,6 +4,7 @@ import net.querz.nbt.tag.CompoundTag
 import net.querz.nbt.tag.StringTag
 import net.querz.nbt.tag.Tag
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
+import top.mcfpp.core.lang.nbt.*
 import top.mcfpp.exception.OperationNotImplementException
 import top.mcfpp.model.*
 import top.mcfpp.model.function.Function

@@ -2,6 +2,8 @@ package top.mcfpp.mni;
 
 import top.mcfpp.annotations.MNIFunction;
 import top.mcfpp.core.lang.*;
+import top.mcfpp.core.lang.nbt.MCString;
+import top.mcfpp.core.lang.nbt.NBTBasedData;
 import top.mcfpp.core.lang.resource.Advancement;
 import top.mcfpp.core.lang.resource.EntityType;
 import top.mcfpp.core.lang.resource.LootTablePredicate;

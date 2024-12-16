@@ -3,9 +3,10 @@ package top.mcfpp.core.lang
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
-import top.mcfpp.exception.VariableConverseException
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
+import top.mcfpp.core.lang.nbt.MCString
+import top.mcfpp.core.lang.nbt.MCStringConcrete
+import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.lib.SbObject
 import top.mcfpp.model.Enum
 import top.mcfpp.model.EnumMember
@@ -148,7 +149,7 @@ open class EnumVar : Var<EnumVar> {
         return MCInt(this)
     }
 
-    open fun asNBTVar(): NBTBasedData{
+    open fun asNBTVar(): NBTBasedData {
         return NBTBasedData(this)
     }
 

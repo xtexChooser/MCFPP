@@ -1,7 +1,7 @@
 package top.mcfpp.core.lang.bool
 
 import top.mcfpp.command.Command
-import top.mcfpp.core.lang.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.core.lang.Var
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function

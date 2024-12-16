@@ -31,6 +31,7 @@ fun main(){
     GlobalField.init()
     println("MCFPP ${MCFPP.version} (${Instant.now()})")
     println("Tips: " + UwU.tip) //生成tips
+    println("**MCFPP Interpreter is under RECONSTRUCTION**")
     val compiler = LineCompiler()
     //等待输入
     while(true){

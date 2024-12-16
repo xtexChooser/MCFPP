@@ -6,6 +6,9 @@ import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.bool.BaseBool
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
+import top.mcfpp.core.lang.nbt.MCStringConcrete
+import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.lib.*
 import top.mcfpp.model.*
 import top.mcfpp.model.function.Function
@@ -313,7 +316,12 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
     fun binaryComputation(a: Var<*>, operation: String): Var<*>{
         var qwq = a.implicitCast(this.type)
         if(qwq.isError){
-            qwq = a
+            val pwp = this.implicitCast(a.type)
+            if(!pwp.isError){
+                return pwp.binaryComputation(a, operation)
+            }else{
+                qwq = a
+            }
         }
         val re = when(operation){
             "+" -> plus(qwq)
