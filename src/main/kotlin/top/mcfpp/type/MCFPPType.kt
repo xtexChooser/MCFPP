@@ -218,26 +218,29 @@ open class MCFPPType(
 
         val data = CompoundData("type","mcfpp")
 
-        private val typeCache:MutableMap<String, MCFPPType> by lazy { mutableMapOf(
-            MCFPPBaseType.Void.typeName to MCFPPBaseType.Void,
-            MCFPPEntityType.Entity.typeName to MCFPPEntityType.Entity,
-            MCFPPConcreteType.Type.typeName to MCFPPConcreteType.Type,
-            MCFPPNBTType.Byte.typeName to MCFPPNBTType.Byte,
-            MCFPPNBTType.Short.typeName to MCFPPNBTType.Short,
-            MCFPPBaseType.Int.typeName to MCFPPBaseType.Int,
-            MCFPPNBTType.Long.typeName to MCFPPNBTType.Long,
-            MCFPPNBTType.Double.typeName to MCFPPNBTType.Double,
-            MCFPPBaseType.Float.typeName to MCFPPBaseType.Float,
-            MCFPPBaseType.Bool.typeName to MCFPPBaseType.Bool,
-            MCFPPBaseType.String.typeName to MCFPPBaseType.String,
-            MCFPPBaseType.Any.typeName to MCFPPBaseType.Any,
-            MCFPPEntityType.Selector.typeName to MCFPPEntityType.Selector,
-            MCFPPConcreteType.JavaVar.typeName to MCFPPConcreteType.JavaVar,
-            MCFPPBaseType.JsonText.typeName to MCFPPBaseType.JsonText,
-            MCFPPNBTType.NBT.typeName to MCFPPNBTType.NBT,
-            MCFPPBaseType.Coordinate2.typeName to MCFPPBaseType.Coordinate2,
-            MCFPPBaseType.Coordinate3.typeName to MCFPPBaseType.Coordinate3,
-        )}
+        private val typeCache:MutableMap<String, MCFPPType> by lazy { arrayListOf(
+            MCFPPBaseType.Void,
+            MCFPPEntityType.Entity,
+            MCFPPConcreteType.Type,
+            MCFPPNBTType.Byte,
+            MCFPPNBTType.Short,
+            MCFPPBaseType.Int,
+            MCFPPNBTType.Long,
+            MCFPPNBTType.Double,
+            MCFPPBaseType.Float,
+            MCFPPBaseType.Bool,
+            MCFPPBaseType.String,
+            MCFPPNBTType.ByteArray,
+            MCFPPNBTType.IntArray,
+            MCFPPNBTType.LongArray,
+            MCFPPBaseType.Any,
+            MCFPPEntityType.Selector,
+            MCFPPConcreteType.JavaVar,
+            MCFPPBaseType.JsonText,
+            MCFPPNBTType.NBT,
+            MCFPPBaseType.Coordinate2,
+            MCFPPBaseType.Coordinate3,
+        ).associateBy { it.typeName }.toMutableMap()}
 
         /**
          * 类型注册缓存。键值对的第一个元素判断字符串是否满足条件，而第二个元素则是用于从一个字符串中解析出一个类型

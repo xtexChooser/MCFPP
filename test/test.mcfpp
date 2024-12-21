@@ -2,5 +2,10 @@ namespace test;
 
 func main(){
     byte i = 5b;
-    print(i);
+    short s = 5s;
+    int a = 5;
+    long b = 5l;
+    float f = 5f;
+    double d = 5d;
+    IntArray qwq = [I;1,1,4,5,1,4];
 }

@@ -606,6 +606,9 @@ normalType
     |   ANY
     |   MAP
     |   DICT
+    |   BYTEARRAY
+    |   INTARRAY
+    |   LONGARRAY
     ;
 
 functionReturnType

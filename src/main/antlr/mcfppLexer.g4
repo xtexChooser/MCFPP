@@ -135,6 +135,9 @@ VOID:       'void';
 LIST:       'list';
 MAP:        'map';
 DICT:       'dict';
+BYTEARRAY:  'ByteArray';
+INTARRAY:   'IntArray';
+LONGARRAY:  'LongArray';
 
 
 TRUE:   'true';

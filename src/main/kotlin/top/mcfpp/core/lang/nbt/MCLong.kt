@@ -64,7 +64,7 @@ open class MCLong: NBTBasedData {
     }
 
     override fun implicitCast(type: MCFPPType): Var<*> {
-        val re = super.explicitCast(type)
+        val re = super.implicitCast(type)
         if(!re.isError) return re
         return when(type){
             MCFPPBaseType.Int -> {
