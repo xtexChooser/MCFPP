@@ -2,16 +2,14 @@ package top.mcfpp.antlr
 
 import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
+import top.mcfpp.annotations.MNIFunction
 import top.mcfpp.antlr.mcfppParser.TemplateDeclarationContext
 import top.mcfpp.compiletime.CompileTimeFunction
-import top.mcfpp.exception.*
-import top.mcfpp.io.MCFPPFile
 import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.annotations.MNIFunction
-import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.exception.UndefinedException
+import top.mcfpp.exception.VariableConverseException
+import top.mcfpp.io.MCFPPFile
 import top.mcfpp.model.*
-import top.mcfpp.model.Class
 import top.mcfpp.model.Member.AccessModifier
 import top.mcfpp.model.accessor.*
 import top.mcfpp.model.field.GlobalField
@@ -20,12 +18,13 @@ import top.mcfpp.model.function.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.generic.GenericExtensionFunction
 import top.mcfpp.model.generic.GenericFunction
+import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * 在编译工程之前，应当首先将所有文件中的资源全部遍历一次并写入缓存。
@@ -476,9 +475,9 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             MCFPPBaseType.Any
         }
         val `var` = type.buildUnConcrete(c.Identifier().text, Class.currClass!!)
-        if(Class.currClass is ObjectClass){
+        if(Class.currClass is ObjectClass && `var` is OnScoreboard){
             `var`.name = (Class.currClass as ObjectClass).uuid.toString()
-        }else{
+        }else if(`var` is OnScoreboard){
             `var`.name = "@s"
         }
         `var`.isDynamic = true

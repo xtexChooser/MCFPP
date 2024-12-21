@@ -19,24 +19,19 @@ import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
 
-open class EnumVar : Var<EnumVar> {
+@Suppress("LeakingThis")
+open class EnumVar : Var<EnumVar>, OnScoreboard {
 
     var sbObject: SbObject = SbObject.MCFPP_default
 
-    var enum: Enum
-
-    /**
-     * 创建一个枚举类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        enum: Enum,
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(enum, curr.prefix + identifier) {
-        this.identifier = identifier
+    override fun setObj(sbObject: SbObject): EnumVar {
+        this.sbObject = sbObject
+        return this
     }
+
+    final override var name: String
+
+    var enum: Enum
 
     /**
      * 创建一个枚举值。它的标识符和mc名相同。
@@ -44,6 +39,7 @@ open class EnumVar : Var<EnumVar> {
      */
     constructor(enum: Enum, identifier: String = UUID.randomUUID().toString()) : super(identifier){
         this.enum = enum
+        this.name = identifier
         type = enum.getType()
     }
 
@@ -52,12 +48,15 @@ open class EnumVar : Var<EnumVar> {
      * @param b 被复制的int值
      */
     constructor(b: EnumVar) : super(b){
+        sbObject = b.sbObject
+        name = b.name
         enum = b.enum
         type = enum.getType()
     }
 
     constructor(b: MCInt, enum : Enum): super(b){
         sbObject = b.sbObject
+        name = b.name
         this.enum = enum
         type = enum.getType()
     }
@@ -94,6 +93,7 @@ open class EnumVar : Var<EnumVar> {
                 }
                 EnumVarConcrete(enum, member.value)
             }
+
             else -> {
                 LogProcessor.error(TextTranslator.ASSIGN_ERROR.translate(b.type.typeName, type.typeName))
                 this
@@ -160,23 +160,7 @@ open class EnumVar : Var<EnumVar> {
 
 class EnumVarConcrete : EnumVar, MCFPPValue<EnumMember> {
 
-    override lateinit var value: EnumMember
-
-    /**
-     * 创建一个固定的int
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        enum: Enum,
-        curr: FieldContainer,
-        value: Int,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(enum,curr, identifier) {
-        this.value = enum.getMember(value)!!
-    }
+    override var value: EnumMember
 
     /**
      * 创建一个固定的int。它的标识符和mc名一致/

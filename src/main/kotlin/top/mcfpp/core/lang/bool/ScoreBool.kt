@@ -24,7 +24,10 @@ import top.mcfpp.util.TextTranslator.translate
  * bool型变量实现了多种计算方法，比如与，或，非等基本的逻辑运算。
  */
 open class ScoreBool : BaseBool, OnScoreboard {
-    
+
+
+    final override var name: String
+
     /**
      * 此bool变量依托的记分板
      */
@@ -35,8 +38,8 @@ open class ScoreBool : BaseBool, OnScoreboard {
      *
      * @param identifier 标识符。默认为
      */
-    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : this(curr.prefix + identifier){
-        this.identifier = identifier
+    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+        this.name = curr.prefix + identifier
     }
 
 
@@ -44,13 +47,17 @@ open class ScoreBool : BaseBool, OnScoreboard {
      * 创建一个bool值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+        this.name = identifier
+    }
 
     /**
      * 复制一个bool
      * @param b 被复制的int值
      */
-    constructor(b: ScoreBool) : super(b)
+    constructor(b: ScoreBool) : super(b){
+        this.name = b.name
+    }
 
     override var type: MCFPPType = MCFPPBaseType.Bool
 
@@ -277,7 +284,6 @@ open class ScoreBool : BaseBool, OnScoreboard {
 
     override fun toNBTVar(): NBTBasedData {
         val n = NBTBasedData()
-        n.name = name
         n.identifier = identifier
         n.isStatic = isStatic
         n.accessModifier = accessModifier

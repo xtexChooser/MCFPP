@@ -1,14 +1,12 @@
 package top.mcfpp.antlr
 
 import net.querz.nbt.io.SNBTUtil
-import net.querz.nbt.tag.*
+import net.querz.nbt.tag.DoubleTag
+import net.querz.nbt.tag.LongTag
+import net.querz.nbt.tag.StringTag
 import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPEnumType
-import top.mcfpp.type.MCFPPGenericClassType
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.nbt.*
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.Class
@@ -22,6 +20,9 @@ import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.model.generic.Generic
 import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPEnumType
+import top.mcfpp.type.MCFPPGenericClassType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.BoolTag
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil.toNBTByte
@@ -33,7 +34,6 @@ import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * 获取表达式结果用的visitor。解析并计算一个形如a+b*c的表达式。
@@ -674,7 +674,11 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             for (expr in ctx.nbtList().expression()){
                 valueList.add(visit(expr))
             }
-            val re = NBTListConcrete(valueList, "", valueList.first().type)
+            val re = if(valueList.isEmpty()){
+                NBTListConcrete.getEmpty()
+            }else{
+                NBTListConcrete(valueList, "", valueList.first().type)
+            }
             return if(re.value.all { it is MCFPPValue<*> }){
                 re
             }else{

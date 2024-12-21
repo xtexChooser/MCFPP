@@ -1,7 +1,6 @@
 package top.mcfpp.core.lang.nbt
 
 import net.querz.nbt.tag.LongTag
-import net.querz.nbt.tag.StringTag
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
@@ -9,8 +8,6 @@ import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.MCInt
 import top.mcfpp.core.lang.Var
 import top.mcfpp.exception.VariableConverseException
-import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
@@ -24,11 +21,6 @@ import java.util.*
 open class MCLong: NBTBasedData {
 
     override var type: MCFPPType = MCFPPNBTType.Long
-
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier)
 
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 
@@ -188,21 +180,6 @@ open class MCLong: NBTBasedData {
 class MCLongConcrete: MCLong, MCFPPValue<LongTag> {
 
     override var value: LongTag
-
-    /**
-     * 创建一个固定的string
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: LongTag,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier) {
-        this.value = value
-    }
 
     /**
      * 创建一个固定的string。它的标识符和mc名一致/

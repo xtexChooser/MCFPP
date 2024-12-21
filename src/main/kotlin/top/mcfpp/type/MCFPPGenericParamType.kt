@@ -2,6 +2,7 @@ package top.mcfpp.type
 
 import top.mcfpp.core.lang.MCAny
 import top.mcfpp.core.lang.value.MCTypeValue
+import top.mcfpp.model.CompoundData
 
 /**
  * 泛型类型
@@ -23,7 +24,10 @@ import top.mcfpp.core.lang.value.MCTypeValue
 class MCFPPGenericParamType(
     var identifier:String,
     override var parentType: List<MCFPPType>
-) : MCFPPType(MCAny.data, parentType) {   //TODO: 泛型的CompoundData
+) : MCFPPType(parentType) {   //TODO: 泛型的CompoundData
+
+    override val objectData: CompoundData
+        get() = MCAny.data
 
     override val typeName: String
         get() = identifier

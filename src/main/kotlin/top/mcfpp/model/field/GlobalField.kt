@@ -2,25 +2,19 @@ package top.mcfpp.model.field
 
 import top.mcfpp.Project
 import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.lib.SbObject
 import top.mcfpp.mni.DataObjectData
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.mni.MinecraftData
-import top.mcfpp.mni.annotation.Base
-import top.mcfpp.mni.annotation.ConcreteOnly
-import top.mcfpp.mni.annotation.From
-import top.mcfpp.mni.annotation.NoInstance
-import top.mcfpp.mni.annotation.To
+import top.mcfpp.mni.annotation.*
 import top.mcfpp.model.*
-import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.Enum
 import top.mcfpp.model.accessor.*
+import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.function.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.generic.GenericClass
+import top.mcfpp.type.MCFPPType
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * 全局域。
@@ -128,8 +122,8 @@ object GlobalField : FieldContainer, IField {
      */
     fun getFunction(namespace:String?, identifier: String, readOnlyParams: List<Var<*>>, normalParams : List<Var<*>>): Function {
         if(namespace == null){
-            val f = localNamespaces[Project.currNamespace]!!.field.getFunction(identifier, readOnlyParams, normalParams)
-            if(f !is UnknownFunction) return f
+            val f = localNamespaces[Project.currNamespace]?.field?.getFunction(identifier, readOnlyParams, normalParams)
+            if(f !is UnknownFunction && f != null) return f
             for (n in importedLibNamespaces.values){
                 val f1 = n.field.getFunction(identifier, readOnlyParams, normalParams)
                 if(f1 !is UnknownFunction) return f1
@@ -232,7 +226,7 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var itf: Interface?
             //命名空间为空，从全局寻找
-            itf = localNamespaces[Project.currNamespace]!!.field.getInterface(identifier)
+            itf = localNamespaces[Project.currNamespace]?.field?.getInterface(identifier)
             if(itf != null) return itf
             for (nsp in importedLibNamespaces.values){
                 itf = nsp.field.getInterface(identifier)
@@ -294,7 +288,7 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var enum: Enum?
             //命名空间为空，从全局寻找
-            enum = localNamespaces[Project.currNamespace]!!.field.getEnum(identifier)
+            enum = localNamespaces[Project.currNamespace]?.field?.getEnum(identifier)
             if(enum != null) return enum
             for (nsp in importedLibNamespaces.values){
                 enum = nsp.field.getEnum(identifier)

@@ -3,13 +3,11 @@ package top.mcfpp.model.function
 import top.mcfpp.Project
 import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.core.lang.MCFPPValue
-import top.mcfpp.model.accessor.SimpleAccessor
 import top.mcfpp.model.CanSelectMember
 import top.mcfpp.model.Native
+import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNotCompiledGenericType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.ValueWrapper
 import java.lang.Void
@@ -108,12 +106,16 @@ class NativeFunction : Function, Native {
 
     fun replaceGenericParams(genericParams: Map<String, MCFPPType>) : NativeFunction{
         val n = NativeFunction(this.identifier, this.namespace, this.javaMethod)
+        n.caller = this.caller
         n.returnType = this.returnType
         for(np in normalParams){
             if(genericParams[np.typeIdentifier] != null){
-                n.appendNormalParam(genericParams[np.typeIdentifier]!!, np.identifier, np.isStatic)
+                val p = FunctionParam(genericParams[np.typeIdentifier]!!, np.identifier, this, np.isStatic)
+                n.appendNormalParam(p)
+                n.field.putVar(p.identifier, p.buildVar())
             }else{
-                n.appendNormalParam(np.type, np.identifier, np.isStatic)
+                n.appendNormalParam(np)
+                n.field.putVar(np.identifier, np.buildVar())
             }
         }
         for(rp in readOnlyParams){

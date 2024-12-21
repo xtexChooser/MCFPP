@@ -1,13 +1,15 @@
 package top.mcfpp.type
 
 import net.querz.nbt.tag.CompoundTag
-import net.querz.nbt.tag.Tag
-import top.mcfpp.model.*
 import top.mcfpp.core.lang.DataTemplateObject
 import top.mcfpp.core.lang.DataTemplateObjectConcrete
 import top.mcfpp.core.lang.UnknownVar
 import top.mcfpp.core.lang.Var
 import top.mcfpp.mni.annotation.NoInstance
+import top.mcfpp.model.Class
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.DataTemplate
+import top.mcfpp.model.FieldContainer
 import top.mcfpp.util.LogProcessor
 
 /**
@@ -17,7 +19,10 @@ import top.mcfpp.util.LogProcessor
 open class MCFPPDataTemplateType(
     var template: DataTemplate,
     override var parentType: List<MCFPPType>
-) : MCFPPType(template, parentType) {
+) : MCFPPType(parentType) {
+
+    override val objectData: CompoundData
+        get() = template
 
     override val typeName: String
         get() = "template(${template.namespace}:${template.identifier})"

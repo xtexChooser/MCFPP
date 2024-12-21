@@ -10,8 +10,6 @@ import top.mcfpp.model.Member
 import top.mcfpp.model.field.IFieldWithType
 import top.mcfpp.util.LogProcessor
 
-
-
 /**
  * 一个未被解析的变量。在读取类的字段部分的时候，由于字段的类型对应的类还没有被加载到编译器中，因此会将字段作为未解析的变量暂存在类的域中。
  * 当类被完全解析完毕并加载后，才会将类中的未解析变量逐个解析

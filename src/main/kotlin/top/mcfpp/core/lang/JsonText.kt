@@ -8,7 +8,6 @@ import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.lib.ChatComponent
 import top.mcfpp.lib.NBTChatComponent
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.function.Function
@@ -34,13 +33,6 @@ open class JsonText : NBTBasedData {
     var isElement = false
 
     override var type: MCFPPType = MCFPPBaseType.JsonText
-
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
-        this.identifier = identifier
-    }
 
     /**
      * 创建一个int值。它的标识符和mc名相同。
@@ -123,22 +115,7 @@ open class JsonText : NBTBasedData {
 
 class JsonTextConcrete : MCFPPValue<ChatComponent>, JsonText {
 
-    override lateinit var value: ChatComponent
-
-    /**
-     * 创建一个固定的int
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: ChatComponent,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
-        this.value = value
-    }
+    override var value: ChatComponent
 
     /**
      * 创建一个固定的int。它的标识符和mc名一致/

@@ -11,6 +11,7 @@ import top.mcfpp.antlr.*
 import top.mcfpp.io.DatapackCreator
 import top.mcfpp.io.MCFPPFile
 import top.mcfpp.model.field.GlobalField
+import top.mcfpp.parseArgs
 import top.mcfpp.util.LogProcessor
 import java.io.File
 import java.io.FileInputStream
@@ -23,12 +24,7 @@ object MCFPPStringTest {
         val source = ConfigurationSource(FileInputStream("log4j2.xml"))
         Configurator.initialize(null,source)
         //编译参数
-        if(args.isNotEmpty()){
-            if(args.contains("debug")){
-                CompileSettings.isDebug = true
-                LogProcessor.warn("Compiling in debug mode.")
-            }
-        }
+        parseArgs(args.asList())
         Project.compileStage = 0
         //读取json
         LogProcessor.debug("Generate debug project for a string")
@@ -49,7 +45,7 @@ object MCFPPStringTest {
         val tokens = CommonTokenStream(mcfppLexer(charStream))
         val parser = mcfppParser(tokens)
         val context = parser.compilationUnit()
-        MCFPPFile.currFile = MCFPPFile("./test.mcfpp")
+        MCFPPFile.currFile = MCFPPFile()
         LogProcessor.debug("Generate Type Index...")
         MCFPPTypeVisitor().visit(context)
         LogProcessor.debug("Generate Function Index...")
@@ -59,7 +55,7 @@ object MCFPPStringTest {
         LogProcessor.debug("Compiling mcfpp code...")
         visitor.visit(context)
         Project.optimization() //优化
-        Project.genIndex() //生成索引
+        if(targetPath != null) Project.genIndex() //生成索引
         Project.ctx = null
         if(Project.config.targetPath != null){
             try{

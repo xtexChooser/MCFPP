@@ -7,7 +7,9 @@ import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.mni.NBTBasedDataData
-import top.mcfpp.model.*
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.FieldContainer
+import top.mcfpp.model.Member
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.function.Function
 import top.mcfpp.type.*
@@ -16,7 +18,6 @@ import top.mcfpp.util.NBTUtil
 import top.mcfpp.util.NBTUtil.toJava
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.lang.Class
 import java.util.*
 
 
@@ -30,18 +31,6 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable {
     open var nbtType: NBTTypeWithTag = NBTTypeWithTag.ANY
 
     override var type: MCFPPType = MCFPPNBTType.NBT
-
-    /**
-     * 创建一个nbt类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
-        this.identifier = identifier
-    }
 
     /**
      * 创建一个nbt值。它的标识符和mc名相同。
@@ -74,7 +63,9 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable {
         }
     }
 
-    override fun canAssignedBy(b: Var<*>): Boolean = true
+    override fun canAssignedBy(b: Var<*>): Boolean {
+        return !b.implicitCast(type).isError
+    }
 
     @InsertCommand
     protected open fun assignCommand(a: NBTBasedData) : NBTBasedData {
@@ -421,7 +412,7 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable {
 
 class NBTBasedDataConcrete : NBTBasedData, MCFPPValue<Tag<*>> {
 
-    override lateinit var value : Tag<*>
+    override var value : Tag<*>
 
     constructor(
         curr: FieldContainer,

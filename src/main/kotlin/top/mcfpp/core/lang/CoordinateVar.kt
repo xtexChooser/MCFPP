@@ -233,7 +233,7 @@ open class CoordinateDimension: MCNumber<Number> {
         identifier: String = UUID.randomUUID().toString()
     ) : this(curr.prefix + identifier) {
         this.identifier = identifier
-        this.prefix = MCStringConcrete(curr, StringTag(prefix), identifier)
+        this.prefix = MCStringConcrete(StringTag(prefix), identifier)
     }
 
     /**

@@ -2,7 +2,10 @@ package top.mcfpp.type
 
 import net.querz.nbt.tag.IntArrayTag
 import net.querz.nbt.tag.Tag
-import top.mcfpp.core.lang.*
+import top.mcfpp.core.lang.EntityVar
+import top.mcfpp.core.lang.EntityVarConcrete
+import top.mcfpp.core.lang.SelectorVar
+import top.mcfpp.core.lang.Var
 import top.mcfpp.lib.EntitySelector
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
@@ -10,7 +13,7 @@ import top.mcfpp.model.FieldContainer
 
 class MCFPPEntityType {
 
-    object EntityBase: MCFPPType(parentType = listOf(MCFPPBaseType.Any)){
+    object EntityBase: MCFPPType(listOf(MCFPPBaseType.Any)){
 
             override val objectData: CompoundData
                 get() = EntityVar.data
@@ -19,7 +22,7 @@ class MCFPPEntityType {
                 get() = "entitybase"
     }
 
-    object Entity: MCFPPType(parentType = listOf(EntityBase)){
+    object Entity: MCFPPType(listOf(EntityBase)){
 
         override val objectData: CompoundData
             get() = EntityVar.data
@@ -31,18 +34,18 @@ class MCFPPEntityType {
             get() = IntArrayTag::class.java
 
         override fun build(identifier: String, container: FieldContainer): Var<*> =
-            EntityVarConcrete(container, IntArrayTag(intArrayOf(0, 0, 0, 0)), identifier)
+            EntityVarConcrete(IntArrayTag(intArrayOf(0, 0, 0, 0)), identifier)
         override fun build(identifier: String): Var<*> =
             EntityVarConcrete(IntArrayTag(intArrayOf(0, 0, 0, 0)), identifier)
         override fun build(identifier: String, clazz: Class): Var<*> =
-            EntityVarConcrete(clazz, IntArrayTag(intArrayOf(0, 0, 0, 0)), identifier)
+            EntityVarConcrete(IntArrayTag(intArrayOf(0, 0, 0, 0)), identifier)
         override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
-            EntityVar(container, identifier)
+            EntityVar(identifier)
         override fun buildUnConcrete(identifier: String): Var<*> = EntityVar(identifier)
-        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = EntityVar(clazz, identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = EntityVar(identifier)
     }
 
-    object Selector: MCFPPConcreteType(parentType = listOf(EntityBase)){
+    object Selector: MCFPPConcreteType(listOf(EntityBase)){
 
         override val objectData: CompoundData
             get() = SelectorVar.data
@@ -61,7 +64,7 @@ class MCFPPEntityType {
 
     }
 
-    class LimitedSelectorType(val limit: Int): MCFPPConcreteType(parentType = listOf(MCFPPEntityType.Entity)){
+    class LimitedSelectorType(val limit: Int): MCFPPConcreteType(listOf(Entity)){
 
         override val objectData: CompoundData
             get() = SelectorVar.data

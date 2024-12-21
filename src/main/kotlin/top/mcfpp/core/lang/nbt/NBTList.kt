@@ -1,6 +1,8 @@
 package top.mcfpp.core.lang.nbt
 
-import net.querz.nbt.tag.*
+import net.querz.nbt.tag.IntTag
+import net.querz.nbt.tag.ListTag
+import net.querz.nbt.tag.Tag
 import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
@@ -11,23 +13,19 @@ import top.mcfpp.lib.NBTPath
 import top.mcfpp.lib.StorageSource
 import top.mcfpp.mni.NBTListConcreteData
 import top.mcfpp.mni.NBTListData
-import top.mcfpp.model.*
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.Member
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NativeFunction
 import top.mcfpp.model.function.UnknownFunction
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPListType
-import top.mcfpp.type.MCFPPNBTType
-import top.mcfpp.type.MCFPPType
+import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * 表示一个列表类型。基于NBTBasedData实现。
@@ -39,20 +37,6 @@ open class NBTList : NBTBasedData {
     var genericType: MCFPPType
 
     override var nbtType = NBTBasedData.Companion.NBTTypeWithTag.LIST
-
-    /**
-     * 创建一个list类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString(),
-        genericType : MCFPPType
-    ) : super(curr, identifier){
-        type = MCFPPListType(genericType)
-        this.genericType = genericType
-    }
 
     /**
      * 创建一个list值。它的标识符和mc名相同。
@@ -76,7 +60,14 @@ open class NBTList : NBTBasedData {
 
     override fun doAssignedBy(b: Var<*>): NBTList {
         return when (b) {
-            is NBTList -> assignCommand(b)
+            is NBTList -> {
+                if(genericType == b.genericType || (b is NBTListConcrete && b.isEmptyTemp)){
+                    assignCommand(b)
+                }else{
+                    LogProcessor.error(TextTranslator.ASSIGN_ERROR.translate(b.type.typeName, type.typeName))
+                    return this
+                }
+            }
             is NBTBasedDataConcrete -> {
                 if (b.nbtType == this.nbtType) {
                     assignCommand(b)
@@ -156,6 +147,17 @@ open class NBTList : NBTBasedData {
                 }else{
                     Function.addCommand(final.last())
                 }
+            }else {
+                //对类中的成员的值进行修改
+                if(a is NBTListConcrete){
+                    return NBTListConcrete(this, a.value)
+                }else if(a is NBTBasedDataConcrete){
+                    return NBTListConcrete(this, ArrayList((a.value as ListTag<*>).map {
+                        NBTBasedDataConcrete(it)
+                    }))
+                }else{
+                    Function.addCommand(Commands.dataSetFrom(nbtPath, a.nbtPath))
+                }
             }
         }
         //返回值
@@ -194,8 +196,7 @@ open class NBTList : NBTBasedData {
     ): Pair<Function, Boolean> {
         var re: Function = UnknownFunction(key)
         data.field.forEachFunction {
-            //TODO 我们约定it为NativeFunction，但是没有考虑拓展函数
-            assert(it is NativeFunction)
+            //TODO 我们约定it为NativeFunction，但是没有考虑拓展函数=
             val nf = (it as NativeFunction).replaceGenericParams(mapOf("E" to genericType))
             if(nf.isSelf(key, normalArgs)){
                 re = nf
@@ -224,6 +225,7 @@ open class NBTList : NBTBasedData {
     companion object {
         val data by lazy {
             CompoundData("list", "mcfpp.lang").apply {
+                field.putType("E", MCFPPGenericParamType("E", listOf(MCFPPBaseType.Any)))
                 extends(NBTBasedData.data)
                 getNativeFromClass(NBTListData::class.java)
             }
@@ -234,21 +236,9 @@ open class NBTList : NBTBasedData {
 
 class NBTListConcrete: NBTList, MCFPPValue<ArrayList<Var<*>>> {
 
-    override lateinit var value: ArrayList<Var<*>>
+    var isEmptyTemp: Boolean = false
 
-    /**
-     * 创建一个固定的list
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: ArrayList<Var<*>>,
-        identifier: String = UUID.randomUUID().toString(),
-        genericType : MCFPPType
-    ) : this(value, curr.prefix + identifier, genericType)
+    override var value: ArrayList<Var<*>>
 
     constructor(value: ArrayList<Var<*>>, identifier: String, genericType: MCFPPType) : super(identifier, genericType){
         type = MCFPPListType(genericType)
@@ -259,9 +249,9 @@ class NBTListConcrete: NBTList, MCFPPValue<ArrayList<Var<*>>> {
         this.value = value
     }
 
-
     constructor(v: NBTListConcrete) : super(v){
         this.value = v.value
+        isEmptyTemp = v.isEmptyTemp
     }
 
     override fun clone(): NBTListConcrete {
@@ -390,7 +380,7 @@ class NBTListConcrete: NBTList, MCFPPValue<ArrayList<Var<*>>> {
             }
         }
 
-        val empty = NBTListConcrete(ArrayList(), "empty", MCFPPBaseType.Any)
+        fun getEmpty() = NBTListConcrete(ArrayList(), "empty", MCFPPBaseType.Any).apply { isEmptyTemp = true }
 
         val listTempNBTPath = NBTPath(StorageSource("mcfpp:system")).memberIndex("temp_list")
 

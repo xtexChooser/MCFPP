@@ -2,7 +2,6 @@ package top.mcfpp.type
 
 import net.querz.nbt.tag.CompoundTag
 import net.querz.nbt.tag.Tag
-import top.mcfpp.core.lang.CommandReturn
 import top.mcfpp.core.lang.UnknownVar
 import top.mcfpp.core.lang.Var
 import top.mcfpp.model.Class
@@ -10,10 +9,7 @@ import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.util.LogProcessor
 
-open class MCFPPPrivateType(
-    override val objectData: CompoundData = CompoundData("unknown", "mcfpp"),
-    override var parentType: List<MCFPPType> = listOf()
-) : MCFPPType(objectData, parentType) {
+open class MCFPPPrivateType(parentType: List<MCFPPType> = listOf()) : MCFPPType(parentType) {
 
     final override fun build(identifier: String, container: FieldContainer): Var<*> {
         LogProcessor.error("Cannot build var for type: $typeName")
@@ -50,7 +46,7 @@ open class MCFPPPrivateType(
         override val objectData: CompoundData
             get() = top.mcfpp.core.lang.CommandReturn.data
 
-        override val typeName: kotlin.String
+        override val typeName: String
             get() = "CommandReturn"
 
         override val nbtType: java.lang.Class<out Tag<*>>

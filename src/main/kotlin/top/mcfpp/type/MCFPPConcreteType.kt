@@ -1,7 +1,5 @@
 package top.mcfpp.type
 
-import net.querz.nbt.tag.EndTag
-import net.querz.nbt.tag.Tag
 import top.mcfpp.core.lang.JavaVar
 import top.mcfpp.core.lang.MCFPPTypeVar
 import top.mcfpp.core.lang.UnknownVar
@@ -11,10 +9,7 @@ import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.util.LogProcessor
 
-open class MCFPPConcreteType(objectData: CompoundData = CompoundData("unknown", "mcfpp"), parentType: List<MCFPPType> = listOf()): MCFPPType(
-    objectData,
-    parentType
-) {
+open class MCFPPConcreteType(parentType: List<MCFPPType> = listOf()): MCFPPType(parentType) {
     final override fun buildUnConcrete(identifier: String): Var<*> {
         LogProcessor.error("Cannot build variable '$typeName' as the compiler cannot track its type.")
         return UnknownVar(identifier)
@@ -30,7 +25,7 @@ open class MCFPPConcreteType(objectData: CompoundData = CompoundData("unknown", 
         return UnknownVar(identifier)
     }
 
-    object Type: MCFPPConcreteType(parentType = listOf()){
+    object Type: MCFPPConcreteType(listOf()){
 
         override val objectData: CompoundData
             get() = data
@@ -44,7 +39,7 @@ open class MCFPPConcreteType(objectData: CompoundData = CompoundData("unknown", 
         override fun build(identifier: String, clazz: Class): Var<*> = MCFPPTypeVar(identifier = identifier)
     }
 
-    object JavaVar: MCFPPConcreteType(parentType = listOf(MCFPPBaseType.Any)){
+    object JavaVar: MCFPPConcreteType(listOf(MCFPPBaseType.Any)){
 
         override val objectData: CompoundData
             get() = top.mcfpp.core.lang.JavaVar.data

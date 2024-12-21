@@ -5,15 +5,14 @@ import top.mcfpp.annotations.MNIFunction
 import top.mcfpp.core.lang.Var
 import top.mcfpp.doc.Document
 import top.mcfpp.model.accessor.Property
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.field.CompoundDataField
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NativeFunction
 import top.mcfpp.model.function.UnknownFunction
-import top.mcfpp.model.generic.GenericClass
+import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPGenericParamType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -73,7 +72,10 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
     open fun initialize(){}
 
     open val getType :() -> MCFPPType = {
-        MCFPPType(this, parent.map { it.getType() }.toList())
+        object :MCFPPType(parent.map { it.getType() }.toList()){
+            override val objectData: CompoundData
+                get() = this@CompoundData
+        }
     }
 
     /**
@@ -215,13 +217,13 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
                 if(this is ObjectCompoundData && !mniRegister.isObject) continue
                 val nf = NativeFunction(method.name, javaMethod = method)
                 //解析MNIMethod注解成员
-                val callerType = MCFPPType.parseFromIdentifier(mniRegister.caller, Function.field)
+                mniRegister.genericType.map {
+                    nf.field.putType(it, MCFPPGenericParamType(it, listOf()))
+                }
+                val callerType = MCFPPType.parseFromIdentifier(mniRegister.caller, nf.field)
                 nf.caller = callerType?: run {
                     LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(mniRegister.caller))
                     MCFPPBaseType.Void
-                }
-                mniRegister.genericType.map {
-                    nf.field.putType(it, MCFPPGenericParamType(it, listOf()))
                 }
                 val readOnlyType = mniRegister.readOnlyParams.map {
                     var qwq = it.split(" ", limit = 3)

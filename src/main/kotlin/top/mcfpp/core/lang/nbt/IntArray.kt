@@ -1,9 +1,7 @@
 package top.mcfpp.core.lang.nbt
 
-import net.querz.nbt.tag.ByteArrayTag
 import net.querz.nbt.tag.IntArrayTag
 import top.mcfpp.core.lang.*
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
@@ -17,8 +15,6 @@ open class IntArray: NBTArray {
 
     override val arrayType: MCFPPType = MCFPPBaseType.Int
 
-    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier)
-
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 
     constructor(b: NBTArray) : super(b)
@@ -27,10 +23,6 @@ open class IntArray: NBTArray {
 class IntArrayConcrete: IntArray, MCFPPValue<IntArrayTag>{
 
     override var value: IntArrayTag
-
-    constructor(curr: FieldContainer, value: IntArrayTag, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier){
-        this.value = value
-    }
 
     constructor(value: IntArrayTag, identifier: String = UUID.randomUUID().toString()) : super(identifier){
         this.value = value

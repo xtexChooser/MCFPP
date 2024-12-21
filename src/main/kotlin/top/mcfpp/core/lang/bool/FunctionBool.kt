@@ -53,7 +53,7 @@ class FunctionBool(identifier: String , function: Function): BaseBool(identifier
             }
 
             is ScoreBool -> {
-                val re = ScoreBool(identifier).apply { name = this@FunctionBool.name }
+                val re = ScoreBool(identifier)
                 return re.assignedBy(this)
             }
 

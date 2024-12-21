@@ -11,22 +11,20 @@ import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.antlr.mcfppParser.FunctionBodyContext
 import top.mcfpp.command.*
 import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.type.UnresolvedType
-import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.doc.Document
 import top.mcfpp.model.*
 import top.mcfpp.model.field.FunctionField
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.generic.Generic
+import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPDeclaredConcreteType
+import top.mcfpp.type.MCFPPType
+import top.mcfpp.type.UnresolvedType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.io.Serializable
-import java.lang.NullPointerException
 import java.lang.reflect.Method
 
 open class Function : Member, FieldContainer, Serializable, WithDocument {
@@ -440,6 +438,11 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         if(!tags.contains(tag)){
             tags.add(tag)
         }
+        return this
+    }
+
+    fun appendNormalParam(param: FunctionParam): Function {
+        normalParams.add(param)
         return this
     }
 

@@ -10,13 +10,12 @@ import top.mcfpp.core.lang.MCAnyConcrete
 import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.Var
 import top.mcfpp.exception.VariableConverseException
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.Member
+import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
-import top.mcfpp.model.Member
-import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -39,19 +38,6 @@ import java.util.*
 open class MCString : NBTBasedData {
 
     override var type: MCFPPType = MCFPPBaseType.String
-
-    /**
-     * 创建一个string类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
-        this.identifier = identifier
-
-    }
 
     /**
      * 创建一个string值。它的标识符和mc名相同。
@@ -165,21 +151,6 @@ open class MCString : NBTBasedData {
 class MCStringConcrete: MCString, MCFPPValue<StringTag> {
 
     override var value: StringTag
-
-    /**
-     * 创建一个固定的string
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: StringTag,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
-        this.value = value
-    }
 
     /**
      * 创建一个固定的string。它的标识符和mc名一致/

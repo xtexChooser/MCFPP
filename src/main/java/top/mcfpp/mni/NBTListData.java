@@ -114,7 +114,7 @@ public class NBTListData {
         Function.Companion.addCommand(command);
     }
 
-    @MNIFunction(normalParams = {"int index, E e"}, caller = "list", genericType = "E")
+    @MNIFunction(normalParams = {"int index", "E e"}, caller = "list", genericType = "E")
     public static void insert(MCInt index, Var<?> e, NBTList caller){
         if(e instanceof MCFPPValue<?> && (MCInt)index instanceof MCIntConcrete indexC){
             //都是确定的
@@ -257,7 +257,7 @@ public class NBTListData {
         returnVar.setValue(index);
     }
 
-    @MNIFunction(normalParams = {"E e"}, caller = "list<E>", returnType = "int")
+    @MNIFunction(normalParams = {"E e"}, caller = "list<E>", genericType = "E", returnType = "int")
     public static void lastIndexOf(Var<?> e, NBTList caller, ValueWrapper<MCInt> returnVar){
         var n = e.toNBTVar();
         element.assignedBy(n);

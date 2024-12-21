@@ -5,7 +5,6 @@ import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.mni.NBTDictionaryData
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.function.Function
@@ -15,21 +14,10 @@ import top.mcfpp.util.NBTUtil
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
-import kotlin.collections.HashMap
 
 open class NBTDictionary : NBTBasedData {
 
     override var type: MCFPPType = MCFPPDictType(MCFPPBaseType.Any)
-
-    /**
-     * 创建一个dict类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为随机UUID
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier)
 
     /**
      * 创建一个dict值。它的标识符和mc名相同。
@@ -101,22 +89,7 @@ open class NBTDictionary : NBTBasedData {
  */
 class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>> {
 
-    override lateinit var value: HashMap<String, Var<*>>
-
-    /**
-     * 创建一个固定的dict
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: HashMap<String, Var<*>>,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier){
-        this.value = value
-    }
+    override var value: HashMap<String, Var<*>>
 
     /**
      * 创建一个固定的dict。它的标识符和mc名一致
@@ -165,7 +138,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
                 if (type.generic == (this.type as MCFPPDictType).generic) {
                     this
                 } else {
-                    Var.buildCastErrorVar(type)
+                    buildCastErrorVar(type)
                 }
             }
 
@@ -178,7 +151,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
             }
 
             MCFPPBaseType.Any -> this
-            else -> Var.buildCastErrorVar(type)
+            else -> buildCastErrorVar(type)
         }
     }
 
@@ -192,7 +165,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
                 if(type.generic == (this.type as MCFPPDictType).generic){
                     this
                 }else{
-                    Var.buildCastErrorVar(type)
+                    buildCastErrorVar(type)
                 }
             }
             is MCFPPDataTemplateType -> {
@@ -203,7 +176,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
                         DataTemplateObject(type.template, identifier)
                     }
                 }else{
-                    Var.buildCastErrorVar(type)
+                    buildCastErrorVar(type)
                 }
             }
             MCFPPNBTType.NBT -> {
@@ -216,7 +189,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
             MCFPPBaseType.Any -> this
             else -> {
                 LogProcessor.error(TextTranslator.CAST_ERROR.translate(this.type.typeName, type.typeName))
-                Var.buildCastErrorVar(type)
+                buildCastErrorVar(type)
             }
         }
     }

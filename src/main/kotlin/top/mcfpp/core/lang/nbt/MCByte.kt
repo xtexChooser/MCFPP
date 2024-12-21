@@ -19,10 +19,7 @@ import java.util.*
 open class MCByte: MCInt {
 
     override var type: MCFPPType = MCFPPNBTType.Byte
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier)
+    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier)
 
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 

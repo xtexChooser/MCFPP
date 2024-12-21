@@ -9,13 +9,12 @@ import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.core.lang.nbt.NBTList
-import top.mcfpp.model.accessor.SimpleAccessor
 import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.mni.NBTListData
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.accessor.Property
+import top.mcfpp.model.accessor.SimpleAccessor
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NativeFunction
 import top.mcfpp.model.function.UnknownFunction
@@ -26,17 +25,6 @@ import top.mcfpp.type.MCFPPType
 import java.util.*
 
 open class ImmutableList : NBTList {
-
-    /**
-     * 创建一个list类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString(),
-        genericType : MCFPPType
-    ) : super(curr, identifier, genericType)
 
     /**
      * 创建一个list值。它的标识符和mc名相同。
@@ -71,20 +59,6 @@ open class ImmutableList : NBTList {
 class ImmutableListConcrete: ImmutableList, MCFPPValue<ListTag<*>>{
 
     override var value: ListTag<*>
-
-    /**
-     * 创建一个固定的list
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: ListTag<*>,
-        identifier: String = UUID.randomUUID().toString(),
-        genericType : MCFPPType
-    ) : this(value, curr.prefix + identifier, genericType)
 
     constructor(value: ListTag<*>, identifier: String, genericType: MCFPPType) : super(identifier, genericType){
         type = MCFPPListType(genericType)

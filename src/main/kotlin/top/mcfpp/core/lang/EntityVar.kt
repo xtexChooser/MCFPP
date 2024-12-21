@@ -9,12 +9,11 @@ import top.mcfpp.core.lang.nbt.MCStringConcrete
 import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.mni.minecraft.EntityVarData
-import top.mcfpp.type.MCFPPEntityType.Entity
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
+import top.mcfpp.type.MCFPPEntityType.Entity
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -31,29 +30,8 @@ open class EntityVar : NBTBasedData, EntityBase{
 
     var isName = false
 
-    /**
-     * 创建一个entity类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
-        this.identifier = identifier
-    }
+    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 
-    /**
-     * 创建一个entity值。它的标识符和mc名相同。
-     * @param identifier identifier
-     */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
-    }
-
-    /**
-     * 复制一个entity
-     * @param b 被复制的entity值
-     */
     constructor(b: EntityVar) : super(b)
 
     override fun isPlayer(): Boolean {
@@ -163,12 +141,7 @@ open class EntityVar : NBTBasedData, EntityBase{
 
 class EntityVarConcrete: EntityVar, MCFPPValue<Tag<*>> {
 
-    override lateinit var value: Tag<*>
-
-    constructor(curr: FieldContainer, value: Tag<*>, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier){
-        this.value = value
-    }
-
+    override var value: Tag<*>
 
     constructor(value: Tag<*>, identifier: String = UUID.randomUUID().toString()) : super(identifier){
         this.value = value

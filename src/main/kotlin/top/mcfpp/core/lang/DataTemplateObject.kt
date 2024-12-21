@@ -42,7 +42,6 @@ open class DataTemplateObject : Var<DataTemplateObject> {
      */
     constructor(template: DataTemplate, identifier: String = UUID.randomUUID().toString()): super(identifier) {
         this.templateType = template
-        this.name = identifier
         this.identifier = identifier
         instanceField = template.field.createDataTemplateInstance(this)
     }
@@ -309,7 +308,7 @@ open class DataTemplateObject : Var<DataTemplateObject> {
 
 class DataTemplateObjectConcrete: DataTemplateObject, MCFPPValue<CompoundTag> {
 
-    override lateinit var value: CompoundTag
+    override var value: CompoundTag
 
     /**
      * 创建一个固定的DataTemplate

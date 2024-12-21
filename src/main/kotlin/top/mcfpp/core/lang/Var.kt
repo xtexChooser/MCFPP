@@ -1,6 +1,6 @@
 package top.mcfpp.core.lang
 
-import net.querz.nbt.tag.*
+import net.querz.nbt.tag.StringTag
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
@@ -10,10 +10,15 @@ import top.mcfpp.core.lang.nbt.MCStringConcrete
 import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
 import top.mcfpp.lib.*
-import top.mcfpp.model.*
+import top.mcfpp.model.CanSelectMember
+import top.mcfpp.model.Class
+import top.mcfpp.model.DataTemplate
+import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.type.*
-import top.mcfpp.util.*
+import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.NBTUtil
+import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.io.Serializable
 import java.util.*
@@ -32,11 +37,6 @@ import java.util.*
  * mcfpp本身的语法并不支持匿名变量。
  */
 abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serializable{
-
-    /**
-     * 在Minecraft中的标识符
-     */
-    var name: String
 
     /**
      * 在mcfpp中的标识符，在域中的键名
@@ -120,7 +120,6 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
      */
     @Suppress("LeakingThis")
     constructor(`var` : Var<*>)  {
-        name = `var`.name
         identifier = `var`.identifier
         isStatic = `var`.isStatic
         accessModifier = `var`.accessModifier
@@ -136,7 +135,6 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
      * @param identifier 变量的标识符。默认为随机的uuid
      */
     constructor(identifier: String = UUID.randomUUID().toString()){
-        this.name = identifier
         this.identifier = identifier
         this.nbtPath = NBTPath(StorageSource("mcfpp:temp"))
     }
@@ -235,7 +233,7 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
             MCFPPNBTType.NBT -> {
                 if(this is MCFPPValue<*> && (this is ScoreBoolConcrete || this !is BaseBool)){
                     NBTBasedDataConcrete(this.toNBTVar(), NBTUtil.varToNBT(this)!!)
-                }else{
+                } else {
                     this.toNBTVar()
                 }
             }
@@ -456,7 +454,6 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
 
     open fun toNBTVar(): NBTBasedData {
         val n = NBTBasedData()
-        n.name = name
         n.identifier = identifier
         n.isStatic = isStatic
         n.accessModifier = accessModifier
@@ -484,24 +481,22 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
 
     override fun toString(): String {
         return if(this is MCFPPValue<*>){
-            "[$type,value=$value]"
+            "Var($type#$identifier=$value)"
         }else{
-            "[$type,value=Unknown]"
+            "Var($type#$identifier)"
         }
     }
 
     override fun equals(other: Any?): Boolean {
         if(other !is Var<*>) return false
         if(this.parent != other.parent) return false
-        if(this.name != other.name) return false
         if(this is MCFPPValue<*> != other is MCFPPValue<*>) return false
         if(this is MCFPPValue<*> && other is MCFPPValue<*> && this.value != other.value) return false
         return true
     }
 
     override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + identifier.hashCode()
+        var result = identifier.hashCode()
         result = 31 * result + stackIndex
         result = 31 * result + hasAssigned.hashCode()
         result = 31 * result + (parent?.hashCode() ?: 0)

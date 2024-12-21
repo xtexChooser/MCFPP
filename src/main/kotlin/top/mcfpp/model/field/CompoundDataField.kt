@@ -2,14 +2,14 @@ package top.mcfpp.model.field
 
 import org.jetbrains.annotations.Nullable
 import top.mcfpp.core.lang.DataTemplateObject
+import top.mcfpp.core.lang.OnScoreboard
 import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.model.*
+import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.model.generic.Generic
-import java.util.HashMap
+import top.mcfpp.type.MCFPPType
 
 /**
  * 一个域，储存了字段和方法。
@@ -154,7 +154,16 @@ class CompoundDataField : IFieldWithFunction, IFieldWithVar, IFieldWithType, IFi
         }
     }
 
-    override fun getType(key: String) = types.getOrDefault(key, null)
+    override fun getType(key: String): MCFPPType? {
+        if(types.containsKey(key)) return types[key]
+        parent.forEach {
+            if(it is IFieldWithType){
+                val re = it.getType(key)
+                if(re!=null) return re
+            }
+        }
+        return null
+    }
 
     override fun containType(id: String): Boolean {
         return types.containsKey(id)
@@ -271,7 +280,9 @@ class CompoundDataField : IFieldWithFunction, IFieldWithVar, IFieldWithType, IFi
         val re = CompoundDataField(this)
         re.allVars.forEach {
             it.parent = selector
-            it.name = selector.identifier + "_" + it.identifier
+            if(it is OnScoreboard){
+                it.name = selector.identifier + "_" + it.identifier
+            }
             if(it.nbtPath.pathList.isEmpty()) return@forEach
             it.nbtPath.pathList.removeLast()
             it.nbtPath.memberIndex(selector.identifier)

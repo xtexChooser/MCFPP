@@ -1,9 +1,5 @@
 package top.mcfpp.core.lang
 
-import com.github.javaparser.utils.Log
-import top.mcfpp.model.Member
-import top.mcfpp.model.function.Function
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 
 @Suppress("UNCHECKED_CAST")

@@ -1,7 +1,7 @@
 package top.mcfpp.test
 
-import kotlin.test.Test
 import top.mcfpp.test.util.MCFPPStringTest
+import kotlin.test.Test
 
 class NBTTypeTest {
 
@@ -16,7 +16,7 @@ class NBTTypeTest {
                     print(l.getJavaVar());
                 }
             """.trimIndent()
-        MCFPPStringTest.readFromString(test)
+        MCFPPStringTest.readFromString(test, arrayOf("-debug"))
         println()
     }
 

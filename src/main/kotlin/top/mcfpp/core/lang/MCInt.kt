@@ -1,6 +1,5 @@
 package top.mcfpp.core.lang
 
-import top.mcfpp.MCFPP
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
@@ -25,28 +24,10 @@ import java.util.*
  */
 open class MCInt : MCNumber<Int> {
 
-    /**
-     * 创建一个int类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
-        this.identifier = identifier
-    }
+    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier)
 
-    /**
-     * 创建一个int值。它的标识符和mc名相同。
-     * @param identifier identifier
-     */
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 
-    /**
-     * 复制一个int
-     * @param b 被复制的int值
-     */
     constructor(b: MCInt) : super(b)
 
     constructor(b: EnumVar): super(b)

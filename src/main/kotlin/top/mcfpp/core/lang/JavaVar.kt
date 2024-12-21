@@ -6,15 +6,15 @@ import net.querz.nbt.tag.Tag
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.core.lang.nbt.*
 import top.mcfpp.exception.OperationNotImplementException
-import top.mcfpp.model.*
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.JavaFunction
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
-import java.lang.Class
+import top.mcfpp.util.TextTranslator
+import top.mcfpp.util.TextTranslator.translate
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
@@ -49,6 +49,31 @@ class JavaVar : Var<JavaVar>, MCFPPValue<Any?> {
      * @param b 被复制的JavaVar值
      */
     constructor(b: JavaVar) : super(b)
+
+    override fun explicitCast(type: MCFPPType): Var<*> {
+        if(type == this.type){
+            LogProcessor.warn(TextTranslator.REDUNDANT_CAST_WARN.translate(this.type.typeName, type.typeName))
+            return this
+        }
+        return when(type){
+            MCFPPBaseType.Any -> MCAnyConcrete(this)
+            else -> {
+                buildCastErrorVar(type)
+            }
+        }
+    }
+
+    override fun implicitCast(type: MCFPPType): Var<*> {
+        if(type == this.type){
+            return this
+        }
+        return when(type){
+            MCFPPBaseType.Any -> MCAnyConcrete(this)
+            else -> {
+                buildCastErrorVar(type)
+            }
+        }
+    }
 
     /**
      * 将b中的值赋值给此变量

@@ -2,6 +2,7 @@ package top.mcfpp.type
 
 import net.querz.nbt.tag.IntArrayTag
 import net.querz.nbt.tag.Tag
+import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.Var
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
@@ -9,7 +10,6 @@ import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.ExtensionFunction
 import top.mcfpp.model.function.Function
-import top.mcfpp.core.lang.ClassPointer
 
 /**
  * 用于标识由mcfpp class定义出来的类
@@ -17,7 +17,7 @@ import top.mcfpp.core.lang.ClassPointer
 open class MCFPPClassType(
     var cls:Class,
     override var parentType: List<MCFPPType>
-): MCFPPType(cls, parentType) {
+): MCFPPType(parentType) {
 
     override val nbtType: java.lang.Class<out Tag<*>>
         get() = IntArrayTag::class.java
@@ -69,12 +69,12 @@ open class MCFPPClassType(
         }
     }
 
-    override fun build(identifier: String, container: FieldContainer): Var<*> = ClassPointer(cls, container, identifier)
+    override fun build(identifier: String, container: FieldContainer): Var<*> = ClassPointer(cls, identifier)
     override fun build(identifier: String): Var<*> = ClassPointer(cls, identifier)
-    override fun build(identifier: String, clazz: Class): Var<*> = ClassPointer(this.cls, clazz, identifier)
-    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = ClassPointer(cls, container, identifier)
+    override fun build(identifier: String, clazz: Class): Var<*> = ClassPointer(this.cls, identifier)
+    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = ClassPointer(cls, identifier)
     override fun buildUnConcrete(identifier: String): Var<*> = ClassPointer(cls, identifier)
-    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ClassPointer(this.cls, clazz, identifier)
+    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ClassPointer(this.cls, identifier)
 
     companion object{
         val regex = Regex("^class\\((.+):(.+)\\)$")

@@ -9,16 +9,15 @@ import top.mcfpp.antlr.mcfppLexer
 import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.antlr.mcfppParser.TypeContext
 import top.mcfpp.antlr.mcfppParser.TypeWithoutExclContext
+import top.mcfpp.core.lang.UnknownVar
 import top.mcfpp.core.lang.Var
+import top.mcfpp.model.*
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.field.IFieldWithType
 import top.mcfpp.model.function.ExtensionFunction
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.model.generic.GenericClass
-import top.mcfpp.core.lang.UnknownVar
-import top.mcfpp.lib.TranslatableChatComponent
-import top.mcfpp.model.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
@@ -28,15 +27,14 @@ import top.mcfpp.util.TextTranslator.translate
  * 所有类型的接口
  */
 open class MCFPPType(
-
-    open val objectData: CompoundData = CompoundData("unknown", "mcfpp"),
-
     /**
      * 父类型，一个列表
      */
     open var parentType: List<MCFPPType> = listOf()
 
 ) : CanSelectMember {
+
+    open val objectData: CompoundData = CompoundData("unknown", "mcfpp")
 
     /**
      * 类型名

@@ -7,12 +7,13 @@ import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import java.util.UUID
 
-open class MCFPPTypeVar : Var<MCFPPTypeVar>, MCFPPValue<MCFPPType> {
+class MCFPPTypeVar : Var<MCFPPTypeVar>, MCFPPValue<MCFPPType> {
 
-    override lateinit var value: MCFPPType
+    override var value: MCFPPType
 
     override var type: MCFPPType = MCFPPConcreteType.Type
 
+    @Suppress("ConvertSecondaryConstructorToPrimary")
     constructor(type: MCFPPType = MCFPPBaseType.Any, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
         this.value = type
     }

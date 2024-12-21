@@ -1,7 +1,9 @@
 package top.mcfpp.core.lang.nbt
 
-import top.mcfpp.core.lang.*
-import top.mcfpp.model.FieldContainer
+import top.mcfpp.core.lang.MCInt
+import top.mcfpp.core.lang.PropertyVar
+import top.mcfpp.core.lang.UnknownVar
+import top.mcfpp.core.lang.Var
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
@@ -10,14 +12,6 @@ import java.util.*
 abstract class NBTArray: NBTBasedData {
 
     abstract val arrayType: MCFPPType
-
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
-        this.identifier = identifier
-
-    }
 
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 

@@ -3,7 +3,6 @@ package top.mcfpp.core.minecraft
 import net.querz.nbt.tag.StringTag
 import top.mcfpp.Project
 import top.mcfpp.core.lang.*
-import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.lib.EntitySelector
 import top.mcfpp.mni.minecraft.PlayerEntityData
 import top.mcfpp.model.CompoundData
@@ -140,7 +139,7 @@ open class PlayerVar : Var<PlayerVar>, EntityBase {
 
     class PlayerEntityVarConcrete: PlayerEntityVar, MCFPPValue<StringTag> {
 
-        override lateinit var value: StringTag
+        override var value: StringTag
 
         constructor(
             curr: FieldContainer,

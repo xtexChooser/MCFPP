@@ -3,8 +3,6 @@ package top.mcfpp.model
 import top.mcfpp.Project
 import top.mcfpp.annotations.MNIFunction
 import top.mcfpp.core.lang.UnresolvedVar
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.type.UnresolvedType
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.field.NamespaceField
 import top.mcfpp.model.function.Function
@@ -12,6 +10,8 @@ import top.mcfpp.model.function.NativeFunction
 import top.mcfpp.model.generic.GenericFunction
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPGenericParamType
+import top.mcfpp.type.MCFPPType
+import top.mcfpp.type.UnresolvedType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -49,6 +49,7 @@ class Namespace(val identifier: String): Serializable {
                     constructor.normalParams.forEach {
                         if(it.type is UnresolvedType){
                             it.type = (it.type as UnresolvedType).resolve(constructor.field)
+                            it.typeIdentifier = it.type.typeName
                         }
                     }
                 } }
@@ -82,6 +83,7 @@ class Namespace(val identifier: String): Serializable {
         for ((index, np) in f.normalParams.withIndex()){
             if(np.type is UnresolvedType){
                 f.normalParams[index].type = (np.type as UnresolvedType).resolve(f.field)
+                f.normalParams[index].typeIdentifier = f.normalParams[index].type.typeName
             }
             f.field.putVar(np.identifier, np.buildVar())
         }
@@ -89,6 +91,7 @@ class Namespace(val identifier: String): Serializable {
             for ((index, rp) in f.readOnlyParams.withIndex()){
                 if(rp.type is UnresolvedType){
                     f.readOnlyParams[index].type = (rp.type as UnresolvedType).resolve(f.field)
+                    f.readOnlyParams[index].typeIdentifier = f.readOnlyParams[index].type.typeName
                 }
                 f.field.putVar(rp.identifier, rp.buildVar())
             }
@@ -97,6 +100,7 @@ class Namespace(val identifier: String): Serializable {
             for ((index, rp) in f.readOnlyParams.withIndex()){
                 if(rp.type is UnresolvedType){
                     f.readOnlyParams[index].type = (rp.type as UnresolvedType).resolve(f.field)
+                    f.readOnlyParams[index].typeIdentifier = f.readOnlyParams[index].type.typeName
                 }
                 f.field.putVar(rp.identifier, rp.buildVar())
             }
@@ -184,6 +188,10 @@ class Namespace(val identifier: String): Serializable {
             }
         }
         Project.currNamespace = l
+    }
+
+    override fun toString(): String {
+        return "Namespace($identifier)"
     }
 
     companion object {

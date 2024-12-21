@@ -24,9 +24,6 @@ import java.util.*
  * 一个类的指针。类的地址储存在storage的uuid中中，因此一个类的指针实际上包含了两个信息，一个是指针代表的是[哪一个类][clazz]，一个是指针指向的这个类的对象
  *在堆中的地址，即nbt uuid的值是多少。
  *
- * 指针继承于类[Var]，然而它的[name]并没有额外的用处，因为我们并不需要关注这个指针处于哪一个类或者哪一个函数中。起到标识符作用的更多是[identifier]。
- * 事实上，指针的[name]和[identifier]拥有相同的值。
- *
  * 创建一个类的对象的时候，在分配完毕类的地址之后，将会立刻创建一个初始指针，这个指针指向了刚刚创建的对象的地址。
  * 而后进行的引用操作无非是把这个初始指针的记分板值赋给其他的指针。
  *
@@ -44,7 +41,7 @@ open class ClassPointer : Var<ClassPointer>{
     /**
      * 指针对应的类的标识符
      */
-    override var type: MCFPPType
+    override lateinit var type: MCFPPType
 
     val tag: String
         /**
@@ -62,18 +59,7 @@ open class ClassPointer : Var<ClassPointer>{
      * @param clazz 指针的类型
      * @param identifier 标识符
      */
-    constructor(clazz: Class, container: FieldContainer, identifier: String) {
-        this.type = clazz.getType()
-        this.identifier = identifier
-        this.name = container.prefix + identifier
-        instanceField = CompoundDataField(clazz.field)
-    }
-
-    /**
-     * 创建一个指针
-     * @param clazz 指针的类型
-     * @param identifier 标识符
-     */
+    @Suppress("LeakingThis")
     constructor(clazz: Class, identifier: String) {
         this.type = clazz.getType()
         this.identifier = identifier
@@ -84,6 +70,7 @@ open class ClassPointer : Var<ClassPointer>{
      * 复制一个指针
      * @param classPointer 被复制的指针
      */
+    @Suppress("LeakingThis")
     constructor(classPointer: ClassPointer) : super(classPointer) {
         type = classPointer.type
         instanceField = classPointer.instanceField
@@ -260,8 +247,6 @@ open class ClassPointer : Var<ClassPointer>{
 class ClassPointerConcrete: ClassPointer, MCFPPValue<Class>{
 
     override lateinit var value: Class
-
-    constructor(clazz: Class, container: FieldContainer, identifier: String): super(clazz, container, identifier)
 
     constructor(clazz: Class, identifier: String): super(clazz, identifier)
 

@@ -1,14 +1,13 @@
 package top.mcfpp.core.lang
 
 import top.mcfpp.exception.VariableConverseException
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.mni.MCAnyConcreteData
 import top.mcfpp.mni.MCAnyData
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
-import top.mcfpp.model.function.Function
 import top.mcfpp.model.Member
+import top.mcfpp.model.function.Function
+import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import java.util.*
 
@@ -58,18 +57,6 @@ import java.util.*
 open class MCAny : Var<MCAny> {
 
     override var type: MCFPPType = MCFPPBaseType.Any
-
-    /**
-     * 创建一个any类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
-        this.identifier = identifier
-    }
 
     /**
      * 创建一个int值。它的标识符和mc名相同。
@@ -204,21 +191,6 @@ class MCAnyConcrete : MCAny, MCFPPValue<Var<*>> {
     override var value: Var<*>
 
     /**
-     * 创建一个固定的int
-     *
-     * @param identifier 标识符
-     * @param curr 域容器
-     * @param value 值
-     */
-    constructor(
-        curr: FieldContainer,
-        value: Var<*>,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier) {
-        this.value = value
-    }
-
-    /**
      * 创建一个固定的any。它的标识符和mc名一致
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
@@ -234,7 +206,6 @@ class MCAnyConcrete : MCAny, MCFPPValue<Var<*>> {
         this.value = value
         this.identifier = v.identifier
         this.parent = v.parent
-        this.name = v.name
         this.stackIndex = v.stackIndex
     }
 

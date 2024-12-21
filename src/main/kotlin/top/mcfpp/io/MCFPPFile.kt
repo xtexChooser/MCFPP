@@ -6,14 +6,11 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTree
 import top.mcfpp.Project
 import top.mcfpp.antlr.*
-import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.model.Class
 import top.mcfpp.model.field.FileField
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.field.NamespaceField
 import top.mcfpp.model.function.Function
-import top.mcfpp.model.generic.GenericClass
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import java.io.File
@@ -23,28 +20,34 @@ import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 
 
-class MCFPPFile(path : String) : File(path) {
+class MCFPPFile : File {
 
-    val field = FileField()
+    val field: FileField = FileField()
 
     val inputStream : FileInputStream by lazy { FileInputStream(this) }
 
     val namespace: String
 
     //TODO 同名文件的顶级函数之间的命名冲突
-    val topFunction = Function(StringHelper.toLegalIdentifier(this.name), context = null)
+    val topFunction: Function = Function(StringHelper.toLegalIdentifier(this.name), context = null)
 
     /**
      * 此文件引用了的命名空间
      */
-    val importedNamespace = ArrayList<NamespaceField>()
+    val importedNamespace: ArrayList<NamespaceField> = ArrayList()
 
-    init {
-        val n = Project.config.sourcePath!!.toAbsolutePath().relativize(this.toPath().toAbsolutePath().parent).toString()
-        namespace = Project.config.rootNamespace + "." + StringHelper.toLegalIdentifier(n.replace("\\",".").replace("/","."))
+    constructor(path: String) : super(path) {
+        val n =
+            Project.config.sourcePath!!.toAbsolutePath().relativize(this.toPath().toAbsolutePath().parent).toString()
+        namespace =
+            Project.config.rootNamespace + "." + StringHelper.toLegalIdentifier(n.replace("\\", ".").replace("/", "."))
     }
 
     constructor(file: File) : this(file.absolutePath)
+
+    constructor(): super("."){
+        namespace = Project.config.rootNamespace + ".test"
+    }
 
     @Throws(IOException::class)
     fun tree(): ParseTree {

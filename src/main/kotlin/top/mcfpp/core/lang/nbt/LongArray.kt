@@ -2,7 +2,6 @@ package top.mcfpp.core.lang.nbt
 
 import net.querz.nbt.tag.LongArrayTag
 import top.mcfpp.core.lang.*
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
@@ -15,8 +14,6 @@ open class LongArray: NBTArray {
 
     override val arrayType: MCFPPType = MCFPPNBTType.Long
 
-    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier)
-
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 
     constructor(b: NBTArray) : super(b)
@@ -25,10 +22,6 @@ open class LongArray: NBTArray {
 class LongArrayConcrete: LongArray, MCFPPValue<LongArrayTag>{
 
     override var value: LongArrayTag
-
-    constructor(curr: FieldContainer, value: LongArrayTag, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier){
-        this.value = value
-    }
 
     constructor(value: LongArrayTag, identifier: String = UUID.randomUUID().toString()) : super(identifier){
         this.value = value

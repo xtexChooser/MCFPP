@@ -19,7 +19,7 @@ public class PlayerEntityConcreteData {
 
     public static void grant(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] command;
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             command = new Command[] {new Command("advancement grant " + playerName + " only " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -30,16 +30,16 @@ public class PlayerEntityConcreteData {
     }
 
     public static void grantAll(PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         var command = new Command("advancement grant " + playerName  + " everything");
         returnValue.setValue(new CommandReturn(command, "return"));
         Function.Companion.addCommand(command);
     }
 
     @MNIFunction(normalParams = {"Advancement advancement"}, caller = "Player", returnType = "CommandReturn")
-    public static void grantFrom(Advancement advancement, PlayerVar.PlayerEntityVar caller, ValueWrapper<CommandReturn> returnValue) {
+    public static void grantFrom(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] commands;
-        String playerName = caller.getEntity().getName();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             commands = new Command[]{new Command("advancement grant " + playerName + " from " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -50,9 +50,9 @@ public class PlayerEntityConcreteData {
     }
 
     @MNIFunction(normalParams = {"Advancement advancement"}, caller = "Player", returnType = "CommandReturn")
-    public static void grantThrough(Advancement advancement, PlayerVar.PlayerEntityVar caller, ValueWrapper<CommandReturn> returnValue) {
+    public static void grantThrough(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] commands;
-        String playerName = caller.getEntity().getName();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             commands = new Command[]{new Command("advancement grant " + playerName + " through " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -63,9 +63,9 @@ public class PlayerEntityConcreteData {
     }
 
     @MNIFunction(normalParams = {"Advancement advancement"}, caller = "Player", returnType = "CommandReturn")
-    public static void grantUntil(Advancement advancement, PlayerVar.PlayerEntityVar caller, ValueWrapper<CommandReturn> returnValue) {
+    public static void grantUntil(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] commands;
-        String playerName = caller.getEntity().getName();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             commands = new Command[]{new Command("advancement grant " + playerName + " until " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -78,7 +78,7 @@ public class PlayerEntityConcreteData {
     @MNIFunction(normalParams = {"Advancement advancement"}, caller = "Player", returnType = "CommandReturn")
     public static void revoke(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] command;
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             command = new Command[] {new Command("advancement revoke " + playerName + " only " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -90,7 +90,7 @@ public class PlayerEntityConcreteData {
 
     @MNIFunction(caller = "Player", returnType = "CommandReturn")
     public static void revokeAll(PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         var command = new Command("advancement revoke " + playerName  + " everything");
         returnValue.setValue(new CommandReturn(command, "return"));
         Function.Companion.addCommand(command);
@@ -99,7 +99,7 @@ public class PlayerEntityConcreteData {
     @MNIFunction(normalParams = {"Advancement advancement"}, caller = "Player", returnType = "CommandReturn")
     public static void revokeFrom(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] command;
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             command = new Command[] {new Command("advancement revoke " + playerName + " from " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -112,7 +112,7 @@ public class PlayerEntityConcreteData {
     @MNIFunction(normalParams = {"Advancement advancement"}, caller = "Player", returnType = "CommandReturn")
     public static void revokeThrough(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] command;
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             command = new Command[] {new Command("advancement revoke " + playerName + " through " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -125,7 +125,7 @@ public class PlayerEntityConcreteData {
     @MNIFunction(normalParams = {"Advancement advancement"}, caller = "Player", returnType = "CommandReturn")
     public static void revokeUntil(Advancement advancement, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue) {
         Command[] command;
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         if(advancement instanceof AdvancementConcrete){
             command = new Command[] {new Command("advancement revoke " + playerName + " until " + ((AdvancementConcrete) advancement).getValue())};
         }else {
@@ -139,7 +139,7 @@ public class PlayerEntityConcreteData {
     public static void getAttribute(MCString id, MCFloat scale, PlayerVar.PlayerEntityVarConcrete caller, ValueWrapper<CommandReturn> returnValue){
         Command[] commands;
         Command command;
-        String playerName = caller.value.getValue();
+        String playerName = caller.getValue().getValue();
         if(id instanceof MCStringConcrete idC){
             command = new Command("attribute " + playerName + " " + idC.getValue().getValue() + " get");
         }else {

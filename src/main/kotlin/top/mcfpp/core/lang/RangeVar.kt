@@ -14,6 +14,8 @@ import kotlin.experimental.and
 
 open class RangeVar: Var<RangeVar> {
 
+    var prefix: FieldContainer? = null
+
     //01 10 11 00(不合法)
     //1表示有，0表示没有
     var point: Byte = 0b00
@@ -29,8 +31,12 @@ open class RangeVar: Var<RangeVar> {
     constructor(
         curr: FieldContainer,
         identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
-        this.identifier = identifier
+    ) : super(identifier) {
+        this.prefix = curr
+        left = MCFloat(curr ,identifier + "_left")
+        left.nbtPath = this.nbtPath.memberIndex("left")
+        right = MCFloat(curr, identifier + "_right")
+        right.nbtPath = this.nbtPath.memberIndex("right")
     }
 
     /**
@@ -49,8 +55,13 @@ open class RangeVar: Var<RangeVar> {
      * @param b 被复制的range值
      */
     constructor(b: RangeVar) : super(b){
-        left = MCFloat(b.identifier + "_left")
-        right = MCFloat(b.identifier + "_right")
+        if(prefix != null){
+            left = MCFloat(prefix!! ,b.identifier + "_left")
+            right = MCFloat(prefix!! ,b.identifier + "_right")
+        }else{
+            left = MCFloat(b.identifier + "_left")
+            right = MCFloat(b.identifier + "_right")
+        }
         point = b.point
     }
 
@@ -100,7 +111,6 @@ open class RangeVar: Var<RangeVar> {
 
     override fun toNBTVar(): NBTBasedData {
         val n = NBTBasedData()
-        n.name = name
         n.identifier = identifier
         n.isStatic = isStatic
         n.accessModifier = accessModifier

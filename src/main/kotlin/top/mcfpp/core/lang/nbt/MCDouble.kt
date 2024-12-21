@@ -21,26 +21,12 @@ import java.util.*
 open class MCDouble: NBTBasedData {
 
     override var type: MCFPPType = MCFPPNBTType.Double
-    
-    /**
-     * 创建一个double类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier) {
-        this.identifier = identifier
-    }
 
     /**
      * 创建一个double值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
-        isTemp = true
-    }
+    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 
     /**
      * 复制一个int

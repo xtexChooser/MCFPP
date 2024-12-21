@@ -1,30 +1,33 @@
 package top.mcfpp
 
-import com.alibaba.fastjson2.*
+import com.alibaba.fastjson2.JSONArray
+import com.alibaba.fastjson2.JSONObject
 import com.ibm.icu.impl.data.ResourceReader
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
-import org.apache.logging.log4j.*
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import top.mcfpp.annotations.InsertCommand
-import top.mcfpp.io.LibReader
-import top.mcfpp.io.LibWriter
-import top.mcfpp.io.MCFPPFile
 import top.mcfpp.core.lang.MCFloat
 import top.mcfpp.core.lang.UnresolvedVar
 import top.mcfpp.core.lang.Var
-import top.mcfpp.model.*
+import top.mcfpp.io.LibReader
+import top.mcfpp.io.LibWriter
+import top.mcfpp.io.MCFPPFile
+import top.mcfpp.model.Native
+import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.Utils
-import java.io.*
+import java.io.File
+import java.io.FileReader
+import java.io.IOException
 import java.net.URLClassLoader
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 import java.util.jar.JarFile
-import kotlin.collections.ArrayList
 import kotlin.io.path.*
 
 
@@ -261,8 +264,10 @@ object Project {
         //函数参数解析
         GlobalField.importedLibNamespaces.clear()
         //读取所有文件
-        MCFPPFile.findFiles(config.sourcePath!!.absolutePathString()).forEach {
-            files.add(MCFPPFile(it.toFile()))
+        if (config.sourcePath != null) {
+            MCFPPFile.findFiles(config.sourcePath!!.absolutePathString()).forEach {
+                files.add(MCFPPFile(it.toFile()))
+            }
         }
         stageProcessor[compileStage].forEach { it() }
     }

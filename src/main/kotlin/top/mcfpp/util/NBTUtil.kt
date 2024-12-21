@@ -1,11 +1,10 @@
 package top.mcfpp.util
 
 import net.querz.nbt.tag.*
-import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.core.lang.*
-import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.core.lang.nbt.*
+import top.mcfpp.exception.VariableConverseException
 
 object NBTUtil {
 
@@ -14,7 +13,7 @@ object NBTUtil {
         return when(v){
             //is ClassPointer -> TODO()
             //is Entity -> TODO()
-            is JavaVar -> valueToNBT(v.value)
+            is JavaVar -> if(v.value is Var<*>) varToNBT(v.value as Var<*>) else valueToNBT(v.value)
             //is JsonString -> TODO()
             is MCAnyConcrete -> varToNBT(v.value)
             is ScoreBoolConcrete -> ByteTag(v.value)

@@ -3,21 +3,21 @@ package top.mcfpp.type
 
 import net.querz.nbt.tag.StringTag
 import net.querz.nbt.tag.Tag
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.core.lang.Var
 import top.mcfpp.core.lang.resource.*
 import top.mcfpp.model.Class
+import top.mcfpp.model.FieldContainer
 
 class MCFPPResourceType {
 
-object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
+object ResourceID: MCFPPType(listOf(MCFPPNBTType.NBT)){
     override val typeName: String
         get() = "ResourceID"
 
     override val nbtType: java.lang.Class<out Tag<*>>
         get() = StringTag::class.java
 }
-    object Block: MCFPPType(parentType = listOf(ResourceID)){
+    object Block: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Block"
 
@@ -28,7 +28,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Block(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Block(clazz, identifier)
     }
-    object BlockEntity: MCFPPType(parentType = listOf(ResourceID)){
+    object BlockEntity: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "BlockEntity"
 
@@ -39,7 +39,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = BlockEntity(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = BlockEntity(clazz, identifier)
     }
-    object Liquid: MCFPPType(parentType = listOf(ResourceID)){
+    object Liquid: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Liquid"
 
@@ -50,7 +50,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Liquid(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Liquid(clazz, identifier)
     }
-    object Item: MCFPPType(parentType = listOf(ResourceID)){
+    object Item: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Item"
 
@@ -61,7 +61,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Item(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Item(clazz, identifier)
     }
-    object EntityType: MCFPPType(parentType = listOf(ResourceID)){
+    object EntityType: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "EntityType"
 
@@ -72,7 +72,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = EntityType(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = EntityType(clazz, identifier)
     }
-    object Memory: MCFPPType(parentType = listOf(ResourceID)){
+    object Memory: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Memory"
 
@@ -83,7 +83,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Memory(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Memory(clazz, identifier)
     }
-    object PaintingVariant: MCFPPType(parentType = listOf(ResourceID)){
+    object PaintingVariant: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "PaintingVariant"
 
@@ -94,7 +94,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = PaintingVariant(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = PaintingVariant(clazz, identifier)
     }
-    object VillagerProfession: MCFPPType(parentType = listOf(ResourceID)){
+    object VillagerProfession: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "VillagerProfession"
 
@@ -105,7 +105,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = VillagerProfession(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = VillagerProfession(clazz, identifier)
     }
-    object VillagerType: MCFPPType(parentType = listOf(ResourceID)){
+    object VillagerType: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "VillagerType"
 
@@ -116,7 +116,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = VillagerType(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = VillagerType(clazz, identifier)
     }
-    object Effect: MCFPPType(parentType = listOf(ResourceID)){
+    object Effect: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Effect"
 
@@ -127,7 +127,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Effect(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Effect(clazz, identifier)
     }
-    object PotionEffect: MCFPPType(parentType = listOf(ResourceID)){
+    object PotionEffect: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "PotionEffect"
 
@@ -138,7 +138,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = PotionEffect(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = PotionEffect(clazz, identifier)
     }
-    object Enchant: MCFPPType(parentType = listOf(ResourceID)){
+    object Enchant: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Enchant"
 
@@ -149,7 +149,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Enchant(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Enchant(clazz, identifier)
     }
-    object Particle: MCFPPType(parentType = listOf(ResourceID)){
+    object Particle: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Particle"
 
@@ -160,7 +160,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Particle(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Particle(clazz, identifier)
     }
-    object Dimension: MCFPPType(parentType = listOf(ResourceID)){
+    object Dimension: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Dimension"
 
@@ -171,7 +171,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Dimension(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Dimension(clazz, identifier)
     }
-    object Biome: MCFPPType(parentType = listOf(ResourceID)){
+    object Biome: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Biome"
 
@@ -182,7 +182,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Biome(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Biome(clazz, identifier)
     }
-    object Statistic: MCFPPType(parentType = listOf(ResourceID)){
+    object Statistic: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Statistic"
 
@@ -193,7 +193,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Statistic(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Statistic(clazz, identifier)
     }
-    object DamageType: MCFPPType(parentType = listOf(ResourceID)){
+    object DamageType: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "DamageType"
 
@@ -204,7 +204,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = DamageType(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = DamageType(clazz, identifier)
     }
-    object RecipeType: MCFPPType(parentType = listOf(ResourceID)){
+    object RecipeType: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "RecipeType"
 
@@ -215,7 +215,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = RecipeType(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = RecipeType(clazz, identifier)
     }
-    object RecipeSerializer: MCFPPType(parentType = listOf(ResourceID)){
+    object RecipeSerializer: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "RecipeSerializer"
 
@@ -226,7 +226,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = RecipeSerializer(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = RecipeSerializer(clazz, identifier)
     }
-    object SoundEvent: MCFPPType(parentType = listOf(ResourceID)){
+    object SoundEvent: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "SoundEvent"
 
@@ -237,7 +237,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = SoundEvent(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = SoundEvent(clazz, identifier)
     }
-    object Advancement: MCFPPType(parentType = listOf(ResourceID)){
+    object Advancement: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Advancement"
 
@@ -248,7 +248,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Advancement(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Advancement(clazz, identifier)
     }
-    object LootTable: MCFPPType(parentType = listOf(ResourceID)){
+    object LootTable: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "LootTable"
 
@@ -259,7 +259,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = LootTable(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LootTable(clazz, identifier)
     }
-    object LootTablePredicate: MCFPPType(parentType = listOf(ResourceID)){
+    object LootTablePredicate: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "LootTablePredicate"
 
@@ -270,7 +270,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = LootTablePredicate(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LootTablePredicate(clazz, identifier)
     }
-    object FunctionID: MCFPPType(parentType = listOf(ResourceID)){
+    object FunctionID: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "FunctionID"
 
@@ -281,7 +281,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = FunctionID(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = FunctionID(clazz, identifier)
     }
-    object Structure: MCFPPType(parentType = listOf(ResourceID)){
+    object Structure: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Structure"
 
@@ -292,7 +292,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Structure(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Structure(clazz, identifier)
     }
-    object Recipe: MCFPPType(parentType = listOf(ResourceID)){
+    object Recipe: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Recipe"
 
@@ -303,7 +303,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Recipe(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Recipe(clazz, identifier)
     }
-    object BlockTag: MCFPPType(parentType = listOf(ResourceID)){
+    object BlockTag: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "BlockTag"
 
@@ -314,7 +314,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = BlockTag(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = BlockTag(clazz, identifier)
     }
-    object LiquidTag: MCFPPType(parentType = listOf(ResourceID)){
+    object LiquidTag: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "LiquidTag"
 
@@ -325,7 +325,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = LiquidTag(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LiquidTag(clazz, identifier)
     }
-    object ItemTag: MCFPPType(parentType = listOf(ResourceID)){
+    object ItemTag: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "ItemTag"
 
@@ -336,7 +336,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = ItemTag(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ItemTag(clazz, identifier)
     }
-    object EntityTypeTag: MCFPPType(parentType = listOf(ResourceID)){
+    object EntityTypeTag: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "EntityTypeTag"
 
@@ -347,7 +347,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = EntityTypeTag(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = EntityTypeTag(clazz, identifier)
     }
-    object FunctionTag: MCFPPType(parentType = listOf(ResourceID)){
+    object FunctionTag: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "FunctionTag"
 
@@ -358,7 +358,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = FunctionTag(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = FunctionTag(clazz, identifier)
     }
-    object BlockStateFile: MCFPPType(parentType = listOf(ResourceID)){
+    object BlockStateFile: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "BlockStateFile"
 
@@ -369,7 +369,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = BlockStateFile(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = BlockStateFile(clazz, identifier)
     }
-    object Model: MCFPPType(parentType = listOf(ResourceID)){
+    object Model: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Model"
 
@@ -380,7 +380,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Model(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Model(clazz, identifier)
     }
-    object Texture: MCFPPType(parentType = listOf(ResourceID)){
+    object Texture: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Texture"
 
@@ -391,7 +391,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Texture(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Texture(clazz, identifier)
     }
-    object Sound: MCFPPType(parentType = listOf(ResourceID)){
+    object Sound: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Sound"
 
@@ -402,7 +402,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Sound(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Sound(clazz, identifier)
     }
-    object BossBar: MCFPPType(parentType = listOf(ResourceID)){
+    object BossBar: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "BossBar"
 
@@ -413,7 +413,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = BossBar(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = BossBar(clazz, identifier)
     }
-    object Storage: MCFPPType(parentType = listOf(ResourceID)){
+    object Storage: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "Storage"
 
@@ -424,7 +424,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = Storage(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = Storage(clazz, identifier)
     }
-    object LootTableFunction: MCFPPType(parentType = listOf(ResourceID)){
+    object LootTableFunction: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "LootTableFunction"
 
@@ -435,7 +435,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = LootTableFunction(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LootTableFunction(clazz, identifier)
     }
-    object LootTableCondition: MCFPPType(parentType = listOf(ResourceID)){
+    object LootTableCondition: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "LootTableCondition"
 
@@ -446,7 +446,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = LootTableCondition(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LootTableCondition(clazz, identifier)
     }
-    object LootTableType: MCFPPType(parentType = listOf(ResourceID)){
+    object LootTableType: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "LootTableType"
 
@@ -457,7 +457,7 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override fun buildUnConcrete(identifier: String): Var<*> = LootTableType(identifier)
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LootTableType(clazz, identifier)
     }
-    object CommandArgumentType: MCFPPType(parentType = listOf(ResourceID)){
+    object CommandArgumentType: MCFPPType(listOf(ResourceID)){
         override val typeName: String
             get() = "CommandArgumentType"
 

@@ -1,14 +1,13 @@
 package top.mcfpp.core.lang
 
 import top.mcfpp.command.Command
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.type.MCFPPPrivateType
+import top.mcfpp.type.MCFPPType
 import java.util.*
 
 class CommandReturn : Var<CommandReturn> {
@@ -20,19 +19,6 @@ class CommandReturn : Var<CommandReturn> {
     val command: Command
 
     override var type: MCFPPType = MCFPPPrivateType.CommandReturn
-
-    /**
-     * 创建一个string类型的变量。它的mc名和变量所在的域容器有关。
-     *
-     * @param identifier 标识符。默认为
-     */
-    constructor(
-        command: Command,
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(command, curr.prefix + identifier) {
-        this.identifier = identifier
-    }
 
     /**
      * 创建一个string值。它的标识符和mc名相同。
@@ -105,7 +91,7 @@ class CommandSuccess(val re: CommandReturn) : Var<CommandSuccess>("success") {
         get() {
             return re.nbtPath.memberIndex("success")
         }
-        set(value) {}
+        set(_) {}
 
     override fun doAssignedBy(b: Var<*>): CommandSuccess = this
 
@@ -138,7 +124,7 @@ class CommandResult(val re: CommandReturn): Var<CommandResult>("result"){
         get() {
             return re.nbtPath.memberIndex("result")
         }
-        set(value) {}
+        set(_) {}
 
     override fun doAssignedBy(b: Var<*>): CommandResult = this
 

@@ -1,18 +1,22 @@
 package top.mcfpp.type
 
 import net.querz.nbt.tag.*
+import top.mcfpp.core.lang.ImmutableList
+import top.mcfpp.core.lang.ImmutableListConcrete
+import top.mcfpp.core.lang.Var
+import top.mcfpp.core.lang.nbt.*
+import top.mcfpp.core.lang.nbt.ByteArray
+import top.mcfpp.core.lang.nbt.IntArray
+import top.mcfpp.core.lang.nbt.LongArray
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
-import top.mcfpp.core.lang.*
-import top.mcfpp.core.lang.nbt.*
-import top.mcfpp.core.lang.nbt.ByteArray
 
 /**
  * 以NBT为底层的类型，包括普通的NBT类型，以及由nbt实现的map，list和dict
  */
 class MCFPPNBTType {
-    object NBT : MCFPPType(parentType = listOf(MCFPPBaseType.Any)) {
+    object NBT : MCFPPType(listOf(MCFPPBaseType.Any)) {
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -28,14 +32,14 @@ class MCFPPNBTType {
             NBTBasedDataConcrete(clazz, IntTag(0), identifier)
 
         override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
-            NBTBasedData(container, identifier)
+            NBTBasedData(identifier)
 
         override fun buildUnConcrete(identifier: String): Var<*> = NBTBasedData(identifier)
-        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTBasedData(clazz, identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTBasedData(identifier)
 
     }
 
-    object Byte: MCFPPType(parentType = listOf(MCFPPBaseType.Int)){
+    object Byte: MCFPPType(listOf(MCFPPBaseType.Int)){
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -57,7 +61,7 @@ class MCFPPNBTType {
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCByte(clazz, identifier)
     }
 
-    object Short: MCFPPType(parentType = listOf(MCFPPBaseType.Int)){
+    object Short: MCFPPType(listOf(MCFPPBaseType.Int)){
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -79,7 +83,7 @@ class MCFPPNBTType {
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCShort(clazz, identifier)
     }
 
-    object Long: MCFPPType(parentType = listOf(NBT)){
+    object Long: MCFPPType(listOf(NBT)){
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -88,20 +92,20 @@ class MCFPPNBTType {
             get() = "long"
 
         override fun build(identifier: String, container: FieldContainer): Var<*> =
-            MCLongConcrete(container, LongTag(0), identifier)
+            MCLongConcrete(LongTag(0), identifier)
 
         override fun build(identifier: String): Var<*> = MCLongConcrete(LongTag(0), identifier)
         override fun build(identifier: String, clazz: Class): Var<*> =
-            MCLongConcrete(clazz, LongTag(0), identifier)
+            MCLongConcrete(LongTag(0), identifier)
 
         override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
-            MCLong(container, identifier)
+            MCLong(identifier)
 
         override fun buildUnConcrete(identifier: String): Var<*> = MCLong(identifier)
-        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCLong(clazz, identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCLong(identifier)
     }
 
-    object Double: MCFPPType(parentType = listOf(NBT)){
+    object Double: MCFPPType(listOf(NBT)){
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -117,13 +121,13 @@ class MCFPPNBTType {
             MCDoubleConcrete(clazz, DoubleTag(0.0), identifier)
 
         override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
-            MCDouble(container, identifier)
+            MCDouble(identifier)
 
         override fun buildUnConcrete(identifier: String): Var<*> = MCLong(identifier)
-        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCLong(clazz, identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = MCLong(identifier)
     }
 
-    object ByteArray: MCFPPType(parentType = listOf(NBT)){
+    object ByteArray: MCFPPType(listOf(NBT)){
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -132,20 +136,20 @@ class MCFPPNBTType {
             get() = "ByteArray"
 
         override fun build(identifier: String, container: FieldContainer): Var<*> =
-            ByteArrayConcrete(container, ByteArrayTag(), identifier)
+            ByteArrayConcrete(ByteArrayTag(), identifier)
 
         override fun build(identifier: String): Var<*> = ByteArrayConcrete(ByteArrayTag(), identifier)
         override fun build(identifier: String, clazz: Class): Var<*> =
-            ByteArrayConcrete(clazz, ByteArrayTag(), identifier)
+            ByteArrayConcrete(ByteArrayTag(), identifier)
 
         override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
-            ByteArray(container, identifier)
+            ByteArray(identifier)
 
         override fun buildUnConcrete(identifier: String): Var<*> = ByteArray(identifier)
-        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ByteArray(clazz, identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ByteArray(identifier)
     }
 
-    object IntArray: MCFPPType(parentType = listOf(NBT)){
+    object IntArray: MCFPPType(listOf(NBT)){
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -154,20 +158,20 @@ class MCFPPNBTType {
             get() = "IntArray"
 
         override fun build(identifier: String, container: FieldContainer): Var<*> =
-            IntArrayConcrete(container, IntArrayTag(), identifier)
+            IntArrayConcrete(IntArrayTag(), identifier)
 
         override fun build(identifier: String): Var<*> = IntArrayConcrete(IntArrayTag(), identifier)
         override fun build(identifier: String, clazz: Class): Var<*> =
-            IntArrayConcrete(clazz, IntArrayTag(), identifier)
+            IntArrayConcrete(IntArrayTag(), identifier)
 
         override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
-            IntArray(container, identifier)
+            IntArray(identifier)
 
         override fun buildUnConcrete(identifier: String): Var<*> = IntArray(identifier)
-        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = IntArray(clazz, identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = IntArray(identifier)
     }
 
-    object LongArray: MCFPPType(parentType = listOf(NBT)){
+    object LongArray: MCFPPType(listOf(NBT)){
 
         override val objectData: CompoundData
             get() = NBTBasedData.data
@@ -176,24 +180,24 @@ class MCFPPNBTType {
             get() = "LongArray"
 
         override fun build(identifier: String, container: FieldContainer): Var<*> =
-            LongArrayConcrete(container, LongArrayTag(), identifier)
+            LongArrayConcrete(LongArrayTag(), identifier)
 
         override fun build(identifier: String): Var<*> = LongArrayConcrete(LongArrayTag(), identifier)
         override fun build(identifier: String, clazz: Class): Var<*> =
-            LongArrayConcrete(clazz, LongArrayTag(), identifier)
+            LongArrayConcrete(LongArrayTag(), identifier)
 
         override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> =
-            LongArray(container, identifier)
+            LongArray(identifier)
 
         override fun buildUnConcrete(identifier: String): Var<*> = LongArray(identifier)
-        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LongArray(clazz, identifier)
+        override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = LongArray(identifier)
     }
 
 }
 
 class MCFPPListType(
     val generic: MCFPPType = MCFPPBaseType.Any
-): MCFPPType(NBTList.data, listOf(MCFPPNBTType.NBT)){
+): MCFPPType(listOf(MCFPPNBTType.NBT)){
 
     override val objectData: CompoundData
         get() = NBTList.data
@@ -204,17 +208,17 @@ class MCFPPListType(
     override val nbtType: java.lang.Class<out Tag<*>>
         get() = ListTag::class.java
 
-    override fun build(identifier: String, container: FieldContainer): Var<*> = NBTListConcrete(container, ArrayList(), identifier, generic)
+    override fun build(identifier: String, container: FieldContainer): Var<*> = NBTListConcrete(ArrayList(), identifier, generic)
     override fun build(identifier: String): Var<*> = NBTListConcrete(ArrayList(), identifier, generic)
-    override fun build(identifier: String, clazz: Class): Var<*> = NBTListConcrete(clazz, ArrayList(), identifier, generic)
-    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = NBTList(container, identifier, generic)
+    override fun build(identifier: String, clazz: Class): Var<*> = NBTListConcrete(ArrayList(), identifier, generic)
+    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = NBTList(identifier, generic)
     override fun buildUnConcrete(identifier: String): Var<*> = NBTList(identifier, generic)
-    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTList(clazz, identifier, generic)
+    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTList(identifier, generic)
 }
 
 class MCFPPImmutableListType(
     val generic: MCFPPType = MCFPPBaseType.Any
-): MCFPPType(NBTList.data, listOf(MCFPPNBTType.NBT)){
+): MCFPPType(listOf(MCFPPNBTType.NBT)){
 
     override val objectData: CompoundData
         get() = NBTList.data
@@ -225,18 +229,18 @@ class MCFPPImmutableListType(
     override val nbtType: java.lang.Class<out Tag<*>>
         get() = ListTag::class.java
 
-    override fun build(identifier: String, container: FieldContainer): Var<*> = ImmutableListConcrete(container, ListTag(IntTag::class.java), identifier, generic)
+    override fun build(identifier: String, container: FieldContainer): Var<*> = ImmutableListConcrete(ListTag(IntTag::class.java), identifier, generic)
     override fun build(identifier: String): Var<*> = ImmutableListConcrete(ListTag(IntTag::class.java), identifier, generic)
-    override fun build(identifier: String, clazz: Class): Var<*> = ImmutableListConcrete(clazz, ListTag(IntTag::class.java), identifier, generic)
-    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = ImmutableList(container, identifier, generic)
+    override fun build(identifier: String, clazz: Class): Var<*> = ImmutableListConcrete(ListTag(IntTag::class.java), identifier, generic)
+    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = ImmutableList(identifier, generic)
     override fun buildUnConcrete(identifier: String): Var<*> = ImmutableList(identifier, generic)
-    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ImmutableList(clazz, identifier, generic)
+    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ImmutableList(identifier, generic)
 
 }
 
 open class MCFPPCompoundType(
     val generic: MCFPPType
-): MCFPPType(NBTDictionary.data, listOf(MCFPPNBTType.NBT)){
+): MCFPPType(listOf(MCFPPNBTType.NBT)){
 
     override val typeName: String
         get() = "compound[${generic.typeName}]"
@@ -247,12 +251,12 @@ class MCFPPDictType(generic: MCFPPType): MCFPPCompoundType(generic){
     override val typeName: String
         get() = "dict[${generic.typeName}]"
 
-    override fun build(identifier: String, container: FieldContainer): Var<*> = NBTDictionaryConcrete(container, HashMap(), identifier)
+    override fun build(identifier: String, container: FieldContainer): Var<*> = NBTDictionaryConcrete(HashMap(), identifier)
     override fun build(identifier: String): Var<*> = NBTDictionaryConcrete(HashMap(), identifier)
-    override fun build(identifier: String, clazz: Class): Var<*> = NBTDictionaryConcrete(clazz, HashMap(), identifier)
-    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = NBTDictionary(container, identifier)
+    override fun build(identifier: String, clazz: Class): Var<*> = NBTDictionaryConcrete(HashMap(), identifier)
+    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = NBTDictionary(identifier)
     override fun buildUnConcrete(identifier: String): Var<*> = NBTDictionary(identifier)
-    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTDictionary(clazz, identifier)
+    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTDictionary(identifier)
 }
 
 class MCFPPMapType(generic: MCFPPType): MCFPPCompoundType(generic){
@@ -260,10 +264,10 @@ class MCFPPMapType(generic: MCFPPType): MCFPPCompoundType(generic){
         get() = "map[${generic.typeName}]"
 
 
-    override fun build(identifier: String, container: FieldContainer): Var<*> = NBTMapConcrete(container, HashMap(), identifier, generic)
+    override fun build(identifier: String, container: FieldContainer): Var<*> = NBTMapConcrete(HashMap(), identifier, generic)
     override fun build(identifier: String): Var<*> = NBTMapConcrete(HashMap(), identifier, generic)
-    override fun build(identifier: String, clazz: Class): Var<*> = NBTMapConcrete(clazz, HashMap(), identifier, generic)
-    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = NBTMap(container, identifier, generic)
+    override fun build(identifier: String, clazz: Class): Var<*> = NBTMapConcrete(HashMap(), identifier, generic)
+    override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = NBTMap(identifier, generic)
     override fun buildUnConcrete(identifier: String): Var<*> = NBTMap(identifier, generic)
-    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTMap(clazz, identifier, generic)
+    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = NBTMap(identifier, generic)
 }

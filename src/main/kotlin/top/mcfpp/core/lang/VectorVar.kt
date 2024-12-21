@@ -1,19 +1,18 @@
 package top.mcfpp.core.lang
 
 import top.mcfpp.core.lang.nbt.NBTBasedData
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.type.MCFPPVectorType
 import top.mcfpp.model.CanSelectMember
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.function.Function
+import top.mcfpp.type.MCFPPType
+import top.mcfpp.type.MCFPPVectorType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
-import kotlin.collections.ArrayList
 
 open class VectorVar: Var<VectorVar>, Indexable, ScoreHolder {
 
@@ -22,6 +21,8 @@ open class VectorVar: Var<VectorVar>, Indexable, ScoreHolder {
     val components: ArrayList<MCInt> = ArrayList()
 
     override var parent : CanSelectMember? = null
+
+    final override var type: MCFPPType
 
     constructor(
         dimension: Int,
@@ -34,7 +35,7 @@ open class VectorVar: Var<VectorVar>, Indexable, ScoreHolder {
     constructor(dimension: Int, identifier: String = UUID.randomUUID().toString()) : super(identifier){
         this.dimension = dimension
         //生成向量变量
-        for (i in 0 until dimension){
+        for (i in 0..<dimension){
             components.add(MCInt("$identifier$$i"))
             components[i].holder = this
         }
@@ -43,7 +44,7 @@ open class VectorVar: Var<VectorVar>, Indexable, ScoreHolder {
 
     constructor(b: VectorVar) : super(b){
         this.dimension = b.dimension
-        for (i in 0 until dimension){
+        for (i in 0..<dimension){
             components.add(MCInt(b.components[i]))
             components[i].holder = this
         }

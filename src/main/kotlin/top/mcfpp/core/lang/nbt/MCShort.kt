@@ -1,14 +1,11 @@
 package top.mcfpp.core.lang.nbt
 
-import net.querz.nbt.tag.ByteTag
-import net.querz.nbt.tag.ShortTag
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.function.Function
-import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
@@ -20,10 +17,7 @@ open class MCShort: MCInt {
 
     override var type: MCFPPType = MCFPPNBTType.Short
 
-    constructor(
-        curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr, identifier)
+    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier)
 
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
 

@@ -13,7 +13,7 @@ class NativeTest1(vars: Array<Var<*>?>?, cls: ClassPointer?) : INativeClass(vars
         fun test(vars: Array<Var<*>>, cls: ClassPointer?) {
             System.out.println("MNI > Hello Minecraft!")
             for (v in vars) {
-                System.out.println("MNI > Get argument " + v.name)
+                System.out.println("MNI > Get argument " + v.identifier)
             }
         }
     }

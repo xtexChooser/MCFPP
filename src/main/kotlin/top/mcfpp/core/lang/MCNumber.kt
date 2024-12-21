@@ -1,6 +1,7 @@
 package top.mcfpp.core.lang
 
 import top.mcfpp.lib.SbObject
+import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import java.util.*
@@ -12,9 +13,24 @@ import java.util.*
  */
 abstract class MCNumber<T> : Var<MCNumber<T>>, OnScoreboard {
 
+    final override var name: String
+
     var holder: ScoreHolder? = null
 
     var sbObject: SbObject
+
+    /**
+     * 创建一个int类型的变量。它的mc名和变量所在的域容器有关。
+     *
+     * @param identifier 标识符。默认为
+     */
+    constructor(
+        curr: FieldContainer,
+        identifier: String = UUID.randomUUID().toString()
+    ) : super(identifier) {
+        this.name = curr.prefix + identifier
+        sbObject = SbObject.MCFPP_default
+    }
 
     /**
      * 创建一个数字类型变量
@@ -22,6 +38,7 @@ abstract class MCNumber<T> : Var<MCNumber<T>>, OnScoreboard {
      * @param identifier 标识符。默认为随机的uuid
      */
     constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+        this.name = identifier
         sbObject = SbObject.MCFPP_default
     }
 
@@ -29,10 +46,12 @@ abstract class MCNumber<T> : Var<MCNumber<T>>, OnScoreboard {
      * 复制一个数字类型变量
      */
     constructor(b: MCNumber<T>) : super(b) {
+        name = b.name
         sbObject = b.sbObject
     }
 
     constructor(b: EnumVar) : super(b){
+        name = b.name
         sbObject = b.sbObject
     }
 

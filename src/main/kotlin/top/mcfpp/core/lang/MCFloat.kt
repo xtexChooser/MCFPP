@@ -452,6 +452,7 @@ open class MCFloat : MCNumber<Float> {
 
 class MCFloatConcrete : MCFloat, MCFPPValue<Float> {
 
+    @Suppress("MUST_BE_INITIALIZED_WARNING")
     override var value: Float
         set(value) {
             field = value
