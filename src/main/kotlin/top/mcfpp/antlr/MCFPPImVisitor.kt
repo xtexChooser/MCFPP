@@ -8,21 +8,18 @@ import top.mcfpp.antlr.mcfppParser.CompileTimeFuncDeclarationContext
 import top.mcfpp.command.Command
 import top.mcfpp.command.CommandList
 import top.mcfpp.command.Commands
-import top.mcfpp.exception.*
-import top.mcfpp.io.MCFPPFile
-import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPEnumType
-import top.mcfpp.type.MCFPPGenericClassType
-import top.mcfpp.type.MCFPPType
+import top.mcfpp.core.lang.DataTemplateObjectConcrete
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.MCInt
+import top.mcfpp.core.lang.Var
 import top.mcfpp.core.lang.bool.BaseBool
 import top.mcfpp.core.lang.bool.ExecuteBool
 import top.mcfpp.core.lang.bool.ScoreBool
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
+import top.mcfpp.exception.VariableConverseException
+import top.mcfpp.io.MCFPPFile
 import top.mcfpp.lib.Execute
 import top.mcfpp.lib.NBTPath
-import top.mcfpp.lib.SbObject
 import top.mcfpp.model.*
 import top.mcfpp.model.accessor.FunctionAccessor
 import top.mcfpp.model.accessor.FunctionMutator
@@ -32,11 +29,14 @@ import top.mcfpp.model.function.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.FunctionParam.Companion.typeToStringList
 import top.mcfpp.model.generic.Generic
+import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPEnumType
+import top.mcfpp.type.MCFPPGenericClassType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
-import kotlin.collections.ArrayList
 
 open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
@@ -214,8 +214,8 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     override fun visitStatementExpression(ctx: mcfppParser.StatementExpressionContext):Any? {
         Project.ctx = ctx
         Function.addComment("expression: " + ctx.text)
-        if(ctx.basicExpression() != null){
-            val left: Var<*> = McfppLeftExprVisitor().visit(ctx.basicExpression())
+        if(ctx.varWithSelector() != null){
+            val left: Var<*> = McfppLeftExprVisitor().visit(ctx.varWithSelector())
             if (left.isConst) {
                 LogProcessor.error("Cannot assign a constant repeatedly: " + left.identifier)
                 return null
@@ -329,7 +329,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
      *
      * @param ctx
      */
-    
     @InsertCommand
     @Suppress("UNCHECKED_CAST")
     fun enterIfStatement(ctx: mcfppParser.IfStatementContext) {
@@ -373,8 +372,9 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         //Function.currFunction = Function.currFunction.parent[0]
         Function.addComment("if end")
         //if以后的语句已经被全部打包到if分支里面，所以if语句之后的statement没有意义
-        Function.currFunction.isEnded = true
-
+        if(ctx.elseStatement() != null){
+            Function.currFunction.isEnded = true
+        }
     }
 
     override fun visitIfBlock(ctx: mcfppParser.IfBlockContext): Any? {

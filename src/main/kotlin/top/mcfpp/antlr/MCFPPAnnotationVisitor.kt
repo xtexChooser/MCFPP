@@ -1,13 +1,14 @@
 package top.mcfpp.antlr
 
 import top.mcfpp.Project
-import top.mcfpp.exception.UndefinedException
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.exception.UndefinedException
 import top.mcfpp.model.Namespace
 import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.ObjectDataTemplate
 import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.field.GlobalField
+import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 
@@ -130,6 +131,23 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
             it.forClass(clazz)
         }
         clazz.annotations.addAll(annotationCache)
+        annotationCache.clear()
+    }
+
+    override fun visitFunctionDeclaration(ctx: mcfppParser.FunctionDeclarationContext) {
+        //获取函数对象
+        val types = ctx.functionParams()?.let { FunctionParam.parseReadonlyAndNormalParamTypes(it) }
+        //获取缓存中的对象
+        val f = GlobalField.getFunction(
+            Project.currNamespace,
+            ctx.Identifier().text,
+            types?.first?.map { it.build("") }?:ArrayList(),
+            types?.second?.map { it.build("") }?:ArrayList()
+        )
+        annotationCache.forEach {
+            it.forFunction(f)
+        }
+        f.annotations.addAll(annotationCache)
         annotationCache.clear()
     }
 }

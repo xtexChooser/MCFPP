@@ -13,6 +13,7 @@ import top.mcfpp.command.*
 import top.mcfpp.core.lang.*
 import top.mcfpp.doc.Document
 import top.mcfpp.model.*
+import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.field.FunctionField
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.generic.Generic
@@ -27,85 +28,85 @@ import top.mcfpp.util.TextTranslator.translate
 import java.io.Serializable
 import java.lang.reflect.Method
 
+/**
+ * 一个minecraft中的命令函数。
+ *
+ * 在mcfpp中，一个命令函数可能是单独存在的，也有可能是一个类的成员。
+ *
+ * 在一般的数据包中，命令函数的调用通常只会是一个简单的`function xxx:xxx`
+ * 这样的形式。这条命令本身的意义便确实是调用一个函数。然而我们需要注意的是，在mc中，
+ * 一个命令函数并没有通常意义上的栈，换句话说，所有的变量都是全局变量，这显然是不符合
+ * 一般的高级语言的规范的。在mcfpp中，我们通过`storage`的方法来模拟一个函数
+ * 的栈。
+ *
+ * mcfpp栈的模拟参考了[https://www.mcbbs.net/thread-1393132-1-1.html](https://www.mcbbs.net/thread-1393132-1-1.html)
+ * 的方法。在下面的描述中，也是摘抄于此文。
+ *
+ * c语言底层是如何实现“局部变量”的？我们以 c 语言为例，看看函数底层的堆栈实现过程是什么样的？请看下面这段代码：
+ * ```c
+ * int test() {
+ *         int a = 1;// 位置1
+ *         funA(a);
+ *         // 位置5
+ * }
+ * int funA(int a) {// 位置2
+ *         a = a + 1;
+ *         funB(a);
+ *         // 位置4
+ * }
+ * int funB(int a) {// 位置3
+ *         a = a + 1;
+ * }
+ * ```
+ *
+ * 位置①：现在父函数还没调用 funA，堆栈情况是：<br></br>
+ * low address {父函数栈帧 ...  }high address<br></br>
+ * （执行 funA(?) ）<br></br>
+ * 位置②：当父函数调用 funA 时，会从栈顶开一块新的空间来保存 funA 的栈帧，堆栈情况是：<br></br>
+ * low address{ funA栈帧 父函数栈帧 ... } high address<br></br>
+ * （执行 a = a + 1）<br></br>
+ * （执行 funB(a) ）<br></br>
+ * 位置③：当 funA 调用 funB 时，会从栈顶开一块新的空间来保存 funB 的栈帧，堆栈情况是：<br></br>
+ * low address { funB栈帧 funA栈帧 父函数栈帧 ... } high address<br></br>
+ * （执行 a = a + 2）<br></br>
+ * 位置④：funB 调用结束，funB 的栈帧被销毁，程序回到 funA 继续执行，堆栈情况是：<br></br>
+ * low address { funA栈帧 父函数栈帧 ... } high address<br></br>
+ * 位置⑤：funA 调用结束，funA 的栈帧被销毁，程序回到 父函数 继续执行，堆栈情况是：<br></br>
+ * low address { 父函数栈帧 ... } high address<br></br>
+ * 我们会发现，funA 和 funB 使用的变量都叫 a，但它们的位置是不同的，此处当前函数只会在属于自己的栈帧的内存空间上
+ * 操作，不同函数之间的变量之所以不会互相干扰，也是因为它们在栈中使用的位置不同，此 a 非彼 a
+ *
+ *
+ *
+ * mcf 如何模拟这样的堆栈？<br></br>
+ * 方法：将 storage 视为栈，将记分板视为寄存器<br></br>
+ * 与汇编语言不同的是，一旦我们这么想，我们就拥有无限的寄存器，且每个寄存器都可以是专用的，所以在下面的叙述中，
+ * 如果说“变量”，指的是寄存器，也就是记分板里的值；只有说“变量内存空间”，才是指 storage 中的值；变量内存空间类似函数栈帧<br></br>
+ * 我们可以使用 storage 的一个列表，它专门用来存放函数的变量内存空间<br></br>
+ * 列表的大致模样： stack_frame [{funB变量内存空间}, {funA变量内存空间}, {父函数变量内存空间}]<br></br>
+ * 每次我们要调用一个函数，只需要在 stack_frame 列表中前插一个 {}，然后压入参数<br></br>
+ *
+ * 思路有了，接下来就是命令了。虽然前面的思路看起来非常复杂，但是实际上转化为命令的时候就非常简单了。
+ *
+ * ```
+ * #函数创建变量内存空间
+ * data modify storage mny:program stack_frame prepend value {}
+ * #父函数处理子函数的参数，压栈
+ * execute store result storage mny:program stack_frame[0].xxx int 1 run ...
+ * #给子函数打电话（划去）调用子函数
+ * function xxx:xxx
+ * #父函数销毁子函数变量内存空间
+ * data remove storage mny:program stack_frame[0]
+ * #父函数恢复记分板值
+ * xxx（命令略去）
+ * ```
+ *
+ * 你可以在[top.mcfpp.antlr.MCFPPExprVisitor.visitVar]方法中看到mcfpp是如何实现的。
+ *
+ * @see InternalFunction
+ */
 open class Function : Member, FieldContainer, Serializable, WithDocument {
 
-    /**
-     * 一个minecraft中的命令函数。
-     *
-     * 在mcfpp中，一个命令函数可能是单独存在的，也有可能是一个类的成员。
-     *
-     * 在一般的数据包中，命令函数的调用通常只会是一个简单的`function xxx:xxx`
-     * 这样的形式。这条命令本身的意义便确实是调用一个函数。然而我们需要注意的是，在mc中，
-     * 一个命令函数并没有通常意义上的栈，换句话说，所有的变量都是全局变量，这显然是不符合
-     * 一般的高级语言的规范的。在mcfpp中，我们通过`storage`的方法来模拟一个函数
-     * 的栈。
-     *
-     * mcfpp栈的模拟参考了[https://www.mcbbs.net/thread-1393132-1-1.html](https://www.mcbbs.net/thread-1393132-1-1.html)
-     * 的方法。在下面的描述中，也是摘抄于此文。
-     *
-     * c语言底层是如何实现“局部变量”的？我们以 c 语言为例，看看函数底层的堆栈实现过程是什么样的？请看下面这段代码：
-     * ```c
-     * int test() {
-     *         int a = 1;// 位置1
-     *         funA(a);
-     *         // 位置5
-     * }
-     * int funA(int a) {// 位置2
-     *         a = a + 1;
-     *         funB(a);
-     *         // 位置4
-     * }
-     * int funB(int a) {// 位置3
-     *         a = a + 1;
-     * }
-     * ```
-     *
-     * 位置①：现在父函数还没调用 funA，堆栈情况是：<br></br>
-     * low address {父函数栈帧 ...  }high address<br></br>
-     * （执行 funA(?) ）<br></br>
-     * 位置②：当父函数调用 funA 时，会从栈顶开一块新的空间来保存 funA 的栈帧，堆栈情况是：<br></br>
-     * low address{ funA栈帧 父函数栈帧 ... } high address<br></br>
-     * （执行 a = a + 1）<br></br>
-     * （执行 funB(a) ）<br></br>
-     * 位置③：当 funA 调用 funB 时，会从栈顶开一块新的空间来保存 funB 的栈帧，堆栈情况是：<br></br>
-     * low address { funB栈帧 funA栈帧 父函数栈帧 ... } high address<br></br>
-     * （执行 a = a + 2）<br></br>
-     * 位置④：funB 调用结束，funB 的栈帧被销毁，程序回到 funA 继续执行，堆栈情况是：<br></br>
-     * low address { funA栈帧 父函数栈帧 ... } high address<br></br>
-     * 位置⑤：funA 调用结束，funA 的栈帧被销毁，程序回到 父函数 继续执行，堆栈情况是：<br></br>
-     * low address { 父函数栈帧 ... } high address<br></br>
-     * 我们会发现，funA 和 funB 使用的变量都叫 a，但它们的位置是不同的，此处当前函数只会在属于自己的栈帧的内存空间上
-     * 操作，不同函数之间的变量之所以不会互相干扰，也是因为它们在栈中使用的位置不同，此 a 非彼 a
-     *
-     *
-     *
-     * mcf 如何模拟这样的堆栈？<br></br>
-     * 方法：将 storage 视为栈，将记分板视为寄存器<br></br>
-     * 与汇编语言不同的是，一旦我们这么想，我们就拥有无限的寄存器，且每个寄存器都可以是专用的，所以在下面的叙述中，
-     * 如果说“变量”，指的是寄存器，也就是记分板里的值；只有说“变量内存空间”，才是指 storage 中的值；变量内存空间类似函数栈帧<br></br>
-     * 我们可以使用 storage 的一个列表，它专门用来存放函数的变量内存空间<br></br>
-     * 列表的大致模样： stack_frame [{funB变量内存空间}, {funA变量内存空间}, {父函数变量内存空间}]<br></br>
-     * 每次我们要调用一个函数，只需要在 stack_frame 列表中前插一个 {}，然后压入参数<br></br>
-     *
-     * 思路有了，接下来就是命令了。虽然前面的思路看起来非常复杂，但是实际上转化为命令的时候就非常简单了。
-     *
-     * ```
-     * #函数创建变量内存空间
-     * data modify storage mny:program stack_frame prepend value {}
-     * #父函数处理子函数的参数，压栈
-     * execute store result storage mny:program stack_frame[0].xxx int 1 run ...
-     * #给子函数打电话（划去）调用子函数
-     * function xxx:xxx
-     * #父函数销毁子函数变量内存空间
-     * data remove storage mny:program stack_frame[0]
-     * #父函数恢复记分板值
-     * xxx（命令略去）
-     * ```
-     *
-     * 你可以在[top.mcfpp.antlr.MCFPPExprVisitor.visitVar]方法中看到mcfpp是如何实现的。
-     *
-     * @see InternalFunction
-     */
     /**
      * 函数的返回类型
      */
@@ -307,6 +308,9 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             return re
         }
 
+    /**
+     * 函数的语法树。当语法树为空的时候，函数会被直接编译而不做编译期常量优化
+     */
     var ast: FunctionBodyContext? = null
 
     var context: FunctionContext = FunctionContext()
@@ -318,6 +322,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
     override var isFinal: Boolean = false
 
     override var document: Document = Document()
+
+    val annotations: ArrayList<Annotation> = ArrayList()
 
     /**
      * 创建一个全局函数，它有指定的命名空间
@@ -555,6 +561,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
     }
 
     protected open fun invoke(normalArgs: ArrayList<Var<*>>){
+        //变量进栈
+        fieldStore()
         //给函数开栈
         addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
         //参数传递
@@ -582,6 +590,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param caller
      */
     protected open fun invoke(normalArgs: ArrayList<Var<*>>, caller: Var<*>){
+        //变量进栈
+        fieldStore()
         //基本类型
         addComment("[Function ${this.namespaceID}] Function Pushing and argument passing")
         //给函数开栈
@@ -614,6 +624,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      */
     @InsertCommand
     protected open fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
+        //变量进栈
+        fieldStore()
         //给函数开栈
         addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
         //参数传递
@@ -645,6 +657,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param data 数据模板的实例
      */
     protected open fun invoke(normalArgs: ArrayList<Var<*>>, data: DataTemplateObject){
+        //变量进栈
+        fieldStore()
         //给函数开栈
         addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
         //参数传递
@@ -672,15 +686,17 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      */
     @InsertCommand
     open fun argPass(normalArgs: ArrayList<Var<*>>){
+        val tempArgs = normalArgs.map { it.getTempVar() }.toCollection(ArrayList())
         for (i in this.normalParams.indices) {
-            if(i >= normalArgs.size){
+            if(i >= tempArgs.size){
                 //参数缺省值
-                normalArgs.add(this.normalParams[i].defaultVar!!)
+                tempArgs.add(this.normalParams[i].defaultVar!!)
             }
             //参数传递和子函数的参数进栈
             val p = field.getVar(this.normalParams[i].identifier)!!
             p.isConst = false
-            val pp = p.assignedBy(normalArgs[i])
+            var pp = p.assignedBy(tempArgs[i])
+            if(pp is MCFPPValue<*>) pp = pp.toDynamic(false)
             if(!this.normalParams[i].isStatic) pp.isConst = true
             field.putVar(p.identifier, pp, true)
         }
@@ -706,6 +722,13 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         }
     }
 
+    fun fieldStore(){
+        addComment("[Function ${this.namespaceID}] Store vars into the Stack")
+        Companion.field.forEachVar { v ->
+            v.storeToStack()
+        }
+    }
+
 
     /**
      * 在函数执行完毕，销毁函数栈之后，将调用栈中的变量值还原到变量中
@@ -716,20 +739,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         addComment("[Function ${this.namespaceID}] Take vars out of the Stack")
         Companion.field.forEachVar { v ->
             run {
-                when (v.type) {
-                    MCFPPBaseType.Int -> {
-                        val tg = v as MCInt
-                        //参数传递和子函数的参数压栈
-                        //如果是int取出到记分板
-                        addCommand(
-                            "execute store result score ${tg.name} ${tg.sbObject} run "
-                                    + "data get storage mcfpp:system ${Project.currNamespace}.stack_frame[0].${tg.identifier}"
-                        )
-                    }
-                    else -> {
-                        //是引用类型，不用还原
-                    }
-                }
+                v.getFromStack()
             }
         }
     }

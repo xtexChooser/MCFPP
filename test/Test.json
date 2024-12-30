@@ -1,7 +1,7 @@
 {
   "description": "",
   "namespace": "mcfpp",
-  "noDatapack": true,
   "ignoreStdLib": false,
-  "isLib": false
+  "isLib": false,
+  "targetPath": "D:\\.minecraft\\saves\\MCFPP Studio\\datapacks"
 }

@@ -106,6 +106,7 @@ object GlobalField : FieldContainer, IField {
         stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("NoInstance", NoInstance::class.java)
         stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("To", To::class.java)
         stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("Base", Base::class.java)
+        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("Dynamic", Dynamic::class.java)
 
         return this
     }

@@ -7,7 +7,6 @@ import net.querz.nbt.tag.Tag
 import top.mcfpp.Project
 import top.mcfpp.core.lang.*
 import top.mcfpp.core.lang.bool.ScoreBool
-import top.mcfpp.type.MCFPPClassType
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.CanSelectMember
 import top.mcfpp.model.Class
@@ -15,9 +14,9 @@ import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NoStackFunction
+import top.mcfpp.type.MCFPPClassType
 import top.mcfpp.util.Utils
 import java.util.*
-import kotlin.math.truncate
 
 /**
  * 命令总类，提供了大量用于生成命令的方法。默认提供了一些可替换的位点
@@ -112,7 +111,7 @@ object Commands {
      * @return 生成的命令
      */
     fun sbPlayerRemove(target: MCInt, value: Int): Command {
-        return Command.build("scoreboard players remove ")
+        return Command.build("scoreboard players remove")
             .build(target.name, target.name)
             .build(target.sbObject.toString(), target.sbObject.toString())
             .build(value.toString())

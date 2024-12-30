@@ -6,10 +6,13 @@ import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
+import top.mcfpp.core.lang.JsonTextConcrete
 import top.mcfpp.core.lang.MCAnyConcrete
 import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.Var
 import top.mcfpp.exception.VariableConverseException
+import top.mcfpp.lib.NBTChatComponent
+import top.mcfpp.lib.PlainChatComponent
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
@@ -79,6 +82,36 @@ open class MCString : NBTBasedData {
             else -> LogProcessor.error(TextTranslator.ASSIGN_ERROR.translate(b.type.typeName, type.typeName))
         }
         return this
+    }
+
+    override fun implicitCast(type: MCFPPType): Var<*> {
+        val re = super.implicitCast(type)
+        if(!re.isError) return re
+        return when (type) {
+            MCFPPBaseType.JsonText -> {
+                if(this is MCStringConcrete){
+                    JsonTextConcrete(PlainChatComponent(this.value.value))
+                }else{
+                    JsonTextConcrete(NBTChatComponent(this, false))
+                }
+            }
+            else -> re
+        }
+    }
+
+    override fun explicitCast(type: MCFPPType): Var<*> {
+        val re = super.explicitCast(type)
+        if(!re.isError) return re
+        return when (type) {
+            MCFPPBaseType.JsonText -> {
+                if(this is MCStringConcrete){
+                    JsonTextConcrete(PlainChatComponent(this.value.value))
+                }else{
+                    JsonTextConcrete(NBTChatComponent(this, false))
+                }
+            }
+            else -> re
+        }
     }
 
     override fun canAssignedBy(b: Var<*>): Boolean {

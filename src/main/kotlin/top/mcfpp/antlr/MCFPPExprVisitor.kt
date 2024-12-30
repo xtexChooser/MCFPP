@@ -59,12 +59,13 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
         val f = NoStackFunction("expression_${UUID.randomUUID()}",Function.currFunction)
         Function.currFunction = f
         return if(ctx.primary() != null){
-            val q = visit(ctx.primary())
+            currSelector = null
+            val q = visitPrimary(ctx.primary())
             Function.currFunction = l
             l.commands.addAll(f.commands)
             q
         }else{
-            val q = visit(ctx.conditionalOrExpression())
+            val q = visitConditionalOrExpression(ctx.conditionalOrExpression())
             Function.currFunction = l
             l.commands.addAll(f.commands)
             q
@@ -81,10 +82,10 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitConditionalOrExpression(ctx: mcfppParser.ConditionalOrExpressionContext): Var<*> {
         Project.ctx = ctx
-        visitConditionalOrExpressionRe = visit(ctx.conditionalAndExpression(0))
+        visitConditionalOrExpressionRe = visitConditionalAndExpression(ctx.conditionalAndExpression(0))
         processVarCache.add(visitConditionalOrExpressionRe!!)
         for (i in 1 until ctx.conditionalAndExpression().size) {
-            var b: Var<*>? = visit(ctx.conditionalAndExpression(i))
+            var b: Var<*>? = visitConditionalAndExpression(ctx.conditionalAndExpression(i))
             if(b is MCFloat) b = b.toTempEntity()
             if(visitConditionalOrExpressionRe!! != MCFloat.ssObj){
                 visitConditionalOrExpressionRe = visitConditionalOrExpressionRe!!.getTempVar()
@@ -106,10 +107,10 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitConditionalAndExpression(ctx: mcfppParser.ConditionalAndExpressionContext): Var<*> {
         Project.ctx = ctx
-        visitConditionalAndExpressionRe = visit(ctx.equalityExpression(0))
+        visitConditionalAndExpressionRe = visitEqualityExpression(ctx.equalityExpression(0))
         processVarCache.add(visitConditionalAndExpressionRe!!)
         for (i in 1 until ctx.equalityExpression().size) {
-            val b: Var<*>? = visit(ctx.equalityExpression(i))
+            val b: Var<*>? = visitEqualityExpression(ctx.equalityExpression(i))
             visitConditionalAndExpressionRe = visitConditionalAndExpressionRe!!.binaryComputation(b!!, "&&")
             processVarCache[processVarCache.size - 1] = visitConditionalAndExpressionRe!!
         }
@@ -125,9 +126,9 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitEqualityExpression(ctx: mcfppParser.EqualityExpressionContext): Var<*> {
         Project.ctx = ctx
-        var re: Var<*> = visit(ctx.relationalExpression(0))
+        var re: Var<*> = visitRelationalExpression(ctx.relationalExpression(0))
         if (ctx.relationalExpression().size != 1) {
-            val b: Var<*> = visit(ctx.relationalExpression(1))
+            val b: Var<*> = visitRelationalExpression(ctx.relationalExpression(1))
             if(!re.isTemp){
                 re = re.getTempVar()
             }
@@ -144,9 +145,9 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitRelationalExpression(ctx: mcfppParser.RelationalExpressionContext): Var<*> {
         Project.ctx = ctx
-        var re: Var<*> = visit(ctx.additiveExpression(0))
+        var re: Var<*> = visitAdditiveExpression(ctx.additiveExpression(0))
         if (ctx.additiveExpression().size != 1) {
-            val b: Var<*> = visit(ctx.additiveExpression(1))
+            val b: Var<*> = visitAdditiveExpression(ctx.additiveExpression(1))
             re = re.binaryComputation(b, ctx.relationalOp().text)
         }
         return re
@@ -161,10 +162,10 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitAdditiveExpression(ctx: mcfppParser.AdditiveExpressionContext): Var<*> {
         Project.ctx = ctx
-        visitAdditiveExpressionRe = visit(ctx.multiplicativeExpression(0))
+        visitAdditiveExpressionRe = visitMultiplicativeExpression(ctx.multiplicativeExpression(0))
         processVarCache.add(visitAdditiveExpressionRe!!)
         for (i in 1 until ctx.multiplicativeExpression().size) {
-            var b: Var<*>? = visit(ctx.multiplicativeExpression(i))
+            var b: Var<*>? = visitMultiplicativeExpression(ctx.multiplicativeExpression(i))
             if(b is MCFloat) {
                 b = b.toTempEntity()
                 if(visitAdditiveExpressionRe!! != MCFloat.ssObj){
@@ -188,10 +189,10 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitMultiplicativeExpression(ctx: mcfppParser.MultiplicativeExpressionContext): Var<*> {
         Project.ctx = ctx
-        visitMultiplicativeExpressionRe = visit(ctx.unaryExpression(0))
+        visitMultiplicativeExpressionRe = visitUnaryExpression(ctx.unaryExpression(0))
         processVarCache.add(visitMultiplicativeExpressionRe!!)
         for (i in 1 until ctx.unaryExpression().size) {
-            var b: Var<*>? = visit(ctx.unaryExpression(i))
+            var b: Var<*>? = visitUnaryExpression(ctx.unaryExpression(i))
             if(b is MCFloat) b = b.toTempEntity()
             if(visitMultiplicativeExpressionRe != MCFloat.ssObj){
                 visitMultiplicativeExpressionRe = visitMultiplicativeExpressionRe!!.getTempVar()
@@ -212,13 +213,13 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     override fun visitUnaryExpression(ctx: mcfppParser.UnaryExpressionContext): Var<*> {
         Project.ctx = ctx
         return if (ctx.rightVarExpression() != null) {
-            visit(ctx.rightVarExpression())
+            visitRightVarExpression(ctx.rightVarExpression())
         } else if (ctx.unaryExpression() != null) {
-            val a: Var<*> = visit(ctx.unaryExpression())
+            val a: Var<*> = visitUnaryExpression(ctx.unaryExpression())
             a.unaryComputation("!")
         } else {
             //类型强制转换
-            visit(ctx.castExpression())
+            visitCastExpression(ctx.castExpression())
         }
     }
 
@@ -231,7 +232,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitCastExpression(ctx: mcfppParser.CastExpressionContext): Var<*> {
         Project.ctx = ctx
-        val a: Var<*> = visit(ctx.unaryExpression())
+        val a: Var<*> = visitUnaryExpression(ctx.unaryExpression())
         return a.explicitCast(MCFPPType.parseFromIdentifier(ctx.type().text, Function.currFunction.field)?: run {
             LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
             MCFPPBaseType.Any
@@ -246,26 +247,11 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
      */
     @Override
     override fun visitRightVarExpression(ctx: mcfppParser.RightVarExpressionContext): Var<*> {
-        val qwq = visit(ctx.basicExpression())
+        val qwq = visitVarWithSelector(ctx.varWithSelector())
         return if(qwq is PropertyVar){
             qwq.getter(qwq.caller)
         }else{
             qwq
-        }
-    }
-
-    /**
-     * 计算一个基本的表达式。可能是一个变量，也可能是一个数值
-     * @param ctx the parse tree
-     * @return 表达式的值
-     */
-    @Override
-    override fun visitBasicExpression(ctx: mcfppParser.BasicExpressionContext): Var<*> {
-        Project.ctx = ctx
-        return if (ctx.jvmAccessExpression() != null) {
-            visitJvmAccessExpression(ctx.jvmAccessExpression())
-        } else {
-            visit(ctx.varWithSelector())
         }
     }
 
@@ -278,11 +264,20 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     @Override
     override fun visitVarWithSelector(ctx: mcfppParser.VarWithSelectorContext): Var<*> {
         Project.ctx = ctx
+        currSelector = null
         if(ctx.jvmAccessExpression() != null){
             currSelector = visitJvmAccessExpression(ctx.jvmAccessExpression())
-        }
-        if(currSelector is UnknownVar){
-            val typeStr = ctx.jvmAccessExpression()?.text?:ctx.type().text
+            if(currSelector is UnknownVar){
+                val typeStr = ctx.jvmAccessExpression().text
+                val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
+                if(type == null){
+                    LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
+                }else{
+                    currSelector = ObjectVar(type)
+                }
+            }
+        }else{
+            val typeStr = ctx.type().text
             val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
             if(type == null){
                 if(ctx.selector().size == 0){
@@ -296,24 +291,24 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             }
         }
         for (selector in ctx.selector()){
-            visit(selector)
+            visitSelector(selector)
         }
         return currSelector!!
     }
 
     override fun visitJvmAccessExpression(ctx: mcfppParser.JvmAccessExpressionContext): Var<*> {
         val re = visitPrimary(ctx.primary())
-        if(ctx.Identifier() != null){
-            return re.getJVM(ctx.Identifier().text)
+        return if(ctx.Identifier() != null){
+            re.getJVM(ctx.Identifier().text)
         }else{
-            return re
+            re
         }
     }
 
     @Override
     override fun visitSelector(ctx: mcfppParser.SelectorContext?): Var<*> {
         //进入visitVar，currSelector作为成员选择的上下文
-        currSelector = visit(ctx!!.`var`())
+        currSelector = visitVar(ctx!!.`var`())
         return currSelector!!
     }
 
@@ -327,17 +322,17 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
         Project.ctx = ctx
         if (ctx.`var`() != null) {
             //变量
-            val qwq = visit(ctx.`var`())
+            val qwq = visitVar(ctx.`var`())
             if(qwq is UnknownVar && ctx.parent !is mcfppParser.VarWithSelectorContext){
                 LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(qwq.identifier))
             }
             return qwq
         } else if (ctx.value() != null) {
-            return visit(ctx.value())
+            return visitValue(ctx.value())
         } else if (ctx.range() != null){
             //是范围
-            val left = ctx.range().num1?.let { visit(it) }
-            val right = ctx.range().num2?.let { visit(it) }
+            val left = ctx.range().num1?.let { visitVar(it) }
+            val right = ctx.range().num2?.let { visitVar(it) }
             if(left is MCNumber<*>? && right is MCNumber<*>?){
                 if(left is MCFPPValue<*>? && right is MCFPPValue<*>?){
                     val leftValue = left?.value.toString().toFloatOrNull()
@@ -385,13 +380,13 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     override fun visitVar(ctx: mcfppParser.VarContext): Var<*> {
         Project.ctx = ctx
         return if (ctx.varWithSuffix() != null) {
-            visit(ctx.varWithSuffix())
+            visitVarWithSuffix(ctx.varWithSuffix())
         } else if (ctx.bucketExpression() != null) {
             // '(' expression ')'
-            visit(ctx.bucketExpression())
+            visitBucketExpression(ctx.bucketExpression())
         } else {
             //函数调用
-            visit(ctx.functionCall())
+            visitFunctionCall(ctx.functionCall())
         }
     }
 

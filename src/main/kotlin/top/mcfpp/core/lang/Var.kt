@@ -136,7 +136,7 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
      */
     constructor(identifier: String = UUID.randomUUID().toString()){
         this.identifier = identifier
-        this.nbtPath = NBTPath(StorageSource("mcfpp:temp"))
+        this.nbtPath = NBTPath(StorageSource("mcfpp:system"))
     }
 
     /**

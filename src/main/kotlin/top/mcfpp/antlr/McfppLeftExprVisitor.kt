@@ -2,16 +2,16 @@ package top.mcfpp.antlr
 
 import top.mcfpp.Project
 import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.core.lang.MCFPPValue
-import top.mcfpp.model.*
-import top.mcfpp.model.function.Function
+import top.mcfpp.model.Class
+import top.mcfpp.model.DataTemplate
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.field.MCFPPFuncGetter
+import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.model.generic.Generic
 import top.mcfpp.model.generic.GenericClass
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
@@ -19,34 +19,37 @@ import top.mcfpp.util.TextTranslator.translate
 import java.util.*
 
 open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
-    private var currSelector : CanSelectMember? = null
-
-    override fun visitBasicExpression(ctx: mcfppParser.BasicExpressionContext): Var<*> {
-        Project.ctx = ctx
-        return if (ctx.jvmAccessExpression() != null) {
-            visit(ctx.jvmAccessExpression())
-        } else {
-            visit(ctx.varWithSelector())
-        }
-    }
+    private var currSelector : Var<*>? = null
 
     override fun visitVarWithSelector(ctx: mcfppParser.VarWithSelectorContext): Var<*> {
         Project.ctx = ctx
         if(ctx.jvmAccessExpression() != null){
-            currSelector = visit(ctx.jvmAccessExpression())
-        }
-        if(currSelector is UnknownVar){
-            val typeStr = ctx.jvmAccessExpression()?.text?:ctx.type().text
+            currSelector = visitJvmAccessExpression(ctx.jvmAccessExpression())
+            if(currSelector is UnknownVar){
+                val typeStr = ctx.jvmAccessExpression().text
+                val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
+                if(type == null){
+                    LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
+                }else{
+                    currSelector = ObjectVar(type)
+                }
+            }
+        }else{
+            val typeStr = ctx.type().text
             val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
             if(type == null){
-                LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(typeStr))
-                currSelector = UnknownVar("unknown_" + UUID.randomUUID())
+                if(ctx.selector().size == 0){
+                    LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
+                }else{
+                    LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(typeStr))
+                    currSelector = UnknownVar("unknown_" + UUID.randomUUID())
+                }
             }else{
                 currSelector = ObjectVar(type)
             }
         }
         for (selector in ctx.selector()){
-            visit(selector)
+            visitSelector(selector)
         }
         return currSelector as Var<*>
     }

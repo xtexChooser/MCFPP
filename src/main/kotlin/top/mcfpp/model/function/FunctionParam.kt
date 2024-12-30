@@ -3,11 +3,12 @@ package top.mcfpp.model.function
 import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.core.lang.DataTemplateObject
 import top.mcfpp.core.lang.Var
+import top.mcfpp.lib.NBTPath
+import top.mcfpp.model.field.SimpleFieldWithType
 import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPConcreteType
 import top.mcfpp.type.MCFPPGenericParamType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.model.field.SimpleFieldWithType
-import top.mcfpp.type.MCFPPConcreteType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -60,6 +61,7 @@ class FunctionParam(
         if(qwq is DataTemplateObject){
             qwq.toFunctionParam()
         }
+        qwq.nbtPath = NBTPath.getNormalStackPath(qwq)
         return qwq
     }
 

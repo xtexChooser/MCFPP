@@ -27,6 +27,12 @@ abstract class ChatComponent {
         }
         return str
     }
+
+    fun toListComponent(): ListChatComponent{
+        val list = ListChatComponent()
+        list.components.add(this)
+        return list
+    }
 }
 
 /**
@@ -53,7 +59,7 @@ class ListChatComponent: ChatComponent() {
 
 class PlainChatComponent(val value: String) : ChatComponent() {
     override fun toCommandPart(): Command {
-        val c = Command("""{""type"": "text", "text": "$value"}""")
+        val c = Command("""{"type": "text", "text": "$value"}""")
         if(styles.isNotEmpty()){
             c.build(",").build(styleToString())
         }

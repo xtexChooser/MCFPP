@@ -3,17 +3,19 @@ package top.mcfpp.core.lang
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
-import top.mcfpp.core.lang.bool.*
+import top.mcfpp.core.lang.bool.CommandBoolPart
+import top.mcfpp.core.lang.bool.ExecuteBool
+import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.core.lang.nbt.MCLong
 import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.mni.MCIntData
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
+import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -353,17 +355,18 @@ open class MCInt : MCNumber<Int> {
 
     override fun storeToStack() {
         if(parentClass() != null || hasStoredInStack) return
-        Function.addCommand("execute " +
-                "store result $nbtPath int 1 " +
-                "run scoreboard players get $name $sbObject")
+        Function.addCommand(Command("execute store result")
+            .build(nbtPath.toCommandPart())
+            .build("int 1 run scoreboard players get $name $sbObject"))
         hasStoredInStack = true
     }
 
     override fun getFromStack() {
         if(parent != null) return
-        Function.addCommand("execute " +
-                "store result score $name $sbObject " +
-                "run data get $nbtPath")
+        Function.addCommand(
+            Command("execute store result score $name $sbObject run data get")
+                .build(nbtPath.toCommandPart())
+        )
     }
 
     /**
@@ -446,6 +449,10 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     override fun clone(): MCIntConcrete {
         return MCIntConcrete(this)
     }
+
+    override fun storeToStack() {}
+
+    override fun getFromStack() {}
 
     /**
      * 动态化

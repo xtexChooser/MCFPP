@@ -313,7 +313,7 @@ expression
 
 //能作为语句的表达式
 statementExpression
-    :   (basicExpression '=' )? expression
+    :   (varWithSelector '=' )? expression
     ;
 
 //条件表达式
@@ -368,7 +368,7 @@ unaryExpression
 
 //右侧计算式取出的变量
 rightVarExpression
-    :   basicExpression
+    :   varWithSelector
     ;
 
 //强制类型转换表达式
@@ -376,9 +376,9 @@ castExpression
     :  '(' type ')' unaryExpression
     ;
 
-basicExpression
-    :   jvmAccessExpression
-    |   varWithSelector
+varWithSelector
+    : jvmAccessExpression selector*
+    | type selector+
     ;
 
 jvmAccessExpression
@@ -393,11 +393,6 @@ primary
     |   THIS
     |   SUPER
     |   type
-    ;
-
-varWithSelector
-    : jvmAccessExpression selector+
-    | type selector+
     ;
 
 var
