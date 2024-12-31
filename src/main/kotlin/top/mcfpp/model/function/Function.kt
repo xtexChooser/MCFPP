@@ -232,8 +232,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             val re: StringBuilder = if(ownerType == OwnerType.NONE){
                 StringBuilder("$namespace:$identifier")
             }else{
-                if(isStatic){
-                    StringBuilder("$namespace:${owner!!.identifier}/object/$identifier")
+                if(parentClass() is ObjectClass){
+                    StringBuilder("$namespace:${owner!!.identifier}/static/$identifier")
                 }else{
                     StringBuilder("$namespace:${owner!!.identifier}/$identifier")
                 }
@@ -252,7 +252,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             val re: StringBuilder = if(ownerType == OwnerType.NONE){
                 StringBuilder(identifier)
             }else{
-                if(isStatic){
+                if(parentClass() is ObjectClass){
                     StringBuilder("${owner!!.identifier}/static/$identifier")
                 }else{
                     StringBuilder("${owner!!.identifier}/$identifier")
@@ -504,7 +504,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param returnType
      */
     fun buildReturnVar(returnType: MCFPPType): Var<*>{
-        return returnType.build("return", this)
+        return returnType.buildUnConcrete("return", this)
     }
 
     /**
@@ -630,6 +630,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
         //参数传递
         argPass(normalArgs)
+        callerClassP.stackIndex ++
         //函数调用的命令
         if(callerClassP is ClassPointerConcrete){
             addCommands(Commands.selectRun(callerClassP,Command.build("function $namespaceID")))
@@ -644,6 +645,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
                 p.dispose()
             }
         }
+        callerClassP.stackIndex --
         //调用完毕，将子函数的栈销毁
         addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
         //取出栈内的值
@@ -760,6 +762,9 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             return
         }
         returnVar = returnVar.assignedBy(v)
+        if(returnVar is MCFPPValue<*> && returnVar.type is MCFPPDeclaredConcreteType){
+            returnVar = (returnVar as MCFPPValue<*>).toDynamic(false)
+        }
     }
 
     /**

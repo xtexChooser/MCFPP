@@ -8,7 +8,7 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.type.MCFPPPrivateType
 import top.mcfpp.type.MCFPPType
-import java.util.*
+import top.mcfpp.util.TempPool
 
 class CommandReturn : Var<CommandReturn> {
 
@@ -24,7 +24,7 @@ class CommandReturn : Var<CommandReturn> {
      * 创建一个string值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(command: Command, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(command: Command, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.result = CommandResult(this)
         this.success = CommandSuccess(this)
         this.command = command

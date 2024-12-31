@@ -1,12 +1,12 @@
 package top.mcfpp.core.lang
 
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.lib.EntitySelector
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPEntityType
-import java.util.*
+import top.mcfpp.type.MCFPPType
+import top.mcfpp.util.TempPool
 
 
 /**
@@ -29,7 +29,7 @@ open class SelectorVar : ConcreteVar<SelectorVar, EntitySelector>, EntityBase {
      * 创建一个目标选择器。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(selector: EntitySelector, identifier: String = UUID.randomUUID().toString())
+    constructor(selector: EntitySelector, identifier: String = TempPool.getVarIdentify())
             : super(identifier, selector)
 
     /**

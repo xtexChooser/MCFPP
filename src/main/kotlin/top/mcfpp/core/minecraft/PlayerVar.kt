@@ -10,20 +10,20 @@ import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 open class PlayerVar : Var<PlayerVar>, EntityBase {
 
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : this(curr.prefix + identifier) {
         this.identifier = identifier
     }
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     constructor(b: PlayerVar) : super(b)
 
@@ -113,12 +113,12 @@ open class PlayerVar : Var<PlayerVar>, EntityBase {
         constructor(
             entity: EntityVar,
             curr: FieldContainer,
-            identifier: String = UUID.randomUUID().toString()
+            identifier: String = TempPool.getVarIdentify()
         ) : super(curr, identifier) {
             this.entity = entity
         }
 
-        constructor(entity: EntityVar, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+        constructor(entity: EntityVar, identifier: String = TempPool.getVarIdentify()) : super(identifier){
             this.entity = entity
         }
 
@@ -145,7 +145,7 @@ open class PlayerVar : Var<PlayerVar>, EntityBase {
             curr: FieldContainer,
             entity: EntityVar,
             value: StringTag,
-            identifier: String = UUID.randomUUID().toString()
+            identifier: String = TempPool.getVarIdentify()
         ) : super(EntityVarConcrete(entity, value), curr, identifier) {
             this.value = value
         }
@@ -153,7 +153,7 @@ open class PlayerVar : Var<PlayerVar>, EntityBase {
         constructor(
             entity: EntityVar,
             value: StringTag,
-            identifier: String = UUID.randomUUID().toString()
+            identifier: String = TempPool.getVarIdentify()
         ) : super(EntityVarConcrete(entity, value), identifier) {
             this.value = value
         }
@@ -186,12 +186,12 @@ open class PlayerVar : Var<PlayerVar>, EntityBase {
         constructor(
             selector: SelectorVar,
             curr: FieldContainer,
-            identifier: String = UUID.randomUUID().toString()
+            identifier: String = TempPool.getVarIdentify()
         ) : super(curr, identifier) {
             this.selector = selector
         }
 
-        constructor(selector: SelectorVar, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+        constructor(selector: SelectorVar, identifier: String = TempPool.getVarIdentify()) : super(identifier){
             this.selector = selector
         }
 

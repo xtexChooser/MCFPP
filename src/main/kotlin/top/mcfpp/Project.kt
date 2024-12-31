@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import top.mcfpp.annotations.InsertCommand
+import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.MCFloat
 import top.mcfpp.core.lang.UnresolvedVar
 import top.mcfpp.core.lang.Var
@@ -366,11 +367,26 @@ object Project {
         }
         //向load函数中添加库初始化命令
         Function.addCommand("execute unless score math mcfpp_init matches 1 run function math:_init")
+        //向load函数中添加实体初始化命令
+        Function.addCommand("summon item 0 0 0 {" +
+                "Tags:[\"mcfpp_ptr_marker\"]," +
+                "UUID:${ClassPointer.tempItemEntityUUIDNBT}, " +
+                "Age:-32768, " +
+                "NoGravity: true, " +
+                "Item:{id:\"stone\"}, " +
+                "Invulnerable: true" +
+                "}"
+        )
         //向load中添加类初始化命令
         for (n in GlobalField.localNamespaces.values){
             n.field.forEachObject { c->
                 run {
                     if(c is ObjectClass){
+                        //浮点数临时marker实体
+                        Function.addCommand("summon marker 0 0 0 {" +
+                                "Tags:[${c.tag}]," +
+                                "UUID:${c.mcuuid.uuidSNBT}}"
+                        )
                         c.classPreInit.invoke(ArrayList(), null)
                     }
                 }
@@ -385,7 +401,7 @@ object Project {
             n.field.forEachObject { o -> mcfppLoad.runInFunction {
                 if(o !is ObjectClass) return@runInFunction
                 val qwq = o.field.getFunction("load",ArrayList(), ArrayList())
-                Function.addCommand("execute as ${o.uuid} at @s run function ${qwq.namespaceID}")
+                Function.addCommand("execute as ${o.mcuuid.uuid} at @s run function ${qwq.namespaceID}")
             } }
         }
 
@@ -398,12 +414,15 @@ object Project {
             n.field.forEachObject { o -> mcfppTick.runInFunction {
                 if(o !is ObjectClass) return@runInFunction
                 val qwq = o.field.getFunction("tick",ArrayList(), ArrayList())
-                Function.addCommand("execute as ${o.uuid} at @s run function ${qwq.namespaceID}")
+                Function.addCommand("execute as ${o.mcuuid.uuid} at @s run function ${qwq.namespaceID}")
             } }
         }
 
         //浮点数临时marker实体
-        Function.addCommand("summon marker 0 0 0 {Tags:[\"mcfpp:float_marker\"],UUID:${MCFloat.tempFloatEntityUUIDNBT}}")
+        Function.addCommand("summon marker 0 0 0 {" +
+                "Tags:[\"mcfpp_float_marker\"]," +
+                "UUID:${MCFloat.tempFloatEntityUUIDNBT}}"
+        )
 
 
         //浮点数的
@@ -426,7 +445,7 @@ object Project {
             logger.warn("No valid entrance function in Project ${config.rootNamespace}")
             warningCount++
         }
-        logger.info("Complete compiling project " + config.root!!.name + " with [$errorCount] error and [$warningCount] warning")
+        logger.info("Complete compiling project " + config.root.name + " with [$errorCount] error and [$warningCount] warning")
         stageProcessor[compileStage].forEach { it() }
     }
 

@@ -15,6 +15,7 @@ import top.mcfpp.core.lang.nbt.NBTList;
 import top.mcfpp.core.lang.nbt.NBTListConcrete;
 import top.mcfpp.model.function.Function;
 import top.mcfpp.util.NBTUtil;
+import top.mcfpp.util.TempPool;
 import top.mcfpp.util.ValueWrapper;
 
 import java.io.IOException;
@@ -197,7 +198,7 @@ public class NBTListConcreteData {
         if(e instanceof MCFPPValue<?>){
             //确定的
             var i = caller.getValue().indexOf(e);
-            returnVar.setValue(new MCIntConcrete(i, UUID.randomUUID().toString()));
+            returnVar.setValue(new MCIntConcrete(i, TempPool.INSTANCE.getVarIdentify()));
         }else {
             NBTListData.indexOf(e, (NBTList) caller.toDynamic(true), returnVar);
         }
@@ -210,11 +211,11 @@ public class NBTListConcreteData {
             //确定的
             for (int i = caller.getValue().size() - 1; i >= 0; i--) {
                 if(caller.getValue().get(i).equals(e)){
-                    returnVar.setValue(new MCIntConcrete(i, UUID.randomUUID().toString()));
+                    returnVar.setValue(new MCIntConcrete(i, TempPool.INSTANCE.getVarIdentify()));
                     return;
                 }
             }
-            returnVar.setValue((MCInt) returnVar.getValue().assignedBy(new MCIntConcrete(-1, UUID.randomUUID().toString())));
+            returnVar.setValue((MCInt) returnVar.getValue().assignedBy(new MCIntConcrete(-1, TempPool.INSTANCE.getVarIdentify())));
         }else {
             NBTListData.lastIndexOf(e, (NBTList) caller.toDynamic(true), returnVar);
         }
@@ -224,7 +225,7 @@ public class NBTListConcreteData {
     public static void contains(Var<?> e, NBTListConcrete caller, ValueWrapper<ScoreBool> returnVar){
         if(e instanceof MCFPPValue eC){
             var contains = caller.getValue().contains(eC.getValue());
-            returnVar.setValue(returnVar.getValue().assignedBy(new ScoreBoolConcrete(contains, UUID.randomUUID().toString())).toScoreBool());
+            returnVar.setValue(returnVar.getValue().assignedBy(new ScoreBoolConcrete(contains, TempPool.INSTANCE.getVarIdentify())).toScoreBool());
         }else {
             caller.toDynamic(false);
             NBTListData.contains(e, caller, returnVar);

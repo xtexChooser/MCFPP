@@ -94,154 +94,161 @@ object DatapackCreator {
             //创建pack.mcmeta
             Files.write(Paths.get("$path/${Project.config.name}/pack.mcmeta"), datapackMcMetaJson.toByteArray())
             for(namespace in GlobalField.localNamespaces){
-                val currPath = "$path\\${Project.config.name}\\data\\${namespace.key}"
-                namespace.value.field.forEachFunction {f ->
-                    run {
-                        if (f is Native) {
-                            return@run
-                        }
-                        LogProcessor.debug("Writing File: $currPath\\function\\${f.nameWithNamespace}.mcfunction")
-                        Files.createDirectories(Paths.get("$currPath/function"))
-                        Files.write(
-                            Paths.get("$currPath/function/${f.nameWithNamespace}.mcfunction"),
-                            f.cmdStr.toByteArray()
-                        )
-                        if(f.compiledFunctions.isNotEmpty()){
-                            for (cf in f.compiledFunctions.values){
-                                LogProcessor.debug("Writing File: $currPath\\function\\${cf.nameWithNamespace}.mcfunction")
-                                Files.createDirectories(Paths.get("$currPath/function"))
-                                Files.write(
-                                    Paths.get("$currPath/function/${cf.nameWithNamespace}.mcfunction"),
-                                    cf.cmdStr.toByteArray()
-                                )
-                            }
-
-                        }
-                    }
-                }
-                namespace.value.field.forEachClass { cls ->
-                    run {
-                        //成员
-                        cls.field.forEachFunction { f->
-                            run {
-                                if (f is Native) {
-                                    return@run
-                                }
-                                LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                                if (f is ExtensionFunction){
-                                    Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier) + "/ex"))
-                                }
-                                Files.write(
-                                    Paths.get("$currPath/function/"  + f.nameWithNamespace + ".mcfunction"),
-                                    f.cmdStr.toByteArray()
-                                )
-                                if(f.compiledFunctions.isNotEmpty()){
-                                    for (cf in f.compiledFunctions.values) {
-                                        LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                        //TODO 可能无法正确创建文件夹
-                                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                                        Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                                    }
-                                }
-                            }
-                        }
-                        //构造函数
-                        cls.constructors.forEach{ c ->
-                            run {
-                                LogProcessor.debug("Writing File: $currPath\\function\\"  + c.nameWithNamespace + ".mcfunction")
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                                Files.write(
-                                    Paths.get("$currPath/function/" + c.nameWithNamespace + ".mcfunction"),
-                                    c.cmdStr.toByteArray()
-                                )
-                                if(c.compiledFunctions.isNotEmpty()){
-                                    for (cf in c.compiledFunctions.values) {
-                                        LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                        //TODO 可能无法正确创建文件夹
-                                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                                        Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                namespace.value.field.forEachTemplate { t ->
-                    run {
-                        //成员
-                        t.field.forEachFunction { f->
-                            run {
-                                if (f is Native) {
-                                    return@run
-                                }
-                                LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
-                                if (f is ExtensionFunction){
-                                    Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier) + "/ex"))
-                                }
-                                Files.write(
-                                    Paths.get("$currPath/function/"  + f.nameWithNamespace + ".mcfunction"),
-                                    f.cmdStr.toByteArray()
-                                )
-                                if(f.compiledFunctions.isNotEmpty()){
-                                    for (cf in f.compiledFunctions.values) {
-                                        LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                        //TODO 可能无法正确创建文件夹
-                                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
-                                        Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                namespace.value.field.forEachObject { obj ->
-                    run {
-                        //成员
-                        obj.field.forEachFunction { f->
-                            run {
-                                if (f is Native) {
-                                    return@run
-                                }
-                                LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier) + "\\static"))
-                                if (f is ExtensionFunction){
-                                    Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier) + "\\static\\ex"))
-                                }
-                                Files.write(
-                                    Paths.get("$currPath/function/"  + f.nameWithNamespace + ".mcfunction"),
-                                    f.cmdStr.toByteArray()
-                                )
-                                if(f.compiledFunctions.isNotEmpty()){
-                                    for (cf in f.compiledFunctions.values) {
-                                        LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                        //TODO 可能无法正确创建文件夹
-                                        Files.createDirectories(Paths.get("$currPath\\function/" + StringHelper.toLowerCase(obj.identifier)))
-                                        Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                genNamespace(path, namespace)
+            }
+            for (namespace in GlobalField.stdNamespaces){
+                genNamespace(path, namespace)
             }
             //写入标签json文件
             for (tag in GlobalField.functionTags.values) {
-                LogProcessor.debug("Writing File: " + path + "\\${Project.config.name}\\data\\" + tag.namespace + "\\tags\\functions\\" + tag.tag + ".json")
-                Files.createDirectories(Paths.get(path + "/${Project.config.name}/data/" + tag.namespace + "/tags/functions"))
+                LogProcessor.debug("Writing File: " + path + "\\${Project.config.name}\\data\\" + tag.namespace + "\\tags\\function\\" + tag.tag + ".json")
+                Files.createDirectories(Paths.get(path + "/${Project.config.name}/data/" + tag.namespace + "/tags/function"))
                 Files.write(
-                    Paths.get(path + "/${Project.config.name}/data/" + tag.namespace + "/tags/functions/" + tag.tag + ".json"),
+                    Paths.get(path + "/${Project.config.name}/data/" + tag.namespace + "/tags/function/" + tag.tag + ".json"),
                     tag.tagJSON.toByteArray()
                 )
             }
         } catch (e: IOException) {
             throw e
+        }
+    }
+
+    private fun genNamespace(path: String, namespace: MutableMap.MutableEntry<String, Namespace>) {
+        val currPath = "$path\\${Project.config.name}\\data\\${namespace.key}"
+        namespace.value.field.forEachFunction {f ->
+            run {
+                if (f is Native) {
+                    return@run
+                }
+                LogProcessor.debug("Writing File: $currPath\\function\\${f.nameWithNamespace}.mcfunction")
+                Files.createDirectories(Paths.get("$currPath/function"))
+                Files.write(
+                    Paths.get("$currPath/function/${f.nameWithNamespace}.mcfunction"),
+                    f.cmdStr.toByteArray()
+                )
+                if(f.compiledFunctions.isNotEmpty()){
+                    for (cf in f.compiledFunctions.values){
+                        LogProcessor.debug("Writing File: $currPath\\function\\${cf.nameWithNamespace}.mcfunction")
+                        Files.createDirectories(Paths.get("$currPath/function"))
+                        Files.write(
+                            Paths.get("$currPath/function/${cf.nameWithNamespace}.mcfunction"),
+                            cf.cmdStr.toByteArray()
+                        )
+                    }
+
+                }
+            }
+        }
+        namespace.value.field.forEachClass { cls ->
+            run {
+                //成员
+                cls.field.forEachFunction { f->
+                    run {
+                        if (f is Native) {
+                            return@run
+                        }
+                        LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
+                        //TODO 可能无法正确创建文件夹
+                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
+                        if (f is ExtensionFunction){
+                            Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier) + "/ex"))
+                        }
+                        Files.write(
+                            Paths.get("$currPath/function/"  + f.nameWithNamespace + ".mcfunction"),
+                            f.cmdStr.toByteArray()
+                        )
+                        if(f.compiledFunctions.isNotEmpty()){
+                            for (cf in f.compiledFunctions.values) {
+                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                //TODO 可能无法正确创建文件夹
+                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
+                                Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
+                            }
+                        }
+                    }
+                }
+                //构造函数
+                cls.constructors.forEach{ c ->
+                    run {
+                        LogProcessor.debug("Writing File: $currPath\\function\\"  + c.nameWithNamespace + ".mcfunction")
+                        //TODO 可能无法正确创建文件夹
+                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
+                        Files.write(
+                            Paths.get("$currPath/function/" + c.nameWithNamespace + ".mcfunction"),
+                            c.cmdStr.toByteArray()
+                        )
+                        if(c.compiledFunctions.isNotEmpty()){
+                            for (cf in c.compiledFunctions.values) {
+                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                //TODO 可能无法正确创建文件夹
+                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
+                                Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        namespace.value.field.forEachTemplate { t ->
+            run {
+                //成员
+                t.field.forEachFunction { f->
+                    run {
+                        if (f is Native) {
+                            return@run
+                        }
+                        LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
+                        //TODO 可能无法正确创建文件夹
+                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
+                        if (f is ExtensionFunction){
+                            Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier) + "/ex"))
+                        }
+                        Files.write(
+                            Paths.get("$currPath/function/"  + f.nameWithNamespace + ".mcfunction"),
+                            f.cmdStr.toByteArray()
+                        )
+                        if(f.compiledFunctions.isNotEmpty()){
+                            for (cf in f.compiledFunctions.values) {
+                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                //TODO 可能无法正确创建文件夹
+                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
+                                Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        namespace.value.field.forEachObject { obj ->
+            run {
+                //成员
+                obj.field.forEachFunction { f->
+                    run {
+                        if (f is Native) {
+                            return@run
+                        }
+                        LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
+                        //TODO 可能无法正确创建文件夹
+                        Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier) + "\\static"))
+                        if (f is ExtensionFunction){
+                            Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier) + "\\static\\ex"))
+                        }
+                        Files.write(
+                            Paths.get("$currPath\\function\\"  + f.nameWithNamespace + ".mcfunction"),
+                            f.cmdStr.toByteArray()
+                        )
+                        if(f.compiledFunctions.isNotEmpty()){
+                            for (cf in f.compiledFunctions.values) {
+                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                //TODO 可能无法正确创建文件夹
+                                Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier)))
+                                Files.write(Paths.get("$currPath\\function\\" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

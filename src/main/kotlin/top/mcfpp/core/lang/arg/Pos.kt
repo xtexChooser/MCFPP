@@ -7,8 +7,7 @@ import top.mcfpp.core.lang.Var
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
-import java.util.*
-import kotlin.collections.HashMap
+import top.mcfpp.util.TempPool
 
 class Pos : Var<Pos> {
 
@@ -17,12 +16,12 @@ class Pos : Var<Pos> {
     constructor(
         dimension: Int,
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : this(dimension, curr.prefix + identifier) {
         this.identifier = identifier
     }
 
-    constructor(dimension: Int, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(dimension: Int, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         coordinate.putAll(mapOf(
             MCInt("$identifier\$x") to false,
             MCInt("$identifier\$y") to false,

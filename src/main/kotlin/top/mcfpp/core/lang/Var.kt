@@ -18,6 +18,7 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.io.Serializable
@@ -134,7 +135,7 @@ abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serial
      *
      * @param identifier 变量的标识符。默认为随机的uuid
      */
-    constructor(identifier: String = UUID.randomUUID().toString()){
+    constructor(identifier: String = TempPool.getVarIdentify()){
         this.identifier = identifier
         this.nbtPath = NBTPath(StorageSource("mcfpp:system"))
     }

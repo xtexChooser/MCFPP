@@ -6,12 +6,10 @@ import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
+import top.mcfpp.type.MCFPPType
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * 一个构造函数。它是一个特殊的成员方法，将会在类的初始化阶段之后调用。
@@ -32,17 +30,6 @@ open class ClassConstructor
         field.putVar("this",thisObj)
         leadFunction = Function(this.identifier + "_lead",this.namespace, context = null)
         target.field.addFunction(leadFunction,false)
-    }
-
-    /**
-     * 调用构造函数。类的实例的实体的生成，类的初始化（preinit和init函数），自身的调用和地址分配都在此方法进行。
-     * @param args 函数的参数
-     * @param callerClassP 构造方法将要构建的对象的临时指针
-     */
-    @Override
-    @InsertCommand
-    override fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
-        addCommand("execute in minecraft:overworld summon ${target.baseEntity} run function " + leadFunction.namespaceID)
         leadFunction.runInFunction {
             //获取所有函数
             val funcs = StringBuilder("functions:{")
@@ -54,17 +41,17 @@ open class ClassConstructor
             funcs.append("}")
             //对象实体创建
             if(target.baseEntity == Class.ENTITY_MARKER){
-                addCommand("data merge entity @s {Tags:[${callerClassP.tag},${callerClassP.tag}_data,just],data:{$funcs}}")
+                addCommand("data merge entity @s {Tags:[${target.tag},${target.tag}_data,just],data:{$funcs}}")
             }else if(target.baseEntity == Class.ENTITY_ITEM_DISPLAY){
-                addCommand("data modify entity @s item.components.\"minecraft:custom_data\".mcfppData set value {Tags:[${callerClassP.tag},${callerClassP.tag}_data,just],data:{$funcs}}")
+                addCommand("data modify entity @s item.components.\"minecraft:custom_data\".mcfppData set value {Tags:[${target.tag},${target.tag}_data,just],data:{$funcs}}")
             }else{
-                addCommand("tag @s add ${callerClassP.tag}")
-                addCommand("execute summon marker run data merge entity @s {Tags:[${callerClassP.tag}_data,just],data:{$funcs}}")
+                addCommand("tag @s add ${target.tag}")
+                addCommand("execute summon marker run data merge entity @s {Tags:[${target.tag}_data,just],data:{$funcs}}")
                 addCommand("ride @n[tag=just, type=marker] mount @s")
                 addCommand("tag @n[tag=just, type=marker] remove just")
             }
             //初始指针
-            addCommand(Command("data modify").build(callerClassP.nbtPath.toCommandPart()).build("set from entity @s UUID"))
+            addCommand(Command("data modify").build(Class.tempPtr.toCommandPart()).build("set from entity @s UUID"))
             //初始化
             if(target.classPreInit.commands.size > 0){
                 //给函数开栈
@@ -76,8 +63,6 @@ open class ClassConstructor
             }
             //给函数开栈，调用构造函数
             addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
-            //参数传递
-            argPass(normalArgs)
             //调用构造函数
             addCommand("function " + this.namespaceID)
             //销毁指针，释放堆内存
@@ -88,9 +73,22 @@ open class ClassConstructor
             }
             //调用完毕，将子函数的栈销毁
             addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
-            //取出栈内的值到记分板
-            fieldRestore()
         }
+    }
+
+    /**
+     * 调用构造函数。类的实例的实体的生成，类的初始化（preinit和init函数），自身的调用和地址分配都在此方法进行。
+     * @param args 函数的参数
+     * @param callerClassP 构造方法将要构建的对象的临时指针
+     */
+    @Override
+    @InsertCommand
+    override fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
+        //参数传递
+        argPass(normalArgs)
+        addCommand("execute in minecraft:overworld summon ${target.baseEntity} run function " + leadFunction.namespaceID)
+        //取出栈内的值
+        fieldRestore()
     }
 
     fun addParamsFromContext(ctx: mcfppParser.NormalParamsContext) {

@@ -1,4 +1,3 @@
-
 package top.mcfpp.core.lang.resource
             
 import top.mcfpp.command.Command
@@ -13,6 +12,7 @@ import java.util.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.mni.resource.LootTableTypeData
 import top.mcfpp.mni.resource.LootTableTypeConcreteData
+import top.mcfpp.util.TempPool
 
 open class LootTableType: ResourceID {
 
@@ -25,8 +25,8 @@ open class LootTableType: ResourceID {
      */
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(curr, identifier) {
         this.identifier = identifier
     }
 
@@ -34,7 +34,7 @@ open class LootTableType: ResourceID {
      * 创建一个LootTableType值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         isTemp = true
     }
 
@@ -43,10 +43,6 @@ open class LootTableType: ResourceID {
      * @param b 被复制的LootTableType值
      */
     constructor(b: LootTableType) : super(b)
-
-    override fun doAssignedBy(b: Var<*>): LootTableType {
-        return super.assignedBy(b) as LootTableType
-    }
 
     companion object {
         val data = CompoundData("LootTableType","mcfpp.lang.resource")
@@ -66,12 +62,12 @@ class LootTableTypeConcrete: MCFPPValue<String>, LootTableType{
     constructor(
         curr: FieldContainer,
         value: String,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(curr, identifier) {
         this.value = value
     }
 
-    constructor(value: String, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: String, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

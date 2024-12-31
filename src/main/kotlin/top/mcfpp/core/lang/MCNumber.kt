@@ -4,7 +4,7 @@ import top.mcfpp.lib.SbObject
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
-import java.util.*
+import top.mcfpp.util.TempPool
 
 /**
  * 代表了mcfpp中的一个数字类型。数字类型都是以记分板为基础的。
@@ -26,7 +26,7 @@ abstract class MCNumber<T> : Var<MCNumber<T>>, OnScoreboard {
      */
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(identifier) {
         this.name = curr.prefix + identifier
         sbObject = SbObject.MCFPP_default
@@ -37,7 +37,7 @@ abstract class MCNumber<T> : Var<MCNumber<T>>, OnScoreboard {
      *
      * @param identifier 标识符。默认为随机的uuid
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.name = identifier
         sbObject = SbObject.MCFPP_default
     }

@@ -1,27 +1,24 @@
 package top.mcfpp.core.lang.nbt
 
-import net.querz.nbt.tag.ByteTag
-import net.querz.nbt.tag.LongTag
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.function.Function
-import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 open class MCByte: MCInt {
 
     override var type: MCFPPType = MCFPPNBTType.Byte
-    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier)
+    constructor(curr: FieldContainer, identifier: String = TempPool.getVarIdentify()) : super(curr, identifier)
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     constructor(b: MCByte) : super(b)
 
@@ -122,7 +119,7 @@ class MCByteConcrete: MCByte, MCFPPValue<Byte> {
     constructor(
         curr: FieldContainer,
         value: Byte,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(curr, identifier) {
         this.value = value
     }
@@ -132,7 +129,7 @@ class MCByteConcrete: MCByte, MCFPPValue<Byte> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Byte, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Byte, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

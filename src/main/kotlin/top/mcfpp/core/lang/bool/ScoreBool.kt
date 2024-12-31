@@ -5,15 +5,17 @@ import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.core.lang.nbt.NBTBasedData
+import top.mcfpp.lib.SbObject
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.FieldContainer
+import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.lib.SbObject
-import top.mcfpp.model.*
-import java.util.*
-import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
+import java.util.*
 
 /**
  * 布尔型变量是mcfpp的基本类型之一，它表示一个只有0，1两种取值可能性的值。
@@ -38,7 +40,7 @@ open class ScoreBool : BaseBool, OnScoreboard {
      *
      * @param identifier 标识符。默认为
      */
-    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(curr: FieldContainer, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.name = curr.prefix + identifier
     }
 
@@ -47,7 +49,7 @@ open class ScoreBool : BaseBool, OnScoreboard {
      * 创建一个bool值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.name = identifier
     }
 
@@ -324,7 +326,7 @@ class ScoreBoolConcrete : ScoreBool, MCFPPValue<Boolean> {
      * @param curr 域容器
      * @param value 值
      */
-    constructor(curr: FieldContainer, value: Boolean, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier) {
+    constructor(curr: FieldContainer, value: Boolean, identifier: String = TempPool.getVarIdentify()) : super(curr, identifier) {
         this.value = value
     }
 
@@ -333,7 +335,7 @@ class ScoreBoolConcrete : ScoreBool, MCFPPValue<Boolean> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Boolean, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Boolean, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

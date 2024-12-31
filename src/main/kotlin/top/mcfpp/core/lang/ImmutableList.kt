@@ -22,7 +22,7 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPListType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
-import java.util.*
+import top.mcfpp.util.TempPool
 
 open class ImmutableList : NBTList {
 
@@ -30,7 +30,7 @@ open class ImmutableList : NBTList {
      * 创建一个list值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString(),
+    constructor(identifier: String = TempPool.getVarIdentify(),
                 genericType : MCFPPType
     ) : super(identifier, genericType)
 

@@ -4,16 +4,16 @@ import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.exception.VariableConverseException
-import top.mcfpp.type.MCFPPClassType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.lib.SbObject
-import top.mcfpp.model.function.Function
 import top.mcfpp.model.*
 import top.mcfpp.model.field.CompoundDataField
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.ExtensionFunction
+import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NoStackFunction
 import top.mcfpp.model.function.UnknownFunction
+import top.mcfpp.type.MCFPPClassType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
@@ -63,7 +63,7 @@ open class ClassPointer : Var<ClassPointer>{
     constructor(clazz: Class, identifier: String) {
         this.type = clazz.getType()
         this.identifier = identifier
-        instanceField = CompoundDataField(clazz.field)
+        instanceField = clazz.field
     }
 
     /**
@@ -216,13 +216,9 @@ open class ClassPointer : Var<ClassPointer>{
         return this
     }
 
-    override fun storeToStack() {
-        TODO("Not yet implemented")
-    }
+    override fun storeToStack() {}
 
-    override fun getFromStack() {
-        TODO("Not yet implemented")
-    }
+    override fun getFromStack() {}
 
     override fun getAccess(function: Function): Member.AccessModifier {
         return if(function !is ExtensionFunction && function.ownerType == Function.Companion.OwnerType.CLASS){

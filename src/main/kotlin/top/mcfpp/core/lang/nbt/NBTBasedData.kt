@@ -16,9 +16,9 @@ import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil
 import top.mcfpp.util.NBTUtil.toJava
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 
 /**
@@ -36,7 +36,7 @@ open class NBTBasedData : Var<NBTBasedData>, Indexable {
      * 创建一个nbt值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         isTemp = true
     }
 
@@ -417,14 +417,14 @@ class NBTBasedDataConcrete : NBTBasedData, MCFPPValue<Tag<*>> {
     constructor(
         curr: FieldContainer,
         value: Tag<*>,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(curr.prefix + identifier) {
         this.value = value
         //记录nbt字面量类型
         nbtType = NBTBasedData.Companion.NBTTypeWithTag.getTagType(value)
     }
 
-    constructor(value: Tag<*>, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Tag<*>, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
         //记录nbt字面量类型
         nbtType = NBTBasedData.Companion.NBTTypeWithTag.getTagType(value)

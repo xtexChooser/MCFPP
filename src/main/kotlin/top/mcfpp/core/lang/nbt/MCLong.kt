@@ -14,6 +14,7 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -22,7 +23,7 @@ open class MCLong: NBTBasedData {
 
     override var type: MCFPPType = MCFPPNBTType.Long
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     constructor(b: MCLong) : super(b)
 
@@ -186,7 +187,7 @@ class MCLongConcrete: MCLong, MCFPPValue<LongTag> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: LongTag, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: LongTag, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

@@ -23,9 +23,9 @@ import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 /**
  * 表示一个列表类型。基于NBTBasedData实现。
@@ -42,7 +42,7 @@ open class NBTList : NBTBasedData {
      * 创建一个list值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString(),
+    constructor(identifier: String = TempPool.getVarIdentify(),
                 genericType : MCFPPType
     ) : super(identifier){
         type = MCFPPListType(genericType)
@@ -211,7 +211,7 @@ open class NBTList : NBTBasedData {
 
     override fun getByIndex(index: Var<*>): PropertyVar {
         if(index is MCInt){
-            val v = genericType.build(UUID.randomUUID().toString())
+            val v = genericType.build(TempPool.getVarIdentify())
             v.nbtPath = nbtPath.intIndex(index)
             v.parent = this
             return PropertyVar(Property.buildSimpleProperty(v), v,this)

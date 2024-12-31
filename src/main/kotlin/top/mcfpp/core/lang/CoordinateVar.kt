@@ -13,9 +13,9 @@ import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.type.MCFPPPrivateType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 class Coordinate3Var: Var<Coordinate3Var> {
 
@@ -25,14 +25,14 @@ class Coordinate3Var: Var<Coordinate3Var> {
 
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString(),
+        identifier: String = TempPool.getVarIdentify(),
     ) : super(identifier){
         this.x = CoordinateDimension("", curr, identifier)
         this.y = CoordinateDimension("", curr, identifier)
         this.z = CoordinateDimension("", curr, identifier)
     }
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         x = CoordinateDimension("", identifier)
         y = CoordinateDimension("", identifier)
         z = CoordinateDimension("", identifier)
@@ -123,13 +123,13 @@ class Coordinate2Var: Var<Coordinate2Var> {
 
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(identifier){
         x = CoordinateDimension("", curr, identifier)
         z = CoordinateDimension("", curr, identifier)
     }
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         x = CoordinateDimension("", identifier)
         z = CoordinateDimension("", identifier)
     }
@@ -230,8 +230,8 @@ open class CoordinateDimension: MCNumber<Number> {
     constructor(
         prefix: String,
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : this(curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(curr, identifier) {
         this.identifier = identifier
         this.prefix = MCStringConcrete(StringTag(prefix), identifier)
     }
@@ -240,7 +240,7 @@ open class CoordinateDimension: MCNumber<Number> {
      * 创建一个int值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(prefix: String, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(prefix: String, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.prefix = MCStringConcrete(StringTag(prefix), identifier)
     }
 
@@ -293,7 +293,7 @@ open class CoordinateDimension: MCNumber<Number> {
     }
 
     override fun getTempVar(): MCNumber<Number> {
-        return CoordinateDimension(UUID.randomUUID().toString())
+        return CoordinateDimension(TempPool.getVarIdentify())
     }
 
     override fun storeToStack() {
@@ -335,7 +335,7 @@ class CoordinateDimensionConcrete: CoordinateDimension, MCFPPValue<Number>{
         prefix: String,
         curr: FieldContainer,
         value: Number,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(prefix, curr, identifier) {
         this.value = value
         number = if(value is Int) {
@@ -345,7 +345,7 @@ class CoordinateDimensionConcrete: CoordinateDimension, MCFPPValue<Number>{
         }
     }
 
-    constructor(prefix: String, value: Number, identifier: String = UUID.randomUUID().toString()) : super(prefix, identifier) {
+    constructor(prefix: String, value: Number, identifier: String = TempPool.getVarIdentify()) : super(prefix, identifier) {
         this.value = value
         number = if(value is Int) {
             MCIntConcrete(value.toInt(), identifier)

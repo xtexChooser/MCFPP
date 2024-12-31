@@ -71,10 +71,10 @@ open class MCFPPClassType(
 
     override fun build(identifier: String, container: FieldContainer): Var<*> = ClassPointer(cls, identifier)
     override fun build(identifier: String): Var<*> = ClassPointer(cls, identifier)
-    override fun build(identifier: String, clazz: Class): Var<*> = ClassPointer(this.cls, identifier)
+    override fun build(identifier: String, clazz: Class): Var<*> = ClassPointer(cls, identifier)
     override fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*> = ClassPointer(cls, identifier)
     override fun buildUnConcrete(identifier: String): Var<*> = ClassPointer(cls, identifier)
-    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ClassPointer(this.cls, identifier)
+    override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = ClassPointer(cls, identifier)
 
     companion object{
         val regex = Regex("^class\\((.+):(.+)\\)$")

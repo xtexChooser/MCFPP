@@ -7,7 +7,7 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
-import java.util.*
+import top.mcfpp.util.TempPool
 
 open class IntArray: NBTArray {
 
@@ -15,7 +15,7 @@ open class IntArray: NBTArray {
 
     override val arrayType: MCFPPType = MCFPPBaseType.Int
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     constructor(b: NBTArray) : super(b)
 }
@@ -24,7 +24,7 @@ class IntArrayConcrete: IntArray, MCFPPValue<IntArrayTag>{
 
     override var value: IntArrayTag
 
-    constructor(value: IntArrayTag, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(value: IntArrayTag, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.value = value
     }
 
@@ -39,7 +39,7 @@ class IntArrayConcrete: IntArray, MCFPPValue<IntArrayTag>{
 
     override fun getByIndex(index: Var<*>): PropertyVar {
         if(index is MCInt){
-            val v = arrayType.build(UUID.randomUUID().toString())
+            val v = arrayType.build(TempPool.getVarIdentify())
             v.nbtPath = nbtPath.intIndex(index)
             v.parent = this
             return PropertyVar(Property.buildSimpleProperty(v), v,this)

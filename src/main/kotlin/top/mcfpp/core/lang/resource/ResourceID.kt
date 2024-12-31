@@ -2,16 +2,17 @@ package top.mcfpp.core.lang.resource
 
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
-import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.UnknownVar
+import top.mcfpp.core.lang.Var
 import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.function.Function
-import top.mcfpp.util.LogProcessor
 import top.mcfpp.type.MCFPPResourceType
-import java.util.*
+import top.mcfpp.type.MCFPPType
+import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 
 open class ResourceID : NBTBasedData {
 
@@ -24,7 +25,7 @@ open class ResourceID : NBTBasedData {
      */
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(curr.prefix + identifier) {
         this.identifier = identifier
     }
@@ -33,7 +34,7 @@ open class ResourceID : NBTBasedData {
      * 创建一个命名空间ID值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         isTemp = true
     }
 
@@ -78,12 +79,12 @@ open class ResourceIDConcrete: MCFPPValue<String>, ResourceID{
     constructor(
         curr: FieldContainer,
         value: String,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(curr.prefix + identifier) {
         this.value = value
     }
 
-    constructor(value: String, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: String, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

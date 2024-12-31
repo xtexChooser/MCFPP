@@ -15,6 +15,7 @@ import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -37,7 +38,7 @@ open class EnumVar : Var<EnumVar>, OnScoreboard {
      * 创建一个枚举值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(enum: Enum, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(enum: Enum, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.enum = enum
         this.name = identifier
         type = enum.getType()
@@ -167,7 +168,7 @@ class EnumVarConcrete : EnumVar, MCFPPValue<EnumMember> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(enum: Enum, value: Int, identifier: String = UUID.randomUUID().toString()) : super(enum ,identifier) {
+    constructor(enum: Enum, value: Int, identifier: String = TempPool.getVarIdentify()) : super(enum ,identifier) {
         this.value = enum.getMember(value)!!
     }
 

@@ -15,9 +15,9 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPEntityType.Entity
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 
 /**
@@ -30,7 +30,7 @@ open class EntityVar : NBTBasedData, EntityBase{
 
     var isName = false
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     constructor(b: EntityVar) : super(b)
 
@@ -143,7 +143,7 @@ class EntityVarConcrete: EntityVar, MCFPPValue<Tag<*>> {
 
     override var value: Tag<*>
 
-    constructor(value: Tag<*>, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(value: Tag<*>, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.value = value
     }
 

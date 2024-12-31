@@ -9,7 +9,7 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
-import java.util.*
+import top.mcfpp.util.TempPool
 
 /**
  *
@@ -62,7 +62,7 @@ open class MCAny : Var<MCAny> {
      * 创建一个int值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     /**
      * 复制一个int
@@ -195,7 +195,7 @@ class MCAnyConcrete : MCAny, MCFPPValue<Var<*>> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Var<*>, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Var<*>, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

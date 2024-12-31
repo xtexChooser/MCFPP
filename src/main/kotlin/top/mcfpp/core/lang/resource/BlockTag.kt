@@ -1,4 +1,3 @@
-
 package top.mcfpp.core.lang.resource
             
 import top.mcfpp.command.Command
@@ -13,6 +12,7 @@ import java.util.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.mni.resource.BlockTagData
 import top.mcfpp.mni.resource.BlockTagConcreteData
+import top.mcfpp.util.TempPool
 
 open class BlockTag: ResourceID {
 
@@ -25,8 +25,8 @@ open class BlockTag: ResourceID {
      */
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(curr, identifier) {
         this.identifier = identifier
     }
 
@@ -34,7 +34,7 @@ open class BlockTag: ResourceID {
      * 创建一个BlockTag值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         isTemp = true
     }
 
@@ -43,10 +43,6 @@ open class BlockTag: ResourceID {
      * @param b 被复制的BlockTag值
      */
     constructor(b: BlockTag) : super(b)
-
-    override fun doAssignedBy(b: Var<*>): BlockTag {
-        return super.assignedBy(b) as BlockTag
-    }
 
     companion object {
         val data = CompoundData("BlockTag","mcfpp.lang.resource")
@@ -66,12 +62,12 @@ class BlockTagConcrete: MCFPPValue<String>, BlockTag{
     constructor(
         curr: FieldContainer,
         value: String,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(curr, identifier) {
         this.value = value
     }
 
-    constructor(value: String, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: String, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

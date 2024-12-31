@@ -15,9 +15,9 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 /**
  * JsonText代表了Minecraft中的富文本格式，即文本组件，又叫原始JSON文本。在MCFPP中，使用类型text来定义。
@@ -40,7 +40,7 @@ open class JsonText : NBTBasedData {
      * 创建一个int值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     /**
      * 复制一个int
@@ -169,7 +169,7 @@ class JsonTextConcrete : MCFPPValue<ChatComponent>, JsonText {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: ChatComponent, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: ChatComponent, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

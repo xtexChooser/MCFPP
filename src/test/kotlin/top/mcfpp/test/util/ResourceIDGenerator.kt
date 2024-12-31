@@ -1,7 +1,6 @@
 package top.mcfpp.test.util
 
 import java.io.File
-import java.lang.StringBuilder
 
 
 /**
@@ -25,9 +24,10 @@ fun main(){
     text.append("package top.mcfpp.type\n\n")
     text.append("\n" +
             "import top.mcfpp.model.FieldContainer\n" +
-            "import top.mcfpp.`var`.lang.Var\n" +
-            "import top.mcfpp.`var`.lang.resource.*\n" +
-            "import top.mcfpp.model.Class\n\n")
+            "import top.mcfpp.core.lang.Var\n" +
+            "import top.mcfpp.core.lang.resource.*\n" +
+            "import top.mcfpp.model.Class\n" +
+            "import top.mcfpp.util.TempPool\n\n")
     text.append("class MCFPPResourceType {\n\n")
     text.append("object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){\n")
     text.append("    override val typeName: String\n")
@@ -56,21 +56,21 @@ fun main(){
 fun ResourceIDWriter(id: String){
 
     val template: String =
-        """
-package top.mcfpp.`var`.lang.resource
+        """package top.mcfpp.core.lang.resource
             
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
-import top.mcfpp.`var`.lang.Var
+import top.mcfpp.core.lang.Var
 import top.mcfpp.type.MCFPPResourceType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.`var`.lang.MCFPPValue
+import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import java.util.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.mni.resource.${id}Data
 import top.mcfpp.mni.resource.${id}ConcreteData
+import top.mcfpp.util.TempPool
 
 open class $id: ResourceID {
 
@@ -83,8 +83,8 @@ open class $id: ResourceID {
      */
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(curr, identifier) {
         this.identifier = identifier
     }
 
@@ -92,7 +92,7 @@ open class $id: ResourceID {
      * 创建一个${id}值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         isTemp = true
     }
 
@@ -102,17 +102,13 @@ open class $id: ResourceID {
      */
     constructor(b: $id) : super(b)
 
-    override fun doAssign(b: Var<*>): $id {
-        return super.assign(b) as $id
-    }
-
     companion object {
         val data = CompoundData("$id","mcfpp.lang.resource")
 
         init {
             data.initialize()
             data.extends(ResourceID.data)
-            data.getNativeFunctionFromClass(${id}Data::class.java)
+            data.getNativeFromClass(${id}Data::class.java)
         }
     }
 }
@@ -124,12 +120,12 @@ class ${id}Concrete: MCFPPValue<String>, ${id}{
     constructor(
         curr: FieldContainer,
         value: String,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(curr, identifier) {
         this.value = value
     }
 
-    constructor(value: String, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: String, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 
@@ -177,22 +173,19 @@ class ${id}Concrete: MCFPPValue<String>, ${id}{
         init {
             data.initialize()
             data.extends(ResourceID.data)
-            data.getNativeFunctionFromClass(${id}ConcreteData::class.java)
+            data.getNativeFromClass(${id}ConcreteData::class.java)
         }
     }
     
 }        
 """
     //覆盖写入文件
-    val file = File("src/main/kotlin/top/mcfpp/var/lang/resource/$id.kt")
+    val file = File("src/main/kotlin/top/mcfpp/core/lang/resource/$id.kt")
     file.writeText(template)
 
     //生成java文件
     val javaTemplate =
-"""
-package top.mcfpp.mni.resource;
-
-import top.mcfpp.annotations.MNIRegister;
+"""package top.mcfpp.mni.resource;
 
 public class ${id}Data {
 
@@ -203,11 +196,7 @@ public class ${id}Data {
 
     //javaConcrete
     val javaConcreteTemplate =
-"""
-    
-package top.mcfpp.mni.resource;
-
-import top.mcfpp.annotations.MNIRegister;
+"""package top.mcfpp.mni.resource;
 
 public class ${id}ConcreteData {
 

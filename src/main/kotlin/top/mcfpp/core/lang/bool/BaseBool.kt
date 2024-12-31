@@ -1,14 +1,14 @@
 package top.mcfpp.core.lang.bool
 
 import top.mcfpp.command.Command
-import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.core.lang.Var
+import top.mcfpp.core.lang.nbt.NBTBasedData
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPType
-import java.util.*
+import top.mcfpp.util.TempPool
 
 abstract class BaseBool : Var<BaseBool> {
 
@@ -18,7 +18,7 @@ abstract class BaseBool : Var<BaseBool> {
      * 创建一个bool值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     abstract override fun negation(): Var<*>?
 

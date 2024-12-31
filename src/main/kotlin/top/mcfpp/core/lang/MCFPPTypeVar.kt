@@ -1,11 +1,11 @@
 package top.mcfpp.core.lang
 
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.function.Function
 import top.mcfpp.model.Member
+import top.mcfpp.model.function.Function
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
-import java.util.UUID
+import top.mcfpp.util.TempPool
 
 class MCFPPTypeVar : Var<MCFPPTypeVar>, MCFPPValue<MCFPPType> {
 
@@ -14,7 +14,7 @@ class MCFPPTypeVar : Var<MCFPPTypeVar>, MCFPPValue<MCFPPType> {
     override var type: MCFPPType = MCFPPConcreteType.Type
 
     @Suppress("ConvertSecondaryConstructorToPrimary")
-    constructor(type: MCFPPType = MCFPPBaseType.Any, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(type: MCFPPType = MCFPPBaseType.Any, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = type
     }
 

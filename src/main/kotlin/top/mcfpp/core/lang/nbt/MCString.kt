@@ -20,6 +20,7 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -46,7 +47,7 @@ open class MCString : NBTBasedData {
      * 创建一个string值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     /**
      * 复制一个string
@@ -190,7 +191,7 @@ class MCStringConcrete: MCString, MCFPPValue<StringTag> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: StringTag, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: StringTag, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

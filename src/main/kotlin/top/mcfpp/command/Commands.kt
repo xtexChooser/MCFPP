@@ -15,8 +15,8 @@ import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NoStackFunction
 import top.mcfpp.type.MCFPPClassType
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.Utils
-import java.util.*
 
 /**
  * 命令总类，提供了大量用于生成命令的方法。默认提供了一些可替换的位点
@@ -236,12 +236,12 @@ object Commands {
                 }
                 val qwq = if(a.clazz.baseEntity != Class.ENTITY_MARKER && a.clazz.baseEntity != Class.ENTITY_ITEM_DISPLAY){
                     arrayOf(
-                        Command.build("data modify storage entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
+                        Command.build("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
                         Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin on passengers as entity @n[tag=${a.tag}_data]")
                     )
                 }else{
                     arrayOf(
-                        Command.build("data modify storage entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
+                        Command.build("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
                         Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin")
                     )
                 }
@@ -253,9 +253,9 @@ object Commands {
             is ObjectVar -> selectRun(a.value, hasExecuteRun)
             is MCFPPClassType -> {
                 if(hasExecuteRun){
-                    arrayOf(Command.build("execute as ${(a.cls as ObjectClass).uuid}").build("run", "run"))
+                    arrayOf(Command.build("execute as ${(a.cls as ObjectClass).mcuuid.uuid}").build("run", "run"))
                 }else{
-                    arrayOf(Command.build("execute as ${(a.cls as ObjectClass).uuid}"))
+                    arrayOf(Command.build("execute as ${(a.cls as ObjectClass).mcuuid.uuid}"))
                 }
             }
             else -> TODO()
@@ -303,7 +303,7 @@ object Commands {
      */
     fun tempFunction(parent: Function, operation: (tempFunction: Function) -> Unit) : Pair<Command, Function>{
         val l = Function.currFunction
-        val f = NoStackFunction(parent.identifier + "_temp_" + UUID.randomUUID().toString(), parent)
+        val f = NoStackFunction(TempPool.getFunctionIdentify(parent.identifier + "_temp"), parent)
         GlobalField.localNamespaces[Project.currNamespace]!!.field.addFunction(f, false)
         Function.currFunction = f
         operation(f)
@@ -329,7 +329,7 @@ object Commands {
         }else{
             if(!entityVar.isName){
                 arrayOf(
-                    Command("data modify storage entity ${ClassPointer.tempItemEntityUUID} Thrower set from").build(entityVar.nbtPath.toCommandPart()),
+                    Command("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from").build(entityVar.nbtPath.toCommandPart()),
                     Command("execute as ${ClassPointer.tempItemEntityUUID} on origin run").build(command)
                 )
             }else{

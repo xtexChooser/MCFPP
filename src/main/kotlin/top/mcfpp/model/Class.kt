@@ -6,13 +6,14 @@ import top.mcfpp.Project
 import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.MCAny
 import top.mcfpp.lib.NBTPath
-import top.mcfpp.type.MCFPPClassType
-import top.mcfpp.type.MCFPPType
+import top.mcfpp.lib.StorageSource
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.ClassConstructor
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPClassType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 
 /**
@@ -198,6 +199,8 @@ open class Class : CompoundData {
             addMember(Function("load", this, false, context = null))
             extends(MCAny.data)
         }
+
+        val tempPtr = NBTPath(StorageSource("mcfpp:system")).memberIndex("temp.init")
 
         const val ENTITY_MARKER = "marker"
         const val ENTITY_ITEM_DISPLAY = "item_display"

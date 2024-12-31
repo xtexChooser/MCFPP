@@ -16,7 +16,7 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
-import java.util.*
+import top.mcfpp.util.TempPool
 
 open class MCDouble: NBTBasedData {
 
@@ -26,7 +26,7 @@ open class MCDouble: NBTBasedData {
      * 创建一个double值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     /**
      * 复制一个int
@@ -109,7 +109,7 @@ class MCDoubleConcrete: MCDouble, MCFPPValue<DoubleTag> {
     constructor(
         curr: FieldContainer,
         value: DoubleTag,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(curr.prefix + identifier) {
         this.value = value
     }
@@ -119,7 +119,7 @@ class MCDoubleConcrete: MCDouble, MCFPPValue<DoubleTag> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: DoubleTag, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: DoubleTag, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

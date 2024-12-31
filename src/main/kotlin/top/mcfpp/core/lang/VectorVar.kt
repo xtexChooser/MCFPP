@@ -10,9 +10,9 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.type.MCFPPVectorType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 open class VectorVar: Var<VectorVar>, Indexable, ScoreHolder {
 
@@ -27,12 +27,12 @@ open class VectorVar: Var<VectorVar>, Indexable, ScoreHolder {
     constructor(
         dimension: Int,
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : this(dimension, curr.prefix + identifier) {
         this.identifier = identifier
     }
 
-    constructor(dimension: Int, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(dimension: Int, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.dimension = dimension
         //生成向量变量
         for (i in 0..<dimension){
@@ -227,8 +227,8 @@ class VectorVarConcrete : VectorVar, MCFPPValue<Array<Int>> {
     constructor(
         value: Array<Int>,
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
-    ) : super(value.size, curr.prefix + identifier) {
+        identifier: String = TempPool.getVarIdentify()
+    ) : super(value.size, curr, identifier) {
         this.value = value
         for (i in components.indices){
             components[i] = MCIntConcrete(value[i], "$identifier$$i")
@@ -240,7 +240,7 @@ class VectorVarConcrete : VectorVar, MCFPPValue<Array<Int>> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Array<Int>, identifier: String = UUID.randomUUID().toString()) : super(value.size, identifier) {
+    constructor(value: Array<Int>, identifier: String = TempPool.getVarIdentify()) : super(value.size, identifier) {
         this.value = value
         for (i in components.indices){
             components[i] = MCIntConcrete(value[i], "$identifier$$i")

@@ -23,15 +23,12 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPEnumType
 import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.util.BoolTag
-import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.*
 import top.mcfpp.util.NBTUtil.toNBTByte
 import top.mcfpp.util.NBTUtil.toNBTDouble
 import top.mcfpp.util.NBTUtil.toNBTFloat
 import top.mcfpp.util.NBTUtil.toNBTLong
 import top.mcfpp.util.NBTUtil.toNBTShort
-import top.mcfpp.util.StringHelper
-import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
 
@@ -56,7 +53,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     override fun visitExpression(ctx: mcfppParser.ExpressionContext): Var<*> {
         Project.ctx = ctx
         val l = Function.currFunction
-        val f = NoStackFunction("expression_${UUID.randomUUID()}",Function.currFunction)
+        val f = NoStackFunction(TempPool.getFunctionIdentify("expression"),Function.currFunction)
         Function.currFunction = f
         return if(ctx.primary() != null){
             currSelector = null
@@ -284,7 +281,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
                     LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
                 }else{
                     LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(typeStr))
-                    currSelector = UnknownVar("unknown_" + UUID.randomUUID())
+                    currSelector = UnknownVar(TempPool.getFunctionIdentify("unknown"))
                 }
             }else{
                 currSelector = ObjectVar(type)
@@ -323,7 +320,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
         if (ctx.`var`() != null) {
             //变量
             val qwq = visitVar(ctx.`var`())
-            if(qwq is UnknownVar && ctx.parent !is mcfppParser.VarWithSelectorContext){
+            if(qwq is UnknownVar && ctx.parent.parent !is mcfppParser.VarWithSelectorContext){
                 LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(qwq.identifier))
             }
             return qwq

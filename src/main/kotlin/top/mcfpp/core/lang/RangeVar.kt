@@ -7,9 +7,9 @@ import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 import kotlin.experimental.and
 
 open class RangeVar: Var<RangeVar> {
@@ -30,7 +30,7 @@ open class RangeVar: Var<RangeVar> {
      */
     constructor(
         curr: FieldContainer,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(identifier) {
         this.prefix = curr
         left = MCFloat(curr ,identifier + "_left")
@@ -43,7 +43,7 @@ open class RangeVar: Var<RangeVar> {
      * 创建一个range值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         left = MCFloat(identifier + "_left")
         left.nbtPath = this.nbtPath.memberIndex("left")
         right = MCFloat(identifier + "_right")
@@ -163,7 +163,7 @@ class RangeVarConcrete: MCFPPValue<Pair<Float?, Float?>>, RangeVar{
     constructor(
         curr: FieldContainer,
         value: Pair<Float?, Float?>,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(curr.prefix + identifier) {
         this.value = value
         if(value.second == null && value.first == null) {
@@ -181,7 +181,7 @@ class RangeVarConcrete: MCFPPValue<Pair<Float?, Float?>>, RangeVar{
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Pair<Float?, Float?>, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Pair<Float?, Float?>, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
         if(value.second == null && value.first == null) {
             LogProcessor.error("Range should have at least one side")

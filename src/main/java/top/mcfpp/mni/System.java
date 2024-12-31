@@ -18,6 +18,7 @@ import top.mcfpp.lib.ScoreChatComponent;
 import top.mcfpp.model.function.Function;
 import top.mcfpp.util.LogProcessor;
 import top.mcfpp.util.NBTUtil;
+import top.mcfpp.util.TempPool;
 import top.mcfpp.util.ValueWrapper;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class System {
 
     @MNIFunction(normalParams = {"any a"}, returnType = "type")
     public static void typeOf(@NotNull Var<?> value, ValueWrapper<MCFPPTypeVar> returnValue){
-        var re = new MCFPPTypeVar(value.getType(), UUID.randomUUID().toString());
+        var re = new MCFPPTypeVar(value.getType(), TempPool.INSTANCE.getVarIdentify());
         returnValue.setValue(re);
     }
 

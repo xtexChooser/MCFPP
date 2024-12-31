@@ -8,6 +8,7 @@ import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete;
 import top.mcfpp.core.lang.Var;
 import top.mcfpp.lib.ListChatComponent;
 import top.mcfpp.lib.PlainChatComponent;
+import top.mcfpp.util.TempPool;
 import top.mcfpp.util.ValueWrapper;
 
 import java.util.UUID;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class MCAnyData {
     @MNIFunction(caller = "any", returnType = "JavaVar")
     public static void getJavaVar(@NotNull Var<?> caller, ValueWrapper<Var<?>> returnValue){
-        var re = new JavaVar(caller, UUID.randomUUID().toString());
+        var re = new JavaVar(caller, "temp_" + TempPool.INSTANCE.getVarIdentify());
         returnValue.setValue(re);
     }
 

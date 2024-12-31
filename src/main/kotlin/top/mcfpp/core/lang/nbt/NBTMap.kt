@@ -11,7 +11,7 @@ import top.mcfpp.model.CompoundData
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPMapType
 import top.mcfpp.type.MCFPPType
-import java.util.*
+import top.mcfpp.util.TempPool
 
 open class NBTMap : NBTDictionary {
 
@@ -25,7 +25,7 @@ open class NBTMap : NBTDictionary {
      * 创建一个map值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString(), genericType : MCFPPType) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify(), genericType : MCFPPType) : super(identifier){
         this.genericType = genericType
         keyList = NBTList(identifier + "_key", MCFPPBaseType.String)
         valueList = NBTList(identifier + "_value", genericType)
@@ -68,7 +68,7 @@ class NBTMapConcrete : NBTMap, MCFPPValue<HashMap<String, Var<*>>> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: HashMap<String, Var<*>>, identifier: String = UUID.randomUUID().toString(), genericType: MCFPPType) : super(identifier, genericType){
+    constructor(value: HashMap<String, Var<*>>, identifier: String = TempPool.getVarIdentify(), genericType: MCFPPType) : super(identifier, genericType){
         this.value = value
         keyList = NBTListConcrete(ArrayList(value.keys.map { MCStringConcrete(StringTag((it))) }), identifier + "_key", MCFPPBaseType.String)
         valueList = NBTListConcrete(ArrayList(value.values), identifier + "_value", genericType)

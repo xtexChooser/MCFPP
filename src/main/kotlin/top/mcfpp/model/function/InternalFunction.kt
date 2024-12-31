@@ -3,7 +3,7 @@ package top.mcfpp.model.function
 import top.mcfpp.model.Class
 import top.mcfpp.model.DataTemplate
 import top.mcfpp.model.field.InternalFunctionField
-import java.util.UUID
+import top.mcfpp.util.TempPool
 
 /**
  * 一个匿名的内部函数。
@@ -29,7 +29,7 @@ import java.util.UUID
  * @param parent 这个函数的调用者，即父函数
  *
  */
-class InternalFunction(prefix: String, parent: Function) : Function(prefix + UUID.randomUUID(), context = null) {
+class InternalFunction(prefix: String, parent: Function) : Function(TempPool.getFunctionIdentify(prefix), context = null) {
 
     init {
         field = InternalFunctionField(parent.field,this)

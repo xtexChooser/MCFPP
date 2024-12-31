@@ -11,9 +11,9 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 open class NBTDictionary : NBTBasedData {
 
@@ -23,7 +23,7 @@ open class NBTDictionary : NBTBasedData {
      * 创建一个dict值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     /**
      * 复制一个dict
@@ -96,7 +96,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: HashMap<String, Var<*>>, identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(value: HashMap<String, Var<*>>, identifier: String = TempPool.getVarIdentify()) : super(identifier){
         this.value = value
     }
 

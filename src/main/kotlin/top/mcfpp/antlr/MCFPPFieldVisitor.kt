@@ -275,7 +275,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         val m = visit(ctx.classMember())
         if(m is Member){
             //访问修饰符
-            m.accessModifier = AccessModifier.valueOf(ctx.accessModifier()?.text?:"public".uppercase(Locale.getDefault()))
+            m.accessModifier = AccessModifier.valueOf((ctx.accessModifier()?.text?:"public").uppercase(Locale.getDefault()))
             if (m !is ClassConstructor) {
                 Class.currClass!!.addMember(m)
             }
@@ -340,7 +340,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             MCFPPBaseType.Void
         }
         if(!isStatic){
-            val thisObj = Class.currClass!!.getType().buildUnConcrete("this", f)
+            val thisObj = Class.currClass!!.getType().buildUnConcrete("this")
             f.field.putVar("this",thisObj)
         }
         //解析参数
@@ -357,6 +357,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 Function.currFunction = Function.nullFunction
             }
         }
+        f.ast = null
         return f
     }
 
@@ -469,14 +470,13 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         Project.ctx = ctx
         //只有类字段构建
         val c = ctx.fieldDeclarationExpression()
-        //字段的解析在Analyse阶段结束后，Compile阶段开始的时候进行
         val type = MCFPPType.parseFromContext(ctx.type(), typeScope)?: run {
             LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
             MCFPPBaseType.Any
         }
         val `var` = type.buildUnConcrete(c.Identifier().text, Class.currClass!!)
         if(Class.currClass is ObjectClass && `var` is OnScoreboard){
-            `var`.name = (Class.currClass as ObjectClass).uuid.toString()
+            `var`.name = (Class.currClass as ObjectClass).mcuuid.uuid.toString()
         }else if(`var` is OnScoreboard){
             `var`.name = "@s"
         }

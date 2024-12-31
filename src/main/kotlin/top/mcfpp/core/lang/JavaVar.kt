@@ -12,6 +12,7 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.JavaFunction
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -40,7 +41,7 @@ class JavaVar : Var<JavaVar>, MCFPPValue<Any?> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Any?, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Any?, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

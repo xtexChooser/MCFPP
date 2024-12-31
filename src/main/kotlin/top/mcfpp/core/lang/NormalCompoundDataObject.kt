@@ -4,9 +4,9 @@ import top.mcfpp.model.CompoundData
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
-import java.util.UUID
+import top.mcfpp.util.TempPool
 
-class NormalCompoundDataObject(identifier: String = UUID.randomUUID().toString(), override var value: Map<String, Any> = emptyMap()): Var<NormalCompoundDataObject>(identifier), MCFPPValue<Map<String, Any>> {
+class NormalCompoundDataObject(identifier: String = TempPool.getVarIdentify(), override var value: Map<String, Any> = emptyMap()): Var<NormalCompoundDataObject>(identifier), MCFPPValue<Map<String, Any>> {
 
     override var isConst = true
 
@@ -15,7 +15,7 @@ class NormalCompoundDataObject(identifier: String = UUID.randomUUID().toString()
         this.data = CompoundData(identifier, "mcfpp.hidden")
     }
 
-    constructor(data: CompoundData, identifier: String = UUID.randomUUID().toString(), value: Map<String, Any> = emptyMap()): this(identifier, value){
+    constructor(data: CompoundData, identifier: String = TempPool.getVarIdentify(), value: Map<String, Any> = emptyMap()): this(identifier, value){
         this.data = data
     }
 

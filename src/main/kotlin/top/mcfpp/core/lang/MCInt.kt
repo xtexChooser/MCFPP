@@ -17,18 +17,18 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 /**
  * 代表了mc中的一个整数。实质上是记分板中的一个记分项。你可以对它进行加减乘除等基本运算操作，以及大小比较等逻辑运算。
  */
 open class MCInt : MCNumber<Int> {
 
-    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : super(curr, identifier)
+    constructor(curr: FieldContainer, identifier: String = TempPool.getVarIdentify()) : super(curr, identifier)
 
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier)
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier)
 
     constructor(b: MCInt) : super(b)
 
@@ -420,7 +420,7 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     constructor(
         curr: FieldContainer,
         value: Int,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(curr, identifier) {
         this.value = value
     }
@@ -430,7 +430,7 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Int, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Int, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

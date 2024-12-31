@@ -34,9 +34,9 @@ import top.mcfpp.type.MCFPPEnumType
 import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
@@ -395,7 +395,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         val parent = ctx.parent
         Function.addComment("if branch start")
         //匿名函数的定义
-        val f = NoStackFunction("_if_branch_${UUID.randomUUID()}", Function.currFunction)
+        val f = NoStackFunction(TempPool.getFunctionIdentify("if_branch"), Function.currFunction)
         //注册函数
         if(!GlobalField.localNamespaces.containsKey(f.namespace))
             GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
@@ -998,7 +998,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             val value = MCFPPExprVisitor().visit(context.expression())
             arg?.assignedBy(value)
         }
-        val execFunction = NoStackFunction("execute_" + UUID.randomUUID().toString(), Function.currFunction)
+        val execFunction = NoStackFunction(TempPool.getFunctionIdentify("execute"), Function.currFunction)
         GlobalField.localNamespaces[execFunction.namespace]!!.field.addFunction(execFunction, false)
         val l = Function.currFunction
         Function.currFunction = execFunction

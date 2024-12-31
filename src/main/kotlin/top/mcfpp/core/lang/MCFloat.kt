@@ -12,6 +12,7 @@ import top.mcfpp.lib.SbObject
 import top.mcfpp.model.*
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -32,7 +33,7 @@ open class MCFloat : MCNumber<Float> {
      *
      * @param identifier 标识符。默认为
      */
-    constructor(curr: FieldContainer, identifier: String = UUID.randomUUID().toString()) : this(curr.prefix + identifier){
+    constructor(curr: FieldContainer, identifier: String = TempPool.getVarIdentify()) : this(curr.prefix + identifier){
         sign = MCInt(name).setObj(SbObject.MCS_float_sign) as MCInt
         int0 = MCInt(name).setObj(SbObject.MCS_float_int0) as MCInt
         int1 = MCInt(name).setObj(SbObject.MCS_float_int1) as MCInt
@@ -43,7 +44,7 @@ open class MCFloat : MCNumber<Float> {
      * 创建一个float值。它的标识符和mc名相同。
      * @param identifier identifier
      */
-    constructor(identifier: String = UUID.randomUUID().toString()) : super(identifier){
+    constructor(identifier: String = TempPool.getVarIdentify()) : super(identifier){
         sign = MCInt(name).setObj(SbObject.MCS_float_sign) as MCInt
         int0 = MCInt(name).setObj(SbObject.MCS_float_int0) as MCInt
         int1 = MCInt(name).setObj(SbObject.MCS_float_int1) as MCInt
@@ -441,7 +442,7 @@ open class MCFloat : MCNumber<Float> {
             tempFloat.isTemp = true
         }
 
-        fun ssObjToVar(identifier: String = UUID.randomUUID().toString()) : MCFloat{
+        fun ssObjToVar(identifier: String = TempPool.getVarIdentify()) : MCFloat{
             val re = MCFloat(identifier)
             re.isTemp = true
             re.assignedBy(ssObj)
@@ -466,7 +467,7 @@ class MCFloatConcrete : MCFloat, MCFPPValue<Float> {
      * @param curr 域容器
      * @param value 值
      */
-    constructor(curr: FieldContainer, value: Float, identifier: String = UUID.randomUUID().toString()) : super(curr.prefix + identifier) {
+    constructor(curr: FieldContainer, value: Float, identifier: String = TempPool.getVarIdentify()) : super(curr.prefix + identifier) {
         this.value = value
     }
 
@@ -475,7 +476,7 @@ class MCFloatConcrete : MCFloat, MCFPPValue<Float> {
      * @param identifier 标识符。如不指定，则为随机uuid
      * @param value 值
      */
-    constructor(value: Float, identifier: String = UUID.randomUUID().toString()) : super(identifier) {
+    constructor(value: Float, identifier: String = TempPool.getVarIdentify()) : super(identifier) {
         this.value = value
     }
 

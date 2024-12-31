@@ -17,6 +17,7 @@ import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -40,7 +41,7 @@ open class DataTemplateObject : Var<DataTemplateObject> {
      * @param template 模板的类型
      * @param identifier 标识符
      */
-    constructor(template: DataTemplate, identifier: String = UUID.randomUUID().toString()): super(identifier) {
+    constructor(template: DataTemplate, identifier: String = TempPool.getVarIdentify()): super(identifier) {
         this.templateType = template
         this.identifier = identifier
         instanceField = template.field.createDataTemplateInstance(this)
@@ -319,7 +320,7 @@ class DataTemplateObjectConcrete: DataTemplateObject, MCFPPValue<CompoundTag> {
     constructor(
         template: DataTemplate,
         value: CompoundTag,
-        identifier: String = UUID.randomUUID().toString()
+        identifier: String = TempPool.getVarIdentify()
     ) : super(template, identifier) {
         this.value = value
     }
