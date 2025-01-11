@@ -217,15 +217,15 @@ class JsonTextConcrete : MCFPPValue<ChatComponent>, JsonText {
             is JsonTextConcrete -> {
                 val v = value as? ListChatComponent ?: value.toListComponent()
                 if(a.value is ListChatComponent){
-                    v.components.addAll((a.value as ListChatComponent).components)
+                    v.append((a.value as ListChatComponent).components)
                 }else{
-                    v.components.add(a.value)
+                    v.append(a.value)
                 }
                 value = v
             }
             is JsonText -> {
                 val v = value as? ListChatComponent?: value.toListComponent()
-                v.components.add(NBTChatComponent(a, true))
+                v.append(NBTChatComponent(a, true))
                 value = v
             }
             else -> return null

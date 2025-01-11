@@ -160,6 +160,8 @@ object Project {
             //是否生成数据包
             config.noDatapack = jsonObject.getBooleanValue("noDatapack")
 
+            config.noComment = jsonObject.getBooleanValue("noComment")
+
 
         } catch (e: Exception) {
             LogProcessor.error("Error while reading project from file \"$path\"")

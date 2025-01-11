@@ -15,7 +15,7 @@ public class MCStringConcreteData {
     @MNIFunction(caller = "string", returnType = "text", override = true)
     public static void toText(MCStringConcrete caller, ValueWrapper<JsonTextConcrete> returnValue) {
         var l = new ListChatComponent();
-        l.getComponents().add(new PlainChatComponent(caller.getValue().getValue()));
+        l.append(new PlainChatComponent(caller.getValue().getValue()));
         returnValue.setValue(new JsonTextConcrete(l, "re"));
     }
 }

@@ -3,5 +3,6 @@
   "namespace": "mcfpp",
   "ignoreStdLib": false,
   "isLib": false,
-  "targetPath": "D:\\.minecraft\\saves\\MCFPP Studio\\datapacks"
+  "targetPath": "D:\\.minecraft\\saves\\MCFPP Studio\\datapacks",
+  "noComment": true
 }

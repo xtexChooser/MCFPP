@@ -447,7 +447,6 @@ statement
     :   fieldDeclaration ';'
     |   statementExpression ';'
     |   ifStatement
-    |   forStatement
     |   whileStatement
     |   doWhileStatement ';'
     |   ';'
@@ -494,36 +493,15 @@ ifStatement
     ;
 
 elseIfStatement
-    :   ELSE IF '('expression')' ifBlock
+    :   ELSE IF '('expression')' block
     ;
 
 elseStatement
-    :   ELSE ifBlock
+    :   ELSE block
     ;
 
 ifBlock
     :   block
-    ;
-
-forStatement
-    :   FOR '(' forControl ')' forBlock
-    ;
-
-forBlock
-    :   block
-    ;
-
-forControl
-    :   forInit ';' expression? ';' forUpdate
-    ;
-
-forInit
-    :   (fieldDeclaration|statementExpression)?
-    |   (fieldDeclaration|statementExpression) (',' (fieldDeclaration|statementExpression))+
-    ;
-
-forUpdate
-    :   statementExpression*
     ;
 
 whileStatement

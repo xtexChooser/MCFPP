@@ -2,6 +2,7 @@ package top.mcfpp.model.field
 
 import top.mcfpp.core.lang.Var
 import top.mcfpp.model.FieldContainer
+import top.mcfpp.type.MCFPPType
 
 class NoStackFunctionField(parent: FunctionField, cacheContainer: FieldContainer?) : FunctionField(parent, cacheContainer) {
 
@@ -23,4 +24,27 @@ class NoStackFunctionField(parent: FunctionField, cacheContainer: FieldContainer
     override fun putVar(key: String, `var`: Var<*>, forced: Boolean): Boolean {
         return (parent as FunctionField).putVar(key, `var`, forced)
     }
+
+
+    override fun putType(key: String, type: MCFPPType, forced: Boolean): Boolean {
+        return (parent as IFieldWithType).putType(key, type, forced)
+    }
+
+    override fun getType(key: String) : MCFPPType? {
+        return (parent as IFieldWithType).getType(key)
+    }
+    override fun containType(id: String): Boolean {
+        return (parent as IFieldWithType).containType(id)
+    }
+
+    override fun removeType(id: String): MCFPPType? {
+        return (parent as IFieldWithType).removeType(id)
+    }
+
+    override fun forEachType(action: (MCFPPType) -> Any?) {
+        (parent as IFieldWithType).forEachType(action)
+    }
+
+    override val allTypes: Collection<MCFPPType>
+        get() = (parent as IFieldWithType).allTypes
 }

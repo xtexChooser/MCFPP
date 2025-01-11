@@ -3,8 +3,8 @@ package top.mcfpp.compiletime
 import top.mcfpp.antlr.MCFPPExprVisitor
 import top.mcfpp.antlr.MCFPPImVisitor
 import top.mcfpp.antlr.mcfppParser
-import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.core.lang.Var
+import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.model.function.Function
 
 class MCFPPCompileTimeVisitor(
@@ -45,13 +45,13 @@ class MCFPPCompileTimeVisitor(
             for(elseIfStatementContext in ctx.elseIfStatement()){
                 val elseIfCondition = exprVisitor.visit(elseIfStatementContext.expression())
                 if(elseIfCondition is ScoreBoolConcrete && elseIfCondition.value){
-                    visit(elseIfStatementContext.ifBlock())
+                    visit(elseIfStatementContext.block())
                     elseIfBool = true
                     break
                 }
             }
             if(!elseIfBool&&ctx.elseStatement()!=null){
-                visit(ctx.elseStatement().ifBlock())
+                visit(ctx.elseStatement().block())
             }
         }
         return null
@@ -60,46 +60,6 @@ class MCFPPCompileTimeVisitor(
     override fun visitIfBlock(ctx: mcfppParser.IfBlockContext): Any? {
         return super.visitBlock(ctx.block())
     }
-
-    override fun visitForStatement(ctx: mcfppParser.ForStatementContext): Any? {
-        val forControlContext = ctx.forControl()
-        visit(forControlContext.forInit())
-        while(true){
-            val condition = exprVisitor.visit(forControlContext.expression())
-            if(condition is ScoreBoolConcrete && condition.value){
-                visit(ctx.forBlock())
-                if(curBreak||curReturn){
-                    curBreak = false
-                    break
-                }
-                else if(curContinue){
-                    curContinue = false
-                }
-                visit(forControlContext.forUpdate())
-            }
-            else{
-                return null
-            }
-        }
-        return null
-    }
-
-    override fun visitForInit(ctx: mcfppParser.ForInitContext): Any? {
-        visitChildren(ctx)
-        return null
-    }
-
-    override fun visitForUpdate(ctx: mcfppParser.ForUpdateContext): Any? {
-        for(statementExpression in ctx.statementExpression()){
-            visit(statementExpression)
-        }
-        return null
-    }
-
-    override fun visitForBlock(ctx: mcfppParser.ForBlockContext): Any? {
-        return visitBlock(ctx.block())
-    }
-
 
     override fun visitReturnStatement(ctx: mcfppParser.ReturnStatementContext): Any? {
         curReturn = true

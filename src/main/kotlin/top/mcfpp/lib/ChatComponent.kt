@@ -55,9 +55,25 @@ class ListChatComponent: ChatComponent() {
         str.build("]", false)
         return str
     }
+
+    fun append(c: ChatComponent){
+        if(components.isEmpty()){
+            components.add(c)
+        }else if(c is PlainChatComponent && components.last() is PlainChatComponent){
+            (components.last() as PlainChatComponent).value += c.value
+        }else{
+            components.add(c)
+        }
+    }
+
+    fun append(c: List<ChatComponent>){
+        for (component in c){
+            append(component)
+        }
+    }
 }
 
-class PlainChatComponent(val value: String) : ChatComponent() {
+class PlainChatComponent(var value: String) : ChatComponent() {
     override fun toCommandPart(): Command {
         val c = Command("""{"type": "text", "text": "$value"}""")
         if(styles.isNotEmpty()){

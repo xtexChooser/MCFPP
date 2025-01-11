@@ -17,10 +17,7 @@ import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.field.FunctionField
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.generic.Generic
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPDeclaredConcreteType
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.type.UnresolvedType
+import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
 import top.mcfpp.util.TextTranslator
@@ -504,7 +501,11 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param returnType
      */
     fun buildReturnVar(returnType: MCFPPType): Var<*>{
-        return returnType.buildUnConcrete("return", this)
+        if(returnType is MCFPPConcreteType) {
+            return returnType.build("return", this)
+        }else{
+            return returnType.buildUnConcrete("return", this)
+        }
     }
 
     /**
@@ -544,11 +545,17 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
                 cf.normalParams = params
                 cf.commands.clear()
                 cf.identifier = this.identifier + "_" + compiledFunctions.size
+                compiledFunctions[values] = cf
                 cf.ast = null
                 cf.runInFunction {
+                    val qwq = buildString {
+                        for ((index, np) in normalParams.withIndex()){
+                            append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
+                        }
+                    }
+                    addComment(qwq)
                     MCFPPImVisitor().visitFunctionBody(ast!!)
                 }
-                compiledFunctions[values] = cf
                 return cf.invoke(args, caller)
             }
         }
@@ -1005,6 +1012,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
          * @param str
          */
         fun addComment(str: String, type: CommentType = CommentType.INFO){
+            if(Project.config.noComment) return
             if(this.equals(nullFunction)){
                 LogProcessor.warn("Unexpected command added to NullFunction")
                 throw NullPointerException()

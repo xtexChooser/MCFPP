@@ -1,7 +1,6 @@
 package top.mcfpp
 
 import top.mcfpp.command.CommentType
-import top.mcfpp.io.MCFPPFile
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -70,5 +69,10 @@ open class ProjectConfig(
     /**
      * 不生成数据包
      */
-    var noDatapack: Boolean = false
+    var noDatapack: Boolean = false,
+
+    /**
+     * 不生成注释
+     */
+    var noComment: Boolean = false
 )

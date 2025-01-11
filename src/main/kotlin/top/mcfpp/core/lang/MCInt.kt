@@ -496,6 +496,7 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     @InsertCommand
     override fun plus(a: Var<*>): Var<*>? {
         //t = t + a
+        if(!isTemp) return getTempVar().plus(a)
         when(a){
             is MCIntConcrete -> {
                 value += a.value
@@ -511,6 +512,7 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     @InsertCommand
     override fun minus(a: Var<*>): Var<*>? {
         //t = t + a
+        if(!isTemp) return getTempVar().minus(a)
         when(a){
             is MCIntConcrete -> {
                 value -= a.value
@@ -528,6 +530,7 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     @InsertCommand
     override fun multiple(a: Var<*>): Var<*>? {
         //t = t * a
+        if(!isTemp) return getTempVar().multiple(a)
         when(a){
             is MCIntConcrete -> {
                 value *= a.value
@@ -544,6 +547,7 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     @InsertCommand
     override fun divide(a: Var<*>): Var<*>? {
         //t = t / a
+        if(!isTemp) return getTempVar().divide(a)
         when(a){
             is MCIntConcrete -> {
                 value /= a.value
@@ -560,6 +564,7 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     @InsertCommand
     override fun modular(a: Var<*>): Var<*>? {
         //t = t % a
+        if(!isTemp) return getTempVar().modular(a)
         when(a){
             is MCIntConcrete -> {
                 value %= a.value
@@ -654,6 +659,6 @@ class MCIntConcrete : MCInt, MCFPPValue<Int> {
     @InsertCommand
     override fun getTempVar(): MCIntConcrete {
         if (isTemp) return this
-        return MCIntConcrete(value)
+        return MCIntConcrete(value).apply { isTemp = true }
     }
 }

@@ -6,7 +6,6 @@ import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.antlr.RuleContextExtension.children
 import top.mcfpp.antlr.mcfppParser.CompileTimeFuncDeclarationContext
 import top.mcfpp.command.Command
-import top.mcfpp.command.CommandList
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.DataTemplateObjectConcrete
 import top.mcfpp.core.lang.MCFPPValue
@@ -86,17 +85,26 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     override fun visitFunctionBody(ctx: mcfppParser.FunctionBodyContext): Any? {
         if(ctx.parent is CompileTimeFuncDeclarationContext) return null
         if(Function.currFunction !is Generic<*>){
-            super.visitFunctionBody(ctx)
+            ctx.statement().forEach {
+                if(Function.currFunction.hasReturnStatement || Function.currFunction.isEnded){
+                    return@forEach
+                }
+                visitStatement(it)
+            }
         }
         return null
     }
-
 
     //泛型函数编译使用的入口
     fun visitFunctionBody(ctx: mcfppParser.FunctionBodyContext, function: Function){
         val lastFunction = Function.currFunction
         Function.currFunction = function
-        super.visitFunctionBody(ctx)
+        ctx.statement().forEach {
+            if(Function.currFunction.hasReturnStatement){
+                return@forEach
+            }
+            visitStatement(it)
+        }
         Function.currFunction = lastFunction
     }
 
@@ -130,7 +138,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         }
         if(ctx.VAR() != null){
             //自动判断类型
-            val init: Var<*> = MCFPPExprVisitor().visit(ctx.expression())!!
+            val init: Var<*> = MCFPPExprVisitor().visitExpression(ctx.expression())
             var `var` = if(fieldModifier == "import"){
                 val qwq = init.type.buildUnConcrete(ctx.Identifier().text, Function.currFunction)
                 qwq.hasAssigned = true
@@ -182,7 +190,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                 `var`.nbtPath = NBTPath.getNormalStackPath(`var`)
                 //变量初始化
                 if (c.expression() != null) {
-                    val init: Var<*> = MCFPPExprVisitor(if(type is MCFPPGenericClassType) type else null, if(type is MCFPPEnumType) type else null).visit(c.expression())!!
+                    val init: Var<*> = MCFPPExprVisitor(if(type is MCFPPGenericClassType) type else null, if(type is MCFPPEnumType) type else null).visitExpression(c.expression())
                     `var` = `var`.assignedBy(init)
                 }
                 when(fieldModifier){
@@ -215,13 +223,13 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Project.ctx = ctx
         Function.addComment("expression: " + ctx.text)
         if(ctx.varWithSelector() != null){
-            val left: Var<*> = McfppLeftExprVisitor().visit(ctx.varWithSelector())
+            val left: Var<*> = McfppLeftExprVisitor().visitVarWithSelector(ctx.varWithSelector())
             if (left.isConst) {
                 LogProcessor.error("Cannot assign a constant repeatedly: " + left.identifier)
                 return null
             }
             val type = left.type
-            val right: Var<*> = MCFPPExprVisitor(if(type is MCFPPGenericClassType) type else null, if(type is MCFPPEnumType) type else null).visit(ctx.expression())!!
+            val right: Var<*> = MCFPPExprVisitor(if(type is MCFPPGenericClassType) type else null, if(type is MCFPPEnumType) type else null).visitExpression(ctx.expression())
             try {
                 if(right !is MCFPPValue<*> && left.parent is DataTemplateObjectConcrete){
                     left.parent = (left.parent as DataTemplateObjectConcrete).toDynamic(true)
@@ -232,7 +240,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                 throw e
             }
         }else{
-            MCFPPExprVisitor().visit(ctx.expression())!!
+            MCFPPExprVisitor().visitExpression(ctx.expression())
         }
         Function.addComment("expression end: " + ctx.text)
         return null
@@ -307,153 +315,242 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Project.ctx = ctx
         Function.addComment(ctx.text)
         if (ctx.expression() != null) {
-            val ret: Var<*> = MCFPPExprVisitor().visit(ctx.expression())!!
+            val ret: Var<*> = MCFPPExprVisitor().visitExpression(ctx.expression())
             Function.currBaseFunction.assignReturnVar(ret)
         }
-        if(Function.currFunction !is InternalFunction)
-            Function.currFunction.hasReturnStatement = true
+        Function.currBaseFunction.hasReturnStatement = true
         Function.addCommand("return 1")
         return null
     }
 
-    override fun visitIfStatement(ctx: mcfppParser.IfStatementContext): Any? {
-        enterIfStatement(ctx)
-        super.visitIfStatement(ctx)
-        exitIfStatement(ctx)
+    override fun visitBlock(ctx: mcfppParser.BlockContext): Any? {
+        Project.ctx = ctx
+        ctx.statement().forEach {
+            if(Function.currFunction.hasReturnStatement){
+                return@forEach
+            }
+            visitStatement(it)
+        }
         return null
     }
 
-    /**
-     * 进入if语句
-     * Enter if statement
-     *
-     * @param ctx
-     */
-    @InsertCommand
+    private enum class ConditionType {
+        /**
+         * 上一个分支必然不执行
+         */
+        ALWAYS_FALSE,
+
+        /**
+         * 上一个分支必然执行
+         */
+        ALWAYS_TRUE,
+
+        /**
+         * 正常
+         */
+        NORMAL
+    }
+
+    private var breakIf = ConditionType.NORMAL
     @Suppress("UNCHECKED_CAST")
-    fun enterIfStatement(ctx: mcfppParser.IfStatementContext) {
+    override fun visitIfStatement(ctx: mcfppParser.IfStatementContext): Any? {
         //进入if函数
         Project.ctx = ctx
+        breakIf = ConditionType.NORMAL
         Function.addComment("if start")
-        /*
-        ifStatement
-            :   IF'('expression')' ifBlock elseIfStatement* elseStatement?
-            ;
-
-        elseIfStatement
-            :   ELSE IF '('expression')' ifBlock
-            ;
-
-        elseStatement
-            :   ELSE ifBlock
-            ;
-
-        ifBlock
-            :   block
-            ;
-         */
-        //将if以后的语句插入到if的分支后面
+        //获取if语句以后的所有语句
         val index = ctx.parent.parent.children().indexOf(ctx.parent)
-        val list = ctx.parent.parent.children().subList(index + 1, ctx.parent.parent.children().size) as List<mcfppParser.StatementContext>
+        val list =  ctx.parent.parent.children().subList(index + 1, ctx.parent.parent.children().size) as List<mcfppParser.StatementContext>
         list.forEach { ctx.ifBlock().block().addChild(it) }
-        list.forEach { l -> ctx.elseIfStatement().forEach { it.ifBlock().block().addChild(l) } }
-        list.forEach { ctx.elseStatement()?.ifBlock()?.block()?.addChild(it) }
-    }
-
-    /**
-     * 离开if语句
-     * Exit if statement
-     *
-     * @param ctx
-     */
-    @InsertCommand
-    fun exitIfStatement(ctx: mcfppParser.IfStatementContext) {
-        Project.ctx = ctx
-        //Function.currFunction = Function.currFunction.parent[0]
+        list.forEach { l -> ctx.elseIfStatement().forEach { it.block().addChild(l) } }
+        do {
+            //if分支
+            val (c,f) = enterIfBranch(ctx)
+            if(c){
+                //此分支会被编译，注册函数
+                if(breakIf != ConditionType.ALWAYS_TRUE) {
+                    //并不是必然编译的，所以需要注册函数，让分支内的内容在if_branch函数中执行。如果是必然执行的，那么直接内联即可
+                    if (!GlobalField.localNamespaces.containsKey(f.namespace)) {
+                        GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
+                    }
+                    GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f, false)
+                    Function.currFunction = f
+                }
+                visitIfBlock(ctx.ifBlock())
+                //由于原来的调用if的函数已经被return命令返回，需要if_branch函数帮助清理它的栈
+                if(breakIf != ConditionType.ALWAYS_TRUE) {
+                    Function.addCommand("data remove storage mcfpp:system default.stack_frame[0]")
+                    Function.currFunction = Function.currFunction.parent[0]
+                }
+                Function.addComment("if branch end")
+            }
+            //上一条分支必然执行，后面的分支都必定不会执行，不需要编译了
+            if(breakIf == ConditionType.ALWAYS_TRUE) break
+            //else if分支
+            ctx.elseIfStatement().forEach {
+                val (c2, f2) = enterElseIfBranch(it)
+                if(c2){
+                    //这条else if分支会被编译
+                    if(breakIf != ConditionType.ALWAYS_TRUE) {
+                        //如果这里breakIf是1，只能是这一条分支必然会被执行而上一条分支不可能执行（参见enterElseIfBranch中的逻辑
+                        //而不为1的时候，说明它只能是0，因为如果是-1的话c2也会是false而不能执行到这里
+                        //所以让我们注册函数
+                        if (!GlobalField.localNamespaces.containsKey(f2.namespace))
+                            GlobalField.localNamespaces[f2.namespace] = Namespace(f2.namespace)
+                        GlobalField.localNamespaces[f2.namespace]!!.field.addFunction(f2, false)
+                        Function.currFunction = f2
+                    }
+                    visitBlock(it.block())
+                    Project.ctx = ctx
+                    //由于原来的调用if的函数已经被return命令返回，需要if_branch函数帮助清理它的栈
+                    if(breakIf != ConditionType.ALWAYS_TRUE) {  //这里同理
+                        Function.addCommand("data remove storage mcfpp:system default.stack_frame[0]")
+                        Function.currFunction = Function.currFunction.parent[0]
+                    }
+                    Function.addComment("else-if branch end")
+                }
+                //后续的分支也不需要继续编译了
+                if(breakIf == ConditionType.ALWAYS_TRUE) return@forEach
+            }
+            //不需要继续编译else语句了
+            if(breakIf == ConditionType.ALWAYS_TRUE) break
+            //else语句
+            Function.addComment("else branch start")
+            if(breakIf != ConditionType.ALWAYS_FALSE){
+                //注册函数
+                val f3 = NoStackFunction(TempPool.getFunctionIdentify("else_branch"), Function.currFunction)
+                if (!GlobalField.localNamespaces.containsKey(f3.namespace))
+                    GlobalField.localNamespaces[f3.namespace] = Namespace(f3.namespace)
+                GlobalField.localNamespaces[f3.namespace]!!.field.addFunction(f3, false)
+                Function.addCommand(Command("return run").build(Commands.function(f3)))
+                Function.currFunction = f3
+            }
+            if(ctx.elseStatement() != null){
+                visitBlock(ctx.elseStatement().block())
+            }
+            if(!Function.currFunction.hasReturnStatement){
+                list.forEach { visitStatement(it) }
+            }
+            if(breakIf != ConditionType.ALWAYS_FALSE){
+                Function.addCommand("data remove storage mcfpp:system default.stack_frame[0]")
+                Function.currFunction = Function.currFunction.parent[0]
+            }
+            Function.addComment("else branch end")
+        }while (false)
         Function.addComment("if end")
         //if以后的语句已经被全部打包到if分支里面，所以if语句之后的statement没有意义
-        if(ctx.elseStatement() != null){
-            Function.currFunction.isEnded = true
-        }
-    }
-
-    override fun visitIfBlock(ctx: mcfppParser.IfBlockContext): Any? {
-        enterIfBlock(ctx)
-        super.visitIfBlock(ctx)
-        exitIfBlock(ctx)
+        Function.currFunction.isEnded = true
         return null
     }
 
     /**
-     * 进入if分支的语句块
-     * @param ctx the parse tree
+     * 检查条件，返回是否会编译这条if分支
      */
-
-    @InsertCommand
-    fun enterIfBlock(ctx: mcfppParser.IfBlockContext) {
-        Project.ctx = ctx
-        val parent = ctx.parent
+    private fun enterIfBranch(ctx: mcfppParser.IfStatementContext): Pair<Boolean, NoStackFunction>{
         Function.addComment("if branch start")
         //匿名函数的定义
         val f = NoStackFunction(TempPool.getFunctionIdentify("if_branch"), Function.currFunction)
-        //注册函数
-        if(!GlobalField.localNamespaces.containsKey(f.namespace))
-            GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
-        GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
-        if (parent is mcfppParser.IfStatementContext || parent is mcfppParser.ElseIfStatementContext) {
-            //if()，需要进行条件计算
-            parent as mcfppParser.IfStatementContext
-            when(val exp = MCFPPExprVisitor().visit(parent.expression())){
-                is ScoreBoolConcrete -> {
-                    if (exp.value) {
-                        //函数调用的命令
-                        //给子函数开栈
-                        Function.addCommand("function " + f.namespaceID)
-                        LogProcessor.warn("The condition is always true. ")
-                    } else {
-                        Function.addComment("function " + f.namespaceID)
-                        LogProcessor.warn("The condition is always false. ")
-                    }
-                }
-
-                is ExecuteBool -> {
+        when(val exp = MCFPPExprVisitor().visitExpression(ctx.expression())){
+            is ScoreBoolConcrete -> {
+                if (exp.value) {
+                    //函数调用的命令
                     //给子函数开栈
-                    Function.addCommand(
-                        Command("execute").build(exp.toCommandPart()).build("run return run").build(Commands.function(f))
-                    )
+                    Function.addCommand("function " + f.namespaceID)
+                    //LogProcessor.warn("The condition is always true. ")
+                    breakIf = ConditionType.ALWAYS_TRUE
+                } else {
+                    Function.addComment("function " + f.namespaceID)
+                    //LogProcessor.warn("The condition is always false. ")
+                    breakIf = ConditionType.ALWAYS_FALSE
                 }
+                return exp.value to f
+            }
 
-                is BaseBool -> {
-                    Function.addCommand(
-                        Command("execute if").build(exp.toCommandPart()).build("run return run").build(Commands.function(f))
-                    )
-                }
+            is ExecuteBool -> {
+                //注册函数
+                if(!GlobalField.localNamespaces.containsKey(f.namespace))
+                    GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
+                GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
+                //给子函数开栈
+                Function.addCommand(
+                    Command("execute").build(exp.toCommandPart()).build("run return run").build(Commands.function(f))
+                )
+            }
 
-                else -> {
-                    LogProcessor.error("The condition must be a boolean expression.")
-                    Function.addComment("[error/The condition must be a boolean expression]function " + f.namespaceID)
-                }
+            is BaseBool -> {
+                //注册函数
+                if(!GlobalField.localNamespaces.containsKey(f.namespace))
+                    GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
+                GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
+                Function.addCommand(
+                    Command("execute if").build(exp.toCommandPart()).build("run return run").build(Commands.function(f))
+                )
+            }
+
+            else -> {
+                LogProcessor.error("The condition must be a boolean expression.")
+                Function.addComment("[error/The condition must be a boolean expression]function " + f.namespaceID)
+                breakIf = ConditionType.ALWAYS_FALSE
+                return false to f
             }
         }
-        else {
-            //else语句
-            Function.addCommand("function " + f.namespaceID)
-        }
-        Function.currFunction = f
+        return true to f
     }
 
     /**
-     * 离开if语句块
-     * @param ctx the parse tree
+     * 检查条件，返回是否会编译这条else-if分支
      */
-    
-    @InsertCommand
-    fun exitIfBlock(ctx: mcfppParser.IfBlockContext) {
-        Project.ctx = ctx
-        //由于原来的调用if的函数已经被return命令返回，需要if_branch函数帮助清理它的栈
-        Function.addCommand("data remove storage mcfpp:system default.stack_frame[0]")
-        Function.currFunction = Function.currFunction.parent[0]
-        Function.addComment("if branch end")
+    private fun enterElseIfBranch(ctx: mcfppParser.ElseIfStatementContext): Pair<Boolean, NoStackFunction>{
+        Function.addComment("else-if branch start")
+        //匿名函数的定义
+        val f = NoStackFunction(TempPool.getFunctionIdentify("else_if_branch"), Function.currFunction)
+        when(val exp = MCFPPExprVisitor().visitExpression(ctx.expression())){
+            is ScoreBoolConcrete -> {
+                if (exp.value) {
+                    //函数调用的命令
+                    //给子函数开栈
+                    Function.addCommand("function " + f.namespaceID)
+                    //LogProcessor.warn("The condition is always true. ")
+                    breakIf = if(breakIf == ConditionType.NORMAL) ConditionType.NORMAL else ConditionType.ALWAYS_TRUE
+                } else {
+                    Function.addComment("function " + f.namespaceID)
+                    //LogProcessor.warn("The condition is always false. ")
+                    breakIf = if(breakIf == ConditionType.NORMAL) ConditionType.NORMAL else ConditionType.ALWAYS_FALSE
+                }
+                return exp.value to f
+            }
+
+            is ExecuteBool -> {
+                //注册函数
+                if(!GlobalField.localNamespaces.containsKey(f.namespace))
+                    GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
+                GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
+                //给子函数开栈
+                Function.addCommand(
+                    Command("execute").build(exp.toCommandPart()).build("run return run").build(Commands.function(f))
+                )
+                breakIf = ConditionType.NORMAL
+            }
+
+            is BaseBool -> {
+                //注册函数
+                if(!GlobalField.localNamespaces.containsKey(f.namespace))
+                    GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
+                GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
+                Function.addCommand(
+                    Command("execute if").build(exp.toCommandPart()).build("run return run").build(Commands.function(f))
+                )
+                breakIf = ConditionType.NORMAL
+            }
+
+            else -> {
+                LogProcessor.error("The condition must be a boolean expression.")
+                Function.addComment("[error/The condition must be a boolean expression]function " + f.namespaceID)
+                breakIf = if(breakIf == ConditionType.NORMAL) ConditionType.NORMAL else ConditionType.ALWAYS_FALSE
+                return false to f
+            }
+        }
+        return true to f
     }
 
     override fun visitWhileStatement(ctx: mcfppParser.WhileStatementContext): Any? {
@@ -506,7 +603,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
         Function.addComment("while start")
         val parent: mcfppParser.WhileStatementContext = ctx.parent as mcfppParser.WhileStatementContext
-        val exp = MCFPPExprVisitor().visit(parent.expression())
+        val exp = MCFPPExprVisitor().visitExpression(parent.expression())
         //匿名函数的定义
         val f: Function = InternalFunction("_while_block_", Function.currFunction)
         f.child.add(f)
@@ -653,7 +750,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Function.currFunction.parent[0].commands.add("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
         //递归调用
         val parent = ctx.parent as mcfppParser.DoWhileStatementContext
-        when(val exp = MCFPPExprVisitor().visit(parent.expression())){
+        when(val exp = MCFPPExprVisitor().visitExpression(parent.expression())){
             is ScoreBoolConcrete -> {
                 if(exp.value){
                     //给子函数开栈
@@ -713,205 +810,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         }
     }
 
-
-    override fun visitForStatement(ctx: mcfppParser.ForStatementContext): Any? {
-        enterForStatement(ctx)
-        super.visitForStatement(ctx)
-        exitForStatement(ctx)
-        return null
-    }
-
-    /**
-     * 整个for语句本身额外有一个栈，无条件调用函数
-     * @param ctx the parse tree
-     */
-    
-    @InsertCommand
-    fun enterForStatement(ctx: mcfppParser.ForStatementContext) {
-        Project.ctx = ctx
-        Function.addComment("for start")
-        //for语句对应的函数
-        val forFunc: Function = InternalFunction("_for_", Function.currFunction)
-        forFunc.parent.add(Function.currFunction)
-        if(!GlobalField.localNamespaces.containsKey(forFunc.namespace))
-            GlobalField.localNamespaces[forFunc.namespace] = Namespace(forFunc.identifier)
-        GlobalField.localNamespaces[forFunc.namespace]!!.field.addFunction(forFunc,false)
-        Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
-        Function.addCommand(Commands.function(forFunc))
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
-        Function.currFunction = forFunc
-    }
-
-    
-    @InsertCommand
-    fun exitForStatement(ctx: mcfppParser.ForStatementContext) {
-        Project.ctx = ctx
-        Function.currFunction = Function.currFunction.parent[0]
-        Function.addComment("for end")
-    }
-
-    override fun visitForInit(ctx: mcfppParser.ForInitContext): Any? {
-        enterForInit(ctx)
-        super.visitForInit(ctx)
-        exitForInit(ctx)
-        return null
-    }
-    
-    @InsertCommand
-    fun enterForInit(ctx: mcfppParser.ForInitContext) {
-        Project.ctx = ctx
-        Function.addComment("for init start")
-    }
-
-    
-    @InsertCommand
-    fun exitForInit(ctx: mcfppParser.ForInitContext) {
-        Project.ctx = ctx
-        Function.addComment("for init end")
-        //进入for循环主体
-        Function.addComment("for loop start")
-        val forLoopFunc: Function = InternalFunction("_for_loop_", Function.currFunction)
-        forLoopFunc.parent.add(Function.currFunction)
-        if(!GlobalField.localNamespaces.containsKey(forLoopFunc.namespace))
-            GlobalField.localNamespaces[forLoopFunc.namespace] = Namespace(forLoopFunc.identifier)
-        GlobalField.localNamespaces[forLoopFunc.namespace]!!.field.addFunction(forLoopFunc,false)
-        Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
-        Function.addCommand(Commands.function(forLoopFunc))
-        Function.currFunction = forLoopFunc
-    }
-
-    override fun visitForBlock(ctx: mcfppParser.ForBlockContext): Any? {
-        enterForBlock(ctx)
-        super.visitForBlock(ctx)
-        exitForBlock(ctx)
-        return null
-    }
-
-    /**
-     * 进入for block语句。此时当前函数为父函数
-     * @param ctx the parse tree
-     */
-    @InsertCommand
-    fun enterForBlock(ctx: mcfppParser.ForBlockContext) {
-        Project.ctx = ctx
-        //currFunction 是 forLoop
-        val parent: mcfppParser.ForStatementContext = ctx.parent as mcfppParser.ForStatementContext
-        val exp = MCFPPExprVisitor().visit(parent.forControl().expression())
-        //匿名函数的定义。这里才是正式的for函数哦喵
-        val f: Function = InternalFunction("_forblock_", Function.currFunction)
-        f.child.add(f)
-        f.parent.add(f)
-        if(!GlobalField.localNamespaces.containsKey(f.namespace))
-            GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
-        GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
-        //条件循环判断
-        when(exp){
-            is ScoreBoolConcrete -> {
-                if(exp.value){
-                    //给子函数开栈
-                    Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
-                    Function.addCommand("execute " +
-                            "if function " + f.namespaceID + " " +
-                            "run function " + Function.currFunction.namespaceID)
-                    LogProcessor.warn("The condition is always true. ")
-                }else{
-                    Function.addComment("function " + f.namespaceID)
-                    LogProcessor.warn("The condition is always false. ")
-                }
-            }
-
-            is ExecuteBool -> {
-                //给子函数开栈
-                Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
-                Function.addCommand(
-                    Command("execute")
-                        .build(exp.toCommandPart())
-                        .build("if function " + f.namespaceID)
-                        .build("run function " + Function.currFunction.namespaceID)
-                )
-            }
-
-            is BaseBool -> {
-                //给子函数开栈
-                Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
-                Function.addCommand(
-                    Command("execute")
-                        .build("if").build(exp.toCommandPart())
-                        .build("if function " + f.namespaceID)
-                        .build("run function " + Function.currFunction.namespaceID)
-                )
-            }
-
-            else -> {
-                LogProcessor.error("The condition must be a boolean expression.")
-                Function.addComment("[error/The condition must be a boolean expression]function " + f.namespaceID)
-            }
-        }
-        //调用完毕，将子函数的栈销毁。这条命令仍然是在for函数中的。
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
-        Function.currFunction = f //后续块中的命令解析到递归的函数中
-    }
-
-    /**
-     * 离开for block语句。此时当前函数仍然是for的函数
-     * @param ctx the parse tree
-     */
-
-    @InsertCommand
-    fun exitForBlock(ctx: mcfppParser.ForBlockContext) {
-        Project.ctx = ctx
-        //for-update的命令压入
-        Function.currFunction.commands.addAll(forUpdateCommands)
-        forUpdateCommands.clear()
-        //调用完毕，将子函数的栈销毁
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
-        //继续销毁for-loop函数的栈
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
-        Function.addCommand("return 1")
-        Function.currFunction = Function.currFunction.parent[0]
-        Function.currFunction.field.forEachVar {
-            if(it.trackLost){
-                it.trackLost = false
-                if(it is MCFPPValue<*>) it.toDynamic(true)
-            }
-        }
-    }
-
-    /**
-     * 进入for update语句块。
-     * 由于在编译过程中，编译器会首先编译for语句的for control部分，也就是for后面的括号，这就意味着forUpdate语句将会先forBlock
-     * 被写入到命令函数中。因此我们需要将forUpdate语句中的命令临时放在一个列表内部，然后在forBlock调用完毕后加上它的命令
-     *
-     * @param ctx the parse tree
-     */
-
-    override fun visitForUpdate(ctx: mcfppParser.ForUpdateContext): Any? {
-        enterForUpdate(ctx)
-        super.visitForUpdate(ctx)
-        exitForUpdate(ctx)
-        return null
-    }
-
-    fun enterForUpdate(ctx: mcfppParser.ForUpdateContext) {
-        Project.ctx = ctx
-        forInitCommands = Function.currFunction.commands
-        Function.currFunction.commands = forUpdateCommands
-    }
-
-    //暂存
-    private var forInitCommands = CommandList()
-    private var forUpdateCommands = CommandList()
-
-    /**
-     * 离开for update。暂存for update缓存，恢复主缓存，准备forblock编译
-     * @param ctx the parse tree
-     */
-    
-    fun exitForUpdate(ctx: mcfppParser.ForUpdateContext) {
-        Project.ctx = ctx
-        Function.currFunction.commands = forInitCommands
-    }
-
 //endregion
 
     /**
@@ -925,7 +823,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             if(content.OrgCommandText() != null){
                 sb.append(content.OrgCommandText().text)
             }else{
-                val exp = MCFPPExprVisitor().visit(content.orgCommandExpression().expression())
+                val exp = MCFPPExprVisitor().visitExpression(content.orgCommandExpression().expression())
                 if(exp is MCFPPValue<*>){
                     sb.append(exp.value)
                 }else{
@@ -945,11 +843,11 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     @InsertCommand
     override fun visitStatement(ctx: mcfppParser.StatementContext): Any? {
         Project.ctx = ctx
-        if (Function.currFunction.isReturned) {
-            LogProcessor.warn("Unreachable code: " + ctx.text)
+        if(Function.currFunction.isEnded){
             return null
         }
-        if(Function.currFunction.isEnded){
+        if (Function.currFunction.isReturned) {
+            LogProcessor.warn("Unreachable code: " + ctx.text)
             return null
         }
         super.visitStatement(ctx)
@@ -995,7 +893,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                     arg = arg.getData().field.getVar(exp.text) as Execute.WriteOnlyVar
                 }
             }
-            val value = MCFPPExprVisitor().visit(context.expression())
+            val value = MCFPPExprVisitor().visitExpression(context.expression())
             arg?.assignedBy(value)
         }
         val execFunction = NoStackFunction(TempPool.getFunctionIdentify("execute"), Function.currFunction)
@@ -1192,9 +1090,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
          * @return 是否在嵌套中
          */
         public fun inLoopStatement(ctx: RuleContext): Boolean {
-            if (ctx is mcfppParser.ForStatementContext) {
-                return true
-            }
             if (ctx is mcfppParser.DoWhileStatementContext) {
                 return true
             }
