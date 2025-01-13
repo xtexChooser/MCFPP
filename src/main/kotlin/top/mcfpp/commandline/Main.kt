@@ -29,7 +29,7 @@ fun main(){
         }
     }
     GlobalField.init()
-    println("MCFPP ${MCFPP.version} (${Instant.now()})")
+    println("MCFPP ${MCFPP.VERSION} (${Instant.now()})")
     println("Tips: " + UwU.tip) //生成tips
     println("**MCFPP Interpreter is under RECONSTRUCTION**")
     val compiler = LineCompiler()
@@ -52,7 +52,7 @@ fun main(){
         when(line){
             "help" -> printHelp()
             "quit" -> return
-            "version" -> println("MCFPP ${MCFPP.version}")
+            "version" -> println("MCFPP ${MCFPP.VERSION}")
             else -> {
                 try {
                     compiler.compile(line)
@@ -68,7 +68,7 @@ fun main(){
 
 fun printHelp() {
     val helpMessage = """
-        Welcome to MCFPP ${MCFPP.version}'s help utility! If this is your first time using
+        Welcome to MCFPP ${MCFPP.VERSION}'s help utility! If this is your first time using
         MCFPP, you should definitely check out the documentation at
         https://www.mcfpp.top/.
         

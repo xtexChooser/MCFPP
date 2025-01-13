@@ -6,7 +6,7 @@ class CommandList : ArrayList<Command>() {
     fun analyzeAll(): ArrayList<String>{
         val re = ArrayList<String>()
         for (c in this){
-            if(c is Comment && c.type < Project.config.commentLevel) continue
+            if(c is Comment && c.level < Project.config.commentLevel) continue
             re.add(c.analyze())
         }
         return re
@@ -33,5 +33,4 @@ class CommandList : ArrayList<Command>() {
     fun add(index: Int, element: String){
         return super.add(index, Command.build(element))
     }
-
 }

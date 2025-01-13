@@ -473,15 +473,12 @@ class NBTBasedDataConcrete : NBTBasedData, MCFPPValue<Tag<*>> {
 
     override fun toDynamic(replace: Boolean): Var<*> {
         val parent = parent
-        if (parentClass() != null) {
-            val cmd = Commands.selectRun(parent!!, "data modify entity @s data.${identifier} set value ${SNBTUtil.toSNBT(value)}")
-            Function.addCommands(cmd)
-        } else {
-            val cmd = Command.build("data modify")
-                .build(nbtPath.toCommandPart())
-                .build("set value ${SNBTUtil.toSNBT(value)}")
-            Function.addCommand(cmd)
-        }
+        Function.addCommands(
+            Commands.method2(this, Command("data modify")
+                .build(nbtPath.toCommandPart()
+                    .build("set value ${SNBTUtil.toSNBT(value)}"))
+            )
+        )
         val re = NBTBasedData(this)
         if(replace){
             if(parentTemplate() != null){

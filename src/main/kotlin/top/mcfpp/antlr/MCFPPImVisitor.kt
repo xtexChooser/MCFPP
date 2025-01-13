@@ -379,7 +379,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                 visitIfBlock(ctx.ifBlock())
                 //由于原来的调用if的函数已经被return命令返回，需要if_branch函数帮助清理它的栈
                 if(breakIf != ConditionType.ALWAYS_TRUE) {
-                    Function.addCommand("data remove storage mcfpp:system default.stack_frame[0]")
+                    Function.addCommand(Commands.stackOut())
                     Function.currFunction = Function.currFunction.parent[0]
                 }
                 Function.addComment("if branch end")
@@ -404,7 +404,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                     Project.ctx = ctx
                     //由于原来的调用if的函数已经被return命令返回，需要if_branch函数帮助清理它的栈
                     if(breakIf != ConditionType.ALWAYS_TRUE) {  //这里同理
-                        Function.addCommand("data remove storage mcfpp:system default.stack_frame[0]")
+                        Function.addCommand(Commands.stackOut())
                         Function.currFunction = Function.currFunction.parent[0]
                     }
                     Function.addComment("else-if branch end")
@@ -432,7 +432,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                 list.forEach { visitStatement(it) }
             }
             if(breakIf != ConditionType.ALWAYS_FALSE){
-                Function.addCommand("data remove storage mcfpp:system default.stack_frame[0]")
+                Function.addCommand(Commands.stackOut())
                 Function.currFunction = Function.currFunction.parent[0]
             }
             Function.addComment("else branch end")
@@ -567,7 +567,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Function.addComment("while start")
         val whileFunction = InternalFunction("_while_", Function.currFunction)
         Function.addCommand("function " + whileFunction.namespaceID)
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        Function.addCommand(Commands.stackOut())
         Function.currFunction = whileFunction
         if(!GlobalField.localNamespaces.containsKey(whileFunction.namespace))
             GlobalField.localNamespaces[whileFunction.namespace] = Namespace(whileFunction.namespace)
@@ -600,7 +600,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     fun enterWhileBlock(ctx: mcfppParser.WhileBlockContext) {
         Project.ctx = ctx
         //入栈
-        Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+        Function.addCommand(Commands.stackIn())
         Function.addComment("while start")
         val parent: mcfppParser.WhileStatementContext = ctx.parent as mcfppParser.WhileStatementContext
         val exp = MCFPPExprVisitor().visitExpression(parent.expression())
@@ -616,7 +616,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             is ScoreBoolConcrete -> {
                 if(exp.value){
                     //给子函数开栈
-                    Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+                    Function.addCommand(Commands.stackIn())
                     Function.addCommand("execute " +
                             "if function " + f.namespaceID + " " +
                             "run function " + Function.currFunction.namespaceID)
@@ -627,7 +627,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
             is ExecuteBool -> {
                 //给子函数开栈
-                Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -636,7 +636,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
             is BaseBool -> {
                 //给子函数开栈
-                Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build("if").build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -663,9 +663,9 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Project.ctx = ctx
         //调用完毕，将子函数的栈销毁
         //由于在同一个命令中完成了两个函数的调用，因此需要在子函数内部进行子函数栈的销毁工作
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        Function.addCommand(Commands.stackOut())
         //这里取出while函数的栈
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        Function.addCommand(Commands.stackOut())
         Function.addCommand("return 1")
         Function.currFunction = Function.currFunction.parent[0]
         Function.addComment("while loop end")
@@ -738,23 +738,19 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         }
         GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
         //给子函数开栈
-        Function.currFunction.parent[0].commands.add("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
-        Function.currFunction.parent[0].commands.add(
-            "execute " +
-                    "unless function " + f.namespaceID + " " +
-                    "run return 1"
-        )
-        Function.currFunction.parent[0].commands.add("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
-        Function.currFunction.parent[0].commands.add("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+        Function.currFunction.parent[0].commands.add(Commands.stackIn())
+        Function.currFunction.parent[0].commands.add("execute unless function ${f.namespaceID} run return 1")
+        Function.currFunction.parent[0].commands.add(Commands.stackOut())
+        Function.currFunction.parent[0].commands.add(Commands.stackIn())
         Function.currFunction.parent[0].commands.add("function " + doWhileFunction.namespaceID)
-        Function.currFunction.parent[0].commands.add("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        Function.currFunction.parent[0].commands.add(Commands.stackOut())
         //递归调用
         val parent = ctx.parent as mcfppParser.DoWhileStatementContext
         when(val exp = MCFPPExprVisitor().visitExpression(parent.expression())){
             is ScoreBoolConcrete -> {
                 if(exp.value){
                     //给子函数开栈
-                    Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+                    Function.addCommand(Commands.stackIn())
                     Function.addCommand("execute " +
                             "if function " + f.namespaceID + " " +
                             "run function " + Function.currFunction.namespaceID)
@@ -767,7 +763,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
             is ExecuteBool -> {
                 //给子函数开栈
-                Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -776,7 +772,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
 
             is BaseBool -> {
                 //给子函数开栈
-                Function.addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build("if").build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -797,7 +793,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     fun exitDoWhileBlock(ctx: mcfppParser.DoWhileBlockContext) {
         Project.ctx = ctx
         //调用完毕，将子函数的栈销毁
-        Function.addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        Function.addCommand(Commands.stackOut())
         //返回1
         Function.addCommand("return 1")
         Function.currFunction = Function.currFunction.parent[0]

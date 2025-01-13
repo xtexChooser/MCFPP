@@ -6,7 +6,7 @@ import java.io.File
 /**
  * Use
  * ```powershell
- * kotlinc src/test/kotlin/top/mcfpp/test/util/ResourceIDGenerator.kt -include-runtime -d ResourceIDGenerator.jar;java -jar ResourceIDGenerator.jar
+kotlinc src/test/kotlin/top/mcfpp/test/util/ResourceIDGenerator.kt -include-runtime -d ResourceIDGenerator.jar;java -jar ResourceIDGenerator.jar
  * ```
  */
 fun main(){
@@ -58,18 +58,16 @@ fun ResourceIDWriter(id: String){
     val template: String =
         """package top.mcfpp.core.lang.resource
             
-import top.mcfpp.command.Command
-import top.mcfpp.command.Commands
-import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPResourceType
-import top.mcfpp.type.MCFPPType
+import net.querz.nbt.tag.StringTag
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.Var
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
+import top.mcfpp.mni.resource.${id}ConcreteData
+import top.mcfpp.mni.resource.${id}Data
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
-import java.util.*
-import top.mcfpp.model.function.Function
-import top.mcfpp.mni.resource.${id}Data
-import top.mcfpp.mni.resource.${id}ConcreteData
+import top.mcfpp.type.MCFPPResourceType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.TempPool
 
 open class $id: ResourceID {
@@ -146,21 +144,8 @@ class ${id}Concrete: MCFPPValue<String>, ${id}{
     }
 
     override fun toDynamic(replace: Boolean): Var<*> {
-        val parent = parent
-        if (parentClass() != null) {
-            val cmd = Commands.selectRun(parent!!, "data modify entity @s data.${'$'}{identifier} set value ${'$'}value")
-            Function.addCommands(cmd)
-        } else {
-            val cmd = Command.build("data modify")
-                .build(nbtPath.toCommandPart())
-                .build("set value ${'$'}value")
-            Function.addCommand(cmd)
-        }
-        val re = $id(this)
-        if(replace){
-            Function.currFunction.field.putVar(identifier, re, true)
-        }
-        return re
+        NBTBasedDataConcrete(this, StringTag(value)).toDynamic(replace)
+        return ${id}(this)
     }
 
     override fun toString(): String {

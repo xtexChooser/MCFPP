@@ -8,6 +8,8 @@ import org.antlr.v4.runtime.tree.ParseTree
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import top.mcfpp.annotations.InsertCommand
+import top.mcfpp.command.Commands
+import top.mcfpp.command.CommentLevel
 import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.MCFloat
 import top.mcfpp.core.lang.UnresolvedVar
@@ -160,8 +162,15 @@ object Project {
             //是否生成数据包
             config.noDatapack = jsonObject.getBooleanValue("noDatapack")
 
-            config.noComment = jsonObject.getBooleanValue("noComment")
-
+            //注释等级
+            config.commentLevel = jsonObject.getString("commentLevel")?.let {
+                try {
+                    CommentLevel.valueOf(it.uppercase())
+                }catch (e: Exception){
+                    LogProcessor.error("Unsupported comment level: $it, using default value \"DEBUG\"")
+                    CommentLevel.DEBUG
+                }
+            }?: config.commentLevel
 
         } catch (e: Exception) {
             LogProcessor.error("Error while reading project from file \"$path\"")
@@ -436,8 +445,8 @@ object Project {
                     if (f.parent.size == 0 && f !is Native) {
                         //找到了入口函数
                         hasEntrance = true
-                        f.commands.add(0, "data modify storage mcfpp:system ${config.rootNamespace}.stack_frame prepend value {}")
-                        f.commands.add("data remove storage mcfpp:system ${config.rootNamespace}.stack_frame[0]")
+                        f.commands.add(0, Commands.stackIn())
+                        f.commands.add(Commands.stackOut())
                         logger.debug("Find entrance function: {} {}", f.tags, f.identifier)
                     }
                 }

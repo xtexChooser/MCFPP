@@ -2,9 +2,10 @@ package top.mcfpp.lib
 
 import net.querz.nbt.io.SNBTUtil
 import net.querz.nbt.tag.StringTag
-import top.mcfpp.Project
 import top.mcfpp.command.Command
-import top.mcfpp.core.lang.*
+import top.mcfpp.core.lang.MCInt
+import top.mcfpp.core.lang.MCIntConcrete
+import top.mcfpp.core.lang.Var
 import top.mcfpp.core.lang.nbt.MCString
 import top.mcfpp.core.lang.nbt.MCStringConcrete
 import top.mcfpp.core.lang.nbt.NBTBasedData
@@ -20,6 +21,12 @@ class NBTPath(var source: NBTSource): Serializable {
     fun intIndex(index: MCInt): NBTPath{
         return this.clone().apply {
             pathList.add(IntPath(index))
+        }
+    }
+
+    fun intIndex(index: Int): NBTPath{
+        return this.clone().apply {
+            pathList.add(IntPath(MCIntConcrete(index)))
         }
     }
 
@@ -153,8 +160,6 @@ class NBTPath(var source: NBTSource): Serializable {
 
     companion object{
 
-        val FRAME = NBTPath(StorageSource("mcfpp:system")).memberIndex(Project.config.rootNamespace + ".stack_frame[0]")
-
         val macroTemp = NBTPath(StorageSource("mcfpp:system")).memberIndex("macro_temp")
 
         val temp = NBTPath(StorageSource("mcfpp:system")).memberIndex("temp")
@@ -210,10 +215,12 @@ class NBTPath(var source: NBTSource): Serializable {
         //storage mcfpp:system test.stack_frame[0].qwq
         fun getNormalStackPath(v: Var<*>): NBTPath{
             return NBTPath(StorageSource("mcfpp:system"))
-                .memberIndex(Project.config.rootNamespace)
                 .memberIndex("stack_frame[${v.stackIndex}]")
                 .memberIndex(v.identifier)
         }
+
+        fun getNormalStackPath(stackIndex: Int = 0)
+                = NBTPath(StorageSource("mcfpp:system")).memberIndex("stack_frame[$stackIndex]")
     }
 
 }

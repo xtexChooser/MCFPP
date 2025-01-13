@@ -571,7 +571,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         //变量进栈
         fieldStore()
         //给函数开栈
-        addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
+        addCommand(Commands.stackIn())
         //参数传递
         argPass(normalArgs)
         //函数调用的命令
@@ -585,7 +585,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             }
         }
         //调用完毕，将子函数的栈销毁
-        addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        addCommand(Commands.stackOut())
         //取出栈内的值
         fieldRestore()
     }
@@ -602,7 +602,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         //基本类型
         addComment("[Function ${this.namespaceID}] Function Pushing and argument passing")
         //给函数开栈
-        addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
+        addCommand(Commands.stackIn())
         //传入this参数
         field.putVar("this", caller, true)
         //参数传递
@@ -617,7 +617,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             }
         }
         //调用完毕，将子函数的栈销毁
-        addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        addCommand(Commands.stackOut())
         //取出栈内的值
         fieldRestore()
     }
@@ -634,7 +634,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         //变量进栈
         fieldStore()
         //给函数开栈
-        addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
+        addCommand(Commands.stackIn())
         //参数传递
         argPass(normalArgs)
         callerClassP.stackIndex ++
@@ -654,7 +654,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         }
         callerClassP.stackIndex --
         //调用完毕，将子函数的栈销毁
-        addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        addCommand(Commands.stackOut())
         //取出栈内的值
         fieldRestore()
     }
@@ -669,7 +669,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         //变量进栈
         fieldStore()
         //给函数开栈
-        addCommand("data modify storage mcfpp:system ${Project.config.rootNamespace}.stack_frame prepend value {}")
+        addCommand(Commands.stackIn())
         //参数传递
         argPass(normalArgs)
         //函数调用的命令
@@ -683,7 +683,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             }
         }
         //调用完毕，将子函数的栈销毁
-        addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+        addCommand(Commands.stackOut())
         //取出栈内的值
         fieldRestore()
     }
@@ -1011,8 +1011,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
          *
          * @param str
          */
-        fun addComment(str: String, type: CommentType = CommentType.INFO){
-            if(Project.config.noComment) return
+        fun addComment(str: String, type: CommentLevel = CommentLevel.INFO){
+            if(type < Project.config.commentLevel) return
             if(this.equals(nullFunction)){
                 LogProcessor.warn("Unexpected command added to NullFunction")
                 throw NullPointerException()

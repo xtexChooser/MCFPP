@@ -3,9 +3,7 @@ package top.mcfpp.core.lang.nbt
 import net.querz.nbt.tag.IntTag
 import net.querz.nbt.tag.ListTag
 import net.querz.nbt.tag.Tag
-import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
-import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.*
 import top.mcfpp.exception.VariableConverseException
@@ -16,7 +14,6 @@ import top.mcfpp.mni.NBTListData
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.Member
 import top.mcfpp.model.accessor.Property
-import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NativeFunction
 import top.mcfpp.model.function.UnknownFunction
@@ -262,7 +259,7 @@ class NBTListConcrete: NBTList, MCFPPValue<ArrayList<Var<*>>> {
     override fun toDynamic(replace: Boolean): Var<*> {
         val parent = parent
         if(value.isEmpty()) return NBTList(this)
-        val cmds = Commands.tempFunction(Function.currFunction){
+        val commands = Commands.tempFunction(Function.currFunction){
             Commands.dataSetValue(nbtPath, ListTag(IntTag::class.java))
             val first = value.first().type.nbtType
             val list = ListTag.createUnchecked(first) as ListTag<Tag<*>>
@@ -272,23 +269,14 @@ class NBTListConcrete: NBTList, MCFPPValue<ArrayList<Var<*>>> {
                 }else{
                     if(list.size() != 0){
                         Function.addCommand(Commands.dataSetValue(NBTPath.temp, list))
-                        Function.addCommand(Command("data modify").build(nbtPath.toCommandPart()).build("append from").build(NBTPath.temp.clone().iteratorIndex().toCommandPart()))
                         list.clear()
                     }
-                    Function.addCommand(Command("data modify").build(nbtPath.toCommandPart()).build("append from").build(v.nbtPath.toCommandPart()))
+                    Function.addCommand(Commands.dataSetFrom(NBTPath.temp, v.nbtPath))
                 }
             }
+            Function.addCommand(Commands.dataAppendFrom(nbtPath, NBTPath.temp.clone().iteratorIndex()))
         }
-        if (parent != null) {
-            val cmd = Commands.selectRun(parent)
-            if(cmd.size == 2){
-                Function.addCommand(cmd[0])
-            }
-            Function.addCommand(cmd.last().build(cmds.first))
-            GlobalField.localNamespaces[Project.currNamespace]!!.field.addFunction(cmds.second, false)
-        } else {
-            Function.addCommands(cmds.second.commands.toTypedArray())
-        }
+        Function.addCommands(Commands.method2(this, commands.first))
         val re = NBTList(this)
         if(replace){
             if(parentTemplate() != null) {

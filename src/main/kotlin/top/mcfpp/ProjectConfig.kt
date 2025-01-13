@@ -1,6 +1,6 @@
 package top.mcfpp
 
-import top.mcfpp.command.CommentType
+import top.mcfpp.command.CommentLevel
 import java.nio.file.Path
 import kotlin.io.path.Path
 
@@ -34,7 +34,7 @@ open class ProjectConfig(
     /**
      * 注释输出等级
      */
-    var commentLevel : CommentType = CommentType.DEBUG,
+    var commentLevel : CommentLevel = CommentLevel.DEBUG,
 
     /**
      * 工程的根目录
@@ -70,9 +70,4 @@ open class ProjectConfig(
      * 不生成数据包
      */
     var noDatapack: Boolean = false,
-
-    /**
-     * 不生成注释
-     */
-    var noComment: Boolean = false
 )

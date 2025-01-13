@@ -1,12 +1,11 @@
 package top.mcfpp.command
 
-class Comment : Command {
+class Comment(comment: String, commentLevel: CommentLevel = CommentLevel.INFO) : Command(comment) {
 
-    val type : CommentType
+    val level: CommentLevel = commentLevel
 
-    constructor(comment: String, commentType: CommentType = CommentType.INFO):super(comment){
+    init {
         isCompleted = true
-        this.type = commentType
     }
 
     override fun analyze(): String {
@@ -19,6 +18,6 @@ class Comment : Command {
 
 }
 
-enum class CommentType{
+enum class CommentLevel{
     DEBUG, INFO, WARN, ERROR
 }

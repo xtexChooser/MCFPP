@@ -4,13 +4,12 @@ package top.mcfpp.util
 
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.TokenSource
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import top.mcfpp.CompileSettings
 import top.mcfpp.Project
-import top.mcfpp.command.CommentType
+import top.mcfpp.command.CommentLevel
 import top.mcfpp.io.MCFPPFile
 import top.mcfpp.model.function.Function
 import kotlin.math.min
@@ -54,7 +53,7 @@ object LogProcessor {
                         MCFPPFile.currFile!!.absolutePath + ":" + Project.ctx!!.getStart().line + ">>" + msg
                         + Project.ctx?.let { "\n" + getLineInfo(it) }
             )
-            Function.addComment(msg, CommentType.WARN)
+            Function.addComment(msg, CommentLevel.WARN)
         }else{
             logger.warn(msg)
         }
@@ -74,7 +73,7 @@ object LogProcessor {
 
     inline fun warn(msg: String, e: Exception){
         logger.warn(msg, e)
-        Function.addComment(msg, CommentType.WARN)
+        Function.addComment(msg, CommentLevel.WARN)
         Project.warningCount++
         if(CompileSettings.isDebug){
             val stackTrace = Thread.currentThread().stackTrace
@@ -96,7 +95,7 @@ object LogProcessor {
                         MCFPPFile.currFile!!.absolutePath + ":" + Project.ctx!!.getStart().line + ">>" + msg
                         + Project.ctx?.let { "\n" + getLineInfo(it) }
             )
-            Function.addComment(msg, CommentType.ERROR)
+            Function.addComment(msg, CommentLevel.ERROR)
         }else{
             logger.warn(msg)
         }
@@ -116,7 +115,7 @@ object LogProcessor {
 
     inline fun error(msg: String, e: Exception){
         logger.error(msg, e)
-        Function.addComment(msg, CommentType.ERROR)
+        Function.addComment(msg, CommentLevel.ERROR)
         Project.errorCount++
         if(CompileSettings.isDebug){
             val stackTrace = Thread.currentThread().stackTrace

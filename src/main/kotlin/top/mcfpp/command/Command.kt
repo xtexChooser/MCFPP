@@ -1,16 +1,14 @@
 package top.mcfpp.command
 
 import top.mcfpp.Project
-import top.mcfpp.core.lang.MCInt
+import top.mcfpp.command.Command.CommandPart
+import top.mcfpp.command.Command.MacroPart
 import top.mcfpp.core.lang.Var
 import top.mcfpp.exception.CommandException
 import top.mcfpp.lib.MemberPath
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.function.Function
-import java.lang.StringBuilder
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * 一条命令。在MCFPP编译过程中，一条命令可能会被分为多个命令片段，由接口`ICommandPart`实现。一个`Command`对象可以包含多个`CommandPart`对象。命令中的片段可以被字符串标签标记，从而能够对命令的某些片段进行替换操作。
@@ -92,6 +90,9 @@ open class Command {
      * @return
      */
     open fun analyze(): String{
+        if(isMacro){
+            throw CommandException("Try to analyze a macro command")
+        }
         val sb = StringBuilder()
         for (c in commandParts){
             sb.append(c)

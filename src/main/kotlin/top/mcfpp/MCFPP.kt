@@ -67,16 +67,24 @@ fun compile(config: ProjectConfig){
 }
 
 object MCFPP {
-    const val version = "0.1.0"
+    const val VERSION = "0.1.0"
 }
 
 fun parseArgs(args: List<String>){
 
-    for (arg in args){
-        when(arg){
-            "-debug" -> CompileSettings.isDebug = true
-            "-ignoreStdLib" -> CompileSettings.ignoreStdLib = true
-            "-isLib" -> CompileSettings.isLib = true
+    for (arg in args) {
+        when (arg) {
+            "-debug"
+            -> CompileSettings.isDebug = true
+
+            "-ignoreStdLib"
+            -> CompileSettings.ignoreStdLib = true
+
+            "-isLib"
+            -> CompileSettings.isLib = true
+
+            if (arg.startsWith("-maxWhileInline=")) arg else "$$arg"
+            -> CompileSettings.maxWhileInline = arg.split("=")[1].toInt()
         }
     }
 

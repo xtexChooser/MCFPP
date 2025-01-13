@@ -198,6 +198,36 @@ object Commands {
             .build(b.toCommandPart())
     }
 
+    fun dataAppendFrom(a: NBTPath, b: NBTPath): Command{
+        return Command.build("data modify")
+           .build(a.toCommandPart())
+           .build("append from")
+           .build(b.toCommandPart())
+    }
+
+    /**
+     * 输入一个变量，判断这个变量是否是类的成员从而选择正确的nbt路径
+     */
+    private fun method1(v: Var<*>, command: Command): Array<Command>{
+        return if(v.parentClass() != null){
+            selectRun(v.parent!!, command)
+        }else{
+            arrayOf(command)
+        }
+    }
+
+    /**
+     * 输入一个变量，判断这个变量是否是类的成员从而选择正确的nbt路径。同时构建输入命令的宏函数（若为宏命令）并把调用宏函数的
+     * 命令作为selectRun的输入命令
+     */
+    fun method2(v: Var<*>, command: Command): Array<Command>{
+        val cs = command.buildMacroFunction()
+        val last = cs.last()
+        val qwq = method1(v, last)
+        return cs.dropLast(1).toTypedArray() + qwq
+    }
+
+
     /**
      * 以一个类的对象为执行者，执行一个命令。
      *
@@ -236,12 +266,12 @@ object Commands {
                 }
                 val qwq = if(a.clazz.baseEntity != Class.ENTITY_MARKER && a.clazz.baseEntity != Class.ENTITY_ITEM_DISPLAY){
                     arrayOf(
-                        Command.build("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
+                        Command.build("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system stack_frame[${a.stackIndex}].${a.identifier}"),
                         Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin on passengers as entity @n[tag=${a.tag}_data]")
                     )
                 }else{
                     arrayOf(
-                        Command.build("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system ${Project.config.rootNamespace}.stack_frame[${a.stackIndex}].${a.identifier}"),
+                        Command.build("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system stack_frame[${a.stackIndex}].${a.identifier}"),
                         Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin")
                     )
                 }
@@ -353,5 +383,21 @@ object Commands {
         }else{
             arrayOf(c)
         }
+    }
+
+    fun stackIn(): Command{
+        return Command("data modify storage mcfpp:system stack_frame prepend value {}")
+    }
+
+    fun stackOut(): Command {
+        return Command("data remove storage mcfpp:system stack_frame[0]")
+    }
+
+    fun Array<Command>.buildMacroFunction(): Array<Command>{
+        val re = ArrayList<Command>()
+        for (c in this){
+            re.addAll(c.buildMacroFunction())
+        }
+        return re.toTypedArray()
     }
 }

@@ -3,7 +3,6 @@ package top.mcfpp.mni;
 import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.Tag;
 import org.jetbrains.annotations.NotNull;
-import top.mcfpp.Project;
 import top.mcfpp.annotations.MNIFunction;
 import top.mcfpp.command.Command;
 import top.mcfpp.command.Commands;
@@ -22,7 +21,6 @@ import top.mcfpp.util.NBTUtil;
 import top.mcfpp.util.ValueWrapper;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class NBTListData {
 
@@ -40,53 +38,29 @@ public class NBTListData {
 
 
     @MNIFunction(normalParams = {"E e"}, caller = "list", genericType = "E")
-    public static void add(Var<?> e, NBTList caller){
+    public static void add(Var<?> e, NBTList caller) throws IOException {
         if(e instanceof MCFPPValue<?>){
             //e是确定的
             Tag<?> tag = NBTUtil.INSTANCE.varToNBT(e);
-            String command;
-            try{
-                if(caller.parentClass() != null){
-                    command = "data modify " +
-                            "entity @s " +
-                            "data." + caller.getIdentifier() + " " +
-                            "append value " + SNBTUtil.toSNBT(tag);
-                }else {
-                    command = "data modify " +
-                            "storage mcfpp:system " +
-                            Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + " " +
-                            "append value " + SNBTUtil.toSNBT(tag);
-                }
-            }catch (Exception ex){
-                throw new RuntimeException(ex);
-            }
-            Function.Companion.addCommand(command);
+            var command = Commands.INSTANCE.method2(caller, new Command("data modify")
+                    .build(caller.nbtPath.toCommandPart(), true)
+                    .build("append value " + SNBTUtil.toSNBT(tag), true)
+            );
+            Function.Companion.addCommands(command);
         }else {
             //e不是确定的
-            String command;
             if (e.parentClass() != null) e = e.getTempVar();
-            if (caller.parentClass() != null) {
-                command = "data modify " +
-                        "entity @s " +
-                        "data." + caller.getIdentifier() + " " +
-                        "append from " +
-                        "storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + e.getIdentifier() + " ";
-            } else {
-                command = "data modify " +
-                        "storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + " " +
-                        "append from " +
-                        "storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + e.getIdentifier() + " ";
-            }
-            Function.Companion.addCommand(command);
+            Var<?> finalE = e;
+            var command = Commands.INSTANCE.method2(caller, new Command("data modify")
+                    .build(caller.nbtPath.toCommandPart(), true)
+                    .build("append from", true)
+                    .build(finalE.getNbtPath().toCommandPart(), true));
+            Function.Companion.addCommands(command);
         }
     }
 
     @MNIFunction(normalParams = {"list<E> list"}, caller = "list", genericType = "E")
     public static void addAll(@NotNull NBTList list, NBTList caller){
-        String command;
         NBTBasedData l;
         if(list.parentClass() != null) {
             l = list.getTempVar();
@@ -96,114 +70,52 @@ public class NBTListData {
         }else{
             l = list;
         }
-        if(caller.parentClass() != null){
-            command = "data modify " +
-                    "entity @s " +
-                    "data." + caller.getIdentifier() + " " +
-                    "append from " +
-                    "storage mcfpp:system " +
-                    Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + l.getIdentifier() + "[]";
-        }else {
-            command = "data modify " +
-                    "storage mcfpp:system " +
-                    Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + " " +
-                    "append from " +
-                    "storage mcfpp:system " +
-                    Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + l.getIdentifier() + "[]";
-        }
-        Function.Companion.addCommand(command);
+        var command = Commands.INSTANCE.method2(caller, new Command("data modify")
+                .build(caller.nbtPath.toCommandPart(), true)
+                .build("append from", true)
+                .build(l.nbtPath.iteratorIndex().toCommandPart(), true));
+        Function.Companion.addCommands(command);
     }
 
     @MNIFunction(normalParams = {"int index", "E e"}, caller = "list", genericType = "E")
-    public static void insert(MCInt index, Var<?> e, NBTList caller){
-        if(e instanceof MCFPPValue<?> && (MCInt)index instanceof MCIntConcrete indexC){
+    public static void insert(MCInt index, Var<?> e, NBTList caller) throws IOException {
+        if(e instanceof MCFPPValue<?> && index instanceof MCIntConcrete indexC){
             //都是确定的
             Tag<?> tag = NBTUtil.INSTANCE.varToNBT(e);
             int i = indexC.getValue();
-            String command;
-            try {
-                if (caller.parentClass() != null) {
-                    command = "data modify " +
-                            "entity @s " +
-                            "data." + caller.getIdentifier() + " " +
-                            "insert " + i + " value " + SNBTUtil.toSNBT(tag);
-                } else {
-                    command = "data modify " +
-                            "storage mcfpp:system " +
-                            Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + " " +
-                            "insert " + i + " value " + SNBTUtil.toSNBT(tag);
-                }
-            }catch (IOException ex){
-                throw new RuntimeException(ex);
-            }
-            Function.Companion.addCommand(command);
-        }else if((MCInt)index instanceof MCIntConcrete indexC){
+            var command = Commands.INSTANCE.method2(caller, new Command("data modify")
+                    .build(caller.nbtPath.toCommandPart(), true)
+                    .build("insert " + i + " value " + SNBTUtil.toSNBT(tag), true));
+            Function.Companion.addCommands(command);
+        } else if(index instanceof MCIntConcrete indexC){
             //e不是确定的，index是确定的，所以可以直接调用命令而不需要宏
             int i = indexC.getValue();
-            Command[] command;
             if(e.parentClass() != null) e = e.getTempVar();
-            if(caller.parentClass() != null){
-                command = Commands.INSTANCE.selectRun(Objects.requireNonNull(caller.getParent()),"data modify " +
-                        "entity @s " +
-                        "data." + caller.getIdentifier() + " " +
-                        "insert " + i + " from " +
-                        "storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + e.getIdentifier(), true);
-            }else {
-                command = new Command[]{new Command("data modify " +
-                        "storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + " " +
-                        "insert " + i + " from " +
-                        "storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + e.getIdentifier())};
-            }
+            Var<?> finalE = e;
+            var command = Commands.INSTANCE.method2(caller, new Command("data modify")
+                   .build(caller.nbtPath.toCommandPart(), true)
+                   .build("insert " + i + " from", true)
+                   .build(finalE.getNbtPath().toCommandPart(), true));
             Function.Companion.addCommands(command);
         }else if(e instanceof MCFPPValue<?>){
             //e是确定的，index不是确定的，需要使用宏
             Tag<?> tag = NBTUtil.INSTANCE.varToNBT(e);
-            try {
-                if(caller.getParent() != null){
-                    var command = Commands.INSTANCE.selectRun(caller.getParent(), new Command("data modify " +
-                            "entity @s " +
-                            "data." + caller.getIdentifier() + " " +
-                            "insert ").buildMacro(index, true).build ("value " + SNBTUtil.toSNBT(tag), true), true);
-                    Function.Companion.addCommand(command[0]);
-                    var f = command[1].buildMacroFunction();
-                    Function.Companion.addCommands(f);
-                } else {
-                    var command = new Command("data modify " +
-                            "storage mcfpp:system " +
-                            Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + " " +
-                            "insert ").buildMacro(index, true).build("value " + SNBTUtil.toSNBT(tag), true);
-                    var f = command.buildMacroFunction();
-                    Function.Companion.addCommands(f);
-                }
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            var command = Commands.INSTANCE.method2(caller,  new Command("data modify")
+                    .build(caller.nbtPath.toCommandPart(), true)
+                    .build("insert", true)
+                    .buildMacro(index, true)
+                    .build("value " + SNBTUtil.toSNBT(tag), true));
+            Function.Companion.addCommands(command);
         } else{
             //e是不确定的，index也不是确定的
             if(e.parentClass() != null) e = e.getTempVar();
-            if(caller.getParent() != null){
-                var command = Commands.INSTANCE.selectRun(caller.getParent(), new Command("data modify " +
-                        "entity @s " +
-                        "data." + caller.getIdentifier() + " " +
-                        "insert ").buildMacro(index, true)
-                        .build (" from storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + e.getIdentifier(), true), true);
-                Function.Companion.addCommand(command[0]);
-                var f = command[1].buildMacroFunction();
-                Function.Companion.addCommands(f);
-            } else {
-                var command = new Command("data modify " +
-                        "storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + " " +
-                        "insert ").buildMacro(index, true)
-                        .build("from storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + e.getIdentifier(), true);
-                var f = command.buildMacroFunction();
-                Function.Companion.addCommands(f);
-            }
+            var command = Commands.INSTANCE.method2(caller, new Command("data modify")
+                    .build(caller.nbtPath.toCommandPart(), true)
+                    .build("insert", true)
+                    .buildMacro(index, true)
+                    .build("from", true)
+                    .build(e.nbtPath.toCommandPart(), true));
+            Function.Companion.addCommands(command);
         }
     }
 
@@ -215,35 +127,10 @@ public class NBTListData {
 
     @MNIFunction(normalParams = {"int index"}, caller = "list", genericType = "E")
     public static void removeAt(MCInt index, NBTList caller){
-        if(index instanceof MCIntConcrete){
-            int i = ((MCIntConcrete) index).getValue();
-            if(caller.getParent() != null){
-                var command = Commands.INSTANCE.selectRun(caller.getParent(), new Command(
-                        "data remove entity @s " +
-                        "data." + caller.getIdentifier() + "[" + i + "]"), true);
-                Function.Companion.addCommands(command);
-            }else {
-                var command = new Command(
-                        "data remove storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + "[" + i + "]");
-                Function.Companion.addCommand(command);
-            }
-        }else {
-            if(caller.getParent() != null){
-                var command = Commands.INSTANCE.selectRun(caller.getParent(), new Command(
-                        "data remove entity @s " +
-                        "data." + caller.getIdentifier() + "[").buildMacro(index, true).build("]", true), true);
-                Function.Companion.addCommand(command[0]);
-                var f = command[1].buildMacroFunction();
-                Function.Companion.addCommands(f);
-            }else {
-                var command = new Command(
-                        "data remove storage mcfpp:system " +
-                        Project.INSTANCE.getCurrNamespace() + ".stack_frame[" + caller.getStackIndex() + "]." + caller.getIdentifier() + "[").buildMacro(index, true).build("]", true);
-                var f = command.buildMacroFunction();
-                Function.Companion.addCommands(f);
-            }
-        }
+        var command = Commands.INSTANCE.method2(caller, new Command("data remove")
+                .build(caller.nbtPath.intIndex(index).toCommandPart(), true)
+        );
+        Function.Companion.addCommands(command);
     }
 
     @MNIFunction(normalParams = {"E e"}, caller = "list", genericType = "E", returnType = "int")

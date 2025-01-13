@@ -1,10 +1,7 @@
 package top.mcfpp.core.lang.nbt
 
-import net.querz.nbt.io.SNBTUtil
 import net.querz.nbt.tag.DoubleTag
-import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
-import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.MCAnyConcrete
 import top.mcfpp.core.lang.MCFPPValue
@@ -136,21 +133,8 @@ class MCDoubleConcrete: MCDouble, MCFPPValue<DoubleTag> {
     }
 
     override fun toDynamic(replace: Boolean): Var<*> {
-        val parent = parent
-        if (parentClass() != null) {
-            val cmd = Commands.selectRun(parent!!, "data modify entity @s data.${identifier} set value ${SNBTUtil.toSNBT(value)}")
-            Function.addCommands(cmd)
-        } else {
-            val cmd = Command.build(
-                "data modify storage mcfpp:system ${Project.currNamespace}.stack_frame[$stackIndex].$identifier set value ${SNBTUtil.toSNBT(value)}"
-            )
-            Function.addCommand(cmd)
-        }
-        val re = MCDouble(this)
-        if(replace){
-            Function.currFunction.field.putVar(identifier, re, true)
-        }
-        return re
+        NBTBasedDataConcrete(this, value).toDynamic(replace)
+        return MCDouble(this)
     }
 
     @Override

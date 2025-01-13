@@ -112,15 +112,7 @@ class NBTDictionaryConcrete : NBTDictionary, MCFPPValue<HashMap<String, Var<*>>>
     override fun toDynamic(replace: Boolean): Var<*> {
         val parent = parent
         if(value.isEmpty()) return NBTDictionary(this)
-        if (parent != null) {
-            val cmd = Commands.selectRun(parent)
-            if(cmd.size == 2){
-                Function.addCommand(cmd[0])
-            }
-            Function.addCommand(cmd.last().build(Commands.dataMergeValue(nbtPath, getConcretePart())))
-        } else {
-            Function.addCommand(Commands.dataMergeValue(nbtPath, getConcretePart()))
-        }
+        Function.addCommands(Commands.method2(this, Commands.dataMergeValue(nbtPath, getConcretePart())))
         val re = NBTDictionary(this)
         if(replace){
             if(parentTemplate() != null) {

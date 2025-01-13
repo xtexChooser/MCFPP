@@ -1,17 +1,15 @@
 package top.mcfpp.core.lang.resource
             
-import top.mcfpp.command.Command
-import top.mcfpp.command.Commands
-import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPResourceType
-import top.mcfpp.type.MCFPPType
+import net.querz.nbt.tag.StringTag
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.Var
+import top.mcfpp.core.lang.nbt.NBTBasedDataConcrete
+import top.mcfpp.mni.resource.ItemTagConcreteData
+import top.mcfpp.mni.resource.ItemTagData
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
-import java.util.*
-import top.mcfpp.model.function.Function
-import top.mcfpp.mni.resource.ItemTagData
-import top.mcfpp.mni.resource.ItemTagConcreteData
+import top.mcfpp.type.MCFPPResourceType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.TempPool
 
 open class ItemTag: ResourceID {
@@ -88,21 +86,8 @@ class ItemTagConcrete: MCFPPValue<String>, ItemTag{
     }
 
     override fun toDynamic(replace: Boolean): Var<*> {
-        val parent = parent
-        if (parentClass() != null) {
-            val cmd = Commands.selectRun(parent!!, "data modify entity @s data.${identifier} set value $value")
-            Function.addCommands(cmd)
-        } else {
-            val cmd = Command.build("data modify")
-                .build(nbtPath.toCommandPart())
-                .build("set value $value")
-            Function.addCommand(cmd)
-        }
-        val re = ItemTag(this)
-        if(replace){
-            Function.currFunction.field.putVar(identifier, re, true)
-        }
-        return re
+        NBTBasedDataConcrete(this, StringTag(value)).toDynamic(replace)
+        return ItemTag(this)
     }
 
     override fun toString(): String {

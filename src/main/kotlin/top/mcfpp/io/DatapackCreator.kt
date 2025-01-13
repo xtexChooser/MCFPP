@@ -121,6 +121,7 @@ object DatapackCreator {
                     return@run
                 }
                 LogProcessor.debug("Writing File: $currPath\\function\\${f.nameWithNamespace}.mcfunction")
+                f.commands.analyzeAll()
                 Files.createDirectories(Paths.get("$currPath/function"))
                 Files.write(
                     Paths.get("$currPath/function/${f.nameWithNamespace}.mcfunction"),
@@ -129,6 +130,7 @@ object DatapackCreator {
                 if(f.compiledFunctions.isNotEmpty()){
                     for (cf in f.compiledFunctions.values){
                         LogProcessor.debug("Writing File: $currPath\\function\\${cf.nameWithNamespace}.mcfunction")
+                        f.commands.analyzeAll()
                         Files.createDirectories(Paths.get("$currPath/function"))
                         Files.write(
                             Paths.get("$currPath/function/${cf.nameWithNamespace}.mcfunction"),
@@ -148,6 +150,7 @@ object DatapackCreator {
                             return@run
                         }
                         LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
+                        f.commands.analyzeAll()
                         //TODO 可能无法正确创建文件夹
                         Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
                         if (f is ExtensionFunction){
@@ -160,6 +163,7 @@ object DatapackCreator {
                         if(f.compiledFunctions.isNotEmpty()){
                             for (cf in f.compiledFunctions.values) {
                                 LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                f.commands.analyzeAll()
                                 //TODO 可能无法正确创建文件夹
                                 Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
                                 Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
@@ -171,6 +175,7 @@ object DatapackCreator {
                 cls.constructors.forEach{ c ->
                     run {
                         LogProcessor.debug("Writing File: $currPath\\function\\"  + c.nameWithNamespace + ".mcfunction")
+                        c.commands.analyzeAll()
                         //TODO 可能无法正确创建文件夹
                         Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
                         Files.write(
@@ -180,6 +185,7 @@ object DatapackCreator {
                         if(c.compiledFunctions.isNotEmpty()){
                             for (cf in c.compiledFunctions.values) {
                                 LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                c.commands.analyzeAll()
                                 //TODO 可能无法正确创建文件夹
                                 Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
                                 Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
@@ -199,6 +205,7 @@ object DatapackCreator {
                             return@run
                         }
                         LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
+                        f.commands.analyzeAll()
                         //TODO 可能无法正确创建文件夹
                         Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
                         if (f is ExtensionFunction){
@@ -211,6 +218,7 @@ object DatapackCreator {
                         if(f.compiledFunctions.isNotEmpty()){
                             for (cf in f.compiledFunctions.values) {
                                 LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                f.commands.analyzeAll()
                                 //TODO 可能无法正确创建文件夹
                                 Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
                                 Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
@@ -229,6 +237,7 @@ object DatapackCreator {
                             return@run
                         }
                         LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
+                        f.commands.analyzeAll()
                         //TODO 可能无法正确创建文件夹
                         Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier) + "\\static"))
                         if (f is ExtensionFunction){
@@ -241,6 +250,7 @@ object DatapackCreator {
                         if(f.compiledFunctions.isNotEmpty()){
                             for (cf in f.compiledFunctions.values) {
                                 LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
+                                f.commands.analyzeAll()
                                 //TODO 可能无法正确创建文件夹
                                 Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier)))
                                 Files.write(Paths.get("$currPath\\function\\" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())

@@ -1,6 +1,5 @@
 package top.mcfpp.model.function
 
-import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.command.Command
@@ -55,16 +54,16 @@ open class ClassConstructor
             //初始化
             if(target.classPreInit.commands.size > 0){
                 //给函数开栈
-                addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+                addCommand(Commands.stackIn())
                 //不应当立即调用它自己的函数，应当先调用init，再调用constructor
                 addCommand(Commands.function(target.classPreInit))
                 //调用完毕，将子函数的栈销毁
-                addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+                addCommand(Commands.stackOut())
             }
             //给函数开栈，调用构造函数
-            addCommand("data modify storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame prepend value {}")
+            addCommand(Commands.stackIn())
             //调用构造函数
-            addCommand("function " + this.namespaceID)
+            addCommand(Commands.function(this))
             //销毁指针，释放堆内存
             for (p in field.allVars){
                 if (p is ClassPointer){
@@ -72,7 +71,7 @@ open class ClassConstructor
                 }
             }
             //调用完毕，将子函数的栈销毁
-            addCommand("data remove storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[0]")
+            addCommand(Commands.stackOut())
         }
     }
 

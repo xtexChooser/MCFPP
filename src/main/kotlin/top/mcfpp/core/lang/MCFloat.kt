@@ -1,16 +1,16 @@
 package top.mcfpp.core.lang
 
-import top.mcfpp.Project
 import top.mcfpp.annotations.InsertCommand
+import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.bool.ScoreBool
 import top.mcfpp.core.lang.bool.ScoreBoolConcrete
 import top.mcfpp.exception.VariableConverseException
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.lib.SbObject
 import top.mcfpp.model.*
 import top.mcfpp.model.function.Function
+import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
@@ -156,18 +156,18 @@ open class MCFloat : MCNumber<Float> {
                 Function.addCommand("scoreboard players operation ${int1.name} ${int1.sbObject} = ${pwp.int1.name} ${pwp.int1.sbObject}")
                 Function.addCommand("scoreboard players operation ${exp.name} ${exp.sbObject} = ${pwp.exp.name} ${pwp.exp.sbObject}")
             }else{
-                Function.addCommand("execute " +
-                        "store result storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[" + stackIndex + "]." + identifier + ".sign" + " int 1 " +
-                        "run scoreboard players operation ${sign.name} ${sign.sbObject} = ${pwp.sign.name} ${pwp.sign.sbObject}")
-                Function.addCommand("execute " +
-                        "store result storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[" + stackIndex + "]." + identifier + ".int0" + " int 1 " +
-                        "run scoreboard players operation ${int0.name} ${int0.sbObject} = ${pwp.int0.name} ${pwp.int0.sbObject}")
-                Function.addCommand("execute " +
-                        "store result storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[" + stackIndex + "]." + identifier + ".int1" + " int 1 " +
-                        "run scoreboard players operation ${int1.name} ${int1.sbObject} = ${pwp.int1.name} ${pwp.int1.sbObject}")
-                Function.addCommand("execute " +
-                        "store result storage mcfpp:system " + Project.config.rootNamespace + ".stack_frame[" + stackIndex + "]." + identifier + ".exp" + " int 1 " +
-                        "run scoreboard players operation ${exp.name} ${exp.sbObject} = ${pwp.exp.name} ${pwp.exp.sbObject}")
+                Function.addCommands(Commands.method2(this, Command("execute store result")
+                    .build(nbtPath.memberIndex("sign").toCommandPart()).build("int 1")
+                    .build(Commands.sbPlayerOperation(sign, "=", pwp.sign))))
+                Function.addCommands(Commands.method2(this, Command("execute store result")
+                    .build(nbtPath.memberIndex("int0").toCommandPart()).build("int 1")
+                    .build(Commands.sbPlayerOperation(int0, "=", pwp.int0))))
+                Function.addCommands(Commands.method2(this, Command("execute store result")
+                    .build(nbtPath.memberIndex("int1").toCommandPart()).build("int 1")
+                    .build(Commands.sbPlayerOperation(int1, "=", pwp.int1))))
+                Function.addCommands(Commands.method2(this, Command("execute store result")
+                    .build(nbtPath.memberIndex("exp").toCommandPart()).build("int 1")
+                    .build(Commands.sbPlayerOperation(exp, "=", pwp.exp))))
             }
             return this
         }
