@@ -164,6 +164,8 @@ class NBTPath(var source: NBTSource): Serializable {
 
         val temp = NBTPath(StorageSource("mcfpp:system")).memberIndex("temp")
 
+        val stack = NBTPath(StorageSource("mcfpp:system")).memberIndex("stack_frame")
+
         val STORAGE = "storage"
         val ENTITY = "entity"
         val BLOCK = "block"
@@ -218,9 +220,6 @@ class NBTPath(var source: NBTSource): Serializable {
                 .memberIndex("stack_frame[${v.stackIndex}]")
                 .memberIndex(v.identifier)
         }
-
-        fun getNormalStackPath(stackIndex: Int = 0)
-                = NBTPath(StorageSource("mcfpp:system")).memberIndex("stack_frame[$stackIndex]")
     }
 
 }

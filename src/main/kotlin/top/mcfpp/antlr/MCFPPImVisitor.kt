@@ -73,6 +73,8 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         if(Function.currFunction !is Generic<*> && Function.currFunction.returnType !=  MCFPPBaseType.Void && !Function.currFunction.hasReturnStatement){
             LogProcessor.error("Function should return a value: " + Function.currFunction.namespaceID)
         }
+        //释放指针
+        Function.currFunction.disposeClassPtr()
         Function.currFunction = Function.nullFunction
         if (Class.currClass == null) {
             //不在类中
@@ -305,6 +307,8 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         if (Function.currFunction.returnType != MCFPPBaseType.Void && !Function.currFunction.hasReturnStatement) {
             LogProcessor.error("A 'return' expression required in function: " + Function.currFunction.namespaceID)
         }
+        //释放指针
+        Function.currFunction.disposeClassPtr()
         Function.currFunction = Function.nullFunction
     }
 
@@ -565,8 +569,10 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         //进入if函数
         Project.ctx = ctx
         Function.addComment("while start")
+        //外while函数。这个函数中包含了while循环的逻辑
         val whileFunction = InternalFunction("_while_", Function.currFunction)
-        Function.addCommand("function " + whileFunction.namespaceID)
+        Function.addCommand(Commands.stackIn())
+        Function.addCommand(Commands.function(whileFunction))
         Function.addCommand(Commands.stackOut())
         Function.currFunction = whileFunction
         if(!GlobalField.localNamespaces.containsKey(whileFunction.namespace))
@@ -603,20 +609,18 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Function.addCommand(Commands.stackIn())
         Function.addComment("while start")
         val parent: mcfppParser.WhileStatementContext = ctx.parent as mcfppParser.WhileStatementContext
-        val exp = MCFPPExprVisitor().visitExpression(parent.expression())
-        //匿名函数的定义
+        //while语句块编译的目标函数，即内while函数
         val f: Function = InternalFunction("_while_block_", Function.currFunction)
         f.child.add(f)
         f.parent.add(f)
         if(!GlobalField.localNamespaces.containsKey(f.namespace))
             GlobalField.localNamespaces[f.namespace] = Namespace(f.namespace)
         GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
-        //条件判断
-        when(exp){
+        //循环条件判断，此时目标函数是外while函数。条件表达式在外while中计算。
+        when(val exp = MCFPPExprVisitor().visitExpression(parent.expression())){
             is ScoreBoolConcrete -> {
                 if(exp.value){
-                    //给子函数开栈
-                    Function.addCommand(Commands.stackIn())
+                    //内while函数的返回值表示循环是否被阻断，使用execute if判断。若成立，则继续运行外while函数
                     Function.addCommand("execute " +
                             "if function " + f.namespaceID + " " +
                             "run function " + Function.currFunction.namespaceID)
@@ -626,8 +630,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             }
 
             is ExecuteBool -> {
-                //给子函数开栈
-                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -635,8 +637,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             }
 
             is BaseBool -> {
-                //给子函数开栈
-                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build("if").build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -661,17 +661,13 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     @InsertCommand
     fun exitWhileBlock(ctx: mcfppParser.WhileBlockContext) {
         Project.ctx = ctx
-        //调用完毕，将子函数的栈销毁
-        //由于在同一个命令中完成了两个函数的调用，因此需要在子函数内部进行子函数栈的销毁工作
-        Function.addCommand(Commands.stackOut())
-        //这里取出while函数的栈
-        Function.addCommand(Commands.stackOut())
+        Function.currFunction.disposeClassPtr()
         Function.addCommand("return 1")
         Function.currFunction = Function.currFunction.parent[0]
         Function.addComment("while loop end")
         Function.currFunction.field.forEachVar {
-            if(it.trackLost){
-                it.trackLost = false
+            if(!it.trackLost){
+                it.trackLost = true
                 if(it is MCFPPValue<*>) it.toDynamic(true)
             }
         }
@@ -691,6 +687,10 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         Project.ctx = ctx
         Function.addComment("do-while start")
         doWhileFunction = InternalFunction("_dowhile_", Function.currFunction)
+        //这里不能急着调用循环函数，因为循环体必定会执行一次。参见enterDoWhileBlock的代码
+        //Function.addCommand(Commands.stackIn())
+        //Function.addCommand(Commands.function(doWhileFunction))
+        //Function.addCommand(Commands.stackOut())
         Function.currFunction = doWhileFunction
         if(!GlobalField.localNamespaces.containsKey(doWhileFunction.namespace))
             GlobalField.localNamespaces[doWhileFunction.namespace] = Namespace(doWhileFunction.namespace)
@@ -738,19 +738,23 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
         }
         GlobalField.localNamespaces[f.namespace]!!.field.addFunction(f,false)
         //给子函数开栈
-        Function.currFunction.parent[0].commands.add(Commands.stackIn())
-        Function.currFunction.parent[0].commands.add("execute unless function ${f.namespaceID} run return 1")
-        Function.currFunction.parent[0].commands.add(Commands.stackOut())
-        Function.currFunction.parent[0].commands.add(Commands.stackIn())
-        Function.currFunction.parent[0].commands.add("function " + doWhileFunction.namespaceID)
-        Function.currFunction.parent[0].commands.add(Commands.stackOut())
+        Function.currFunction.parent[0].commands.addAll(
+            arrayOf(
+                //必然调用一次循环体内的函数
+                Commands.stackIn(),
+                Commands.function(f),
+                Commands.stackOut(),
+                //然后才开始调用do-while外函数。此时就是先判断再执行，转换为了while语句
+                Commands.stackIn(),
+                Commands.function(doWhileFunction),
+                Commands.stackOut()
+            )
+        )
         //递归调用
         val parent = ctx.parent as mcfppParser.DoWhileStatementContext
         when(val exp = MCFPPExprVisitor().visitExpression(parent.expression())){
             is ScoreBoolConcrete -> {
                 if(exp.value){
-                    //给子函数开栈
-                    Function.addCommand(Commands.stackIn())
                     Function.addCommand("execute " +
                             "if function " + f.namespaceID + " " +
                             "run function " + Function.currFunction.namespaceID)
@@ -762,8 +766,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             }
 
             is ExecuteBool -> {
-                //给子函数开栈
-                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -771,8 +773,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             }
 
             is BaseBool -> {
-                //给子函数开栈
-                Function.addCommand(Commands.stackIn())
                 Function.addCommand(Command("execute")
                     .build("if").build(exp.toCommandPart())
                     .build("if function " + f.namespaceID)
@@ -792,8 +792,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     @InsertCommand
     fun exitDoWhileBlock(ctx: mcfppParser.DoWhileBlockContext) {
         Project.ctx = ctx
-        //调用完毕，将子函数的栈销毁
-        Function.addCommand(Commands.stackOut())
+        Function.currFunction.disposeClassPtr()
         //返回1
         Function.addCommand("return 1")
         Function.currFunction = Function.currFunction.parent[0]

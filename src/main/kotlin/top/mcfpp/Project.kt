@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import top.mcfpp.annotations.InsertCommand
+import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
 import top.mcfpp.command.CommentLevel
 import top.mcfpp.core.lang.ClassPointer
@@ -17,6 +18,7 @@ import top.mcfpp.core.lang.Var
 import top.mcfpp.io.LibReader
 import top.mcfpp.io.LibWriter
 import top.mcfpp.io.MCFPPFile
+import top.mcfpp.lib.SbObject
 import top.mcfpp.model.Native
 import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.field.GlobalField
@@ -71,6 +73,18 @@ object Project {
     lateinit var mcfppLoad : Function
 
     lateinit var mcfppInit : Function
+
+    val mcfppSystemTick: Function = Function("sys.tick","mcfpp", null).apply {
+        commands.addAll(
+            arrayOf(
+                //指针清理
+                Command("execute as @e[type=marker,tag=mcfpp_ptr] if score @s ${SbObject.MCFPP_POINTER_COUNTER} matches ..0 run kill @s"),
+                //内存泄露检查
+                Command("execute if data storage mcfpp:system stack_frame[0] run tellraw @a {\"text\":\"[MCFPP]Stack Leak\"}"),
+                Command("execute if data storage mcfpp:system stack_frame[0] run data modify storage mcfpp:system stack_frame set value []"),
+            )
+        )
+    }
 
     /**
      * 常量池

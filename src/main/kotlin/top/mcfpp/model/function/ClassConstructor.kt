@@ -40,12 +40,12 @@ open class ClassConstructor
             funcs.append("}")
             //对象实体创建
             if(target.baseEntity == Class.ENTITY_MARKER){
-                addCommand("data merge entity @s {Tags:[${target.tag},${target.tag}_data,just],data:{$funcs}}")
+                addCommand("data merge entity @s {Tags:[${target.tag},${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
             }else if(target.baseEntity == Class.ENTITY_ITEM_DISPLAY){
-                addCommand("data modify entity @s item.components.\"minecraft:custom_data\".mcfppData set value {Tags:[${target.tag},${target.tag}_data,just],data:{$funcs}}")
+                addCommand("data modify entity @s item.components.\"minecraft:custom_data\".mcfppData set value {Tags:[${target.tag},${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
             }else{
                 addCommand("tag @s add ${target.tag}")
-                addCommand("execute summon marker run data merge entity @s {Tags:[${target.tag}_data,just],data:{$funcs}}")
+                addCommand("summon marker ~ ~ ~ {Tags:[${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
                 addCommand("ride @n[tag=just, type=marker] mount @s")
                 addCommand("tag @n[tag=just, type=marker] remove just")
             }

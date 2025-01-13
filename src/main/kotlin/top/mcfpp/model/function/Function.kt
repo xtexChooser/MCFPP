@@ -905,6 +905,14 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         currFunction = old
     }
 
+    fun disposeClassPtr(){
+        for (p in field.allVars){
+            if (p is ClassPointer){
+                p.dispose()
+            }
+        }
+    }
+
     companion object {
         /**
          * 用于处理多余的命令的函数
@@ -936,6 +944,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
                 }
                 return ret
             }
+
 
         @Suppress("unused")
         fun replaceCommand(command: String, index: Int){

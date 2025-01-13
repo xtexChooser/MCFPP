@@ -2,10 +2,8 @@ package top.mcfpp.model.field
 
 import org.jetbrains.annotations.Nullable
 import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.FieldContainer
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
+import top.mcfpp.type.MCFPPType
 
 /**
  * 一个函数的域。储存了这个函数中的变量

@@ -459,6 +459,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             } else {
                 constructor.invoke(normalArgs, ptr)
             }
+            ptr.isNull = false
             return ptr
         }
         //可能是模板的构造函数

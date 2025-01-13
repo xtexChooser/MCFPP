@@ -1,15 +1,29 @@
 namespace test;
 
+
 func main(){
-    solveHanoi(3, 1, 3, 2);
+    Test t1 = Test();
+    Test t2 = Test();
+    print(t1.getId());
+    print(t2.getId());
+    print(Test.s_id);
 }
 
-func solveHanoi(int n, int f, int to, int aux) {
-    if(n == 1) {
-        print("Move disk 1 from rod " + f.toText() + " to rod " + to.toText());
-        return;
+class Test{
+
+    int id;
+
+    constructor(){
+        this.id = Test.s_id;
+        Test.s_id = Test.s_id + 1;
     }
-    solveHanoi(n-1, f, aux, to);
-    print("Move disk " + n.toText() + " from rod " + f.toText() + " to rod " + to.toText());
-    solveHanoi(n-1, aux, to, f);
+
+    public func getId() -> int{
+        return this.id;
+    }
+
+}
+
+object class Test{
+    int s_id = 0;
 }

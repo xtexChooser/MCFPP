@@ -74,6 +74,7 @@ open class ClassPointer : Var<ClassPointer>{
     constructor(classPointer: ClassPointer) : super(classPointer) {
         type = classPointer.type
         instanceField = classPointer.instanceField
+        isNull = classPointer.isNull
     }
 
     /**
@@ -140,9 +141,10 @@ open class ClassPointer : Var<ClassPointer>{
     fun dispose(){
         if (!isNull) {
             //原实体中的实例减少一个指针
-            val c = Commands.selectRun(this,Commands.sbPlayerRemove(MCInt("@s").setObj(SbObject.MCFPP_POINTER_COUNTER) as MCInt, 1))
+            val c = Commands.selectRun(this, Commands.sbPlayerRemove(MCInt("@s").setObj(SbObject.MCFPP_POINTER_COUNTER) as MCInt, 1))
             Function.addCommands(c)
         }
+        isNull = true
     }
 
     @Override

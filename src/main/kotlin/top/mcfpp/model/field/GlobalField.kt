@@ -90,10 +90,12 @@ object GlobalField : FieldContainer, IField {
         stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppLoad,true)
         stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppTick,true)
         stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppInit, true)
+        stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppSystemTick, true)
 
-        functionTags["minecraft:tick"]!!.functions.add(Project.mcfppTick)
-        functionTags["minecraft:load"]!!.functions.add(Project.mcfppLoad)
-        functionTags["minecraft:load"]!!.functions.add(Project.mcfppInit)
+        FunctionTag.TICK.functions.add(Project.mcfppTick)
+        FunctionTag.TICK.functions.add(Project.mcfppSystemTick)
+        FunctionTag.LOAD.functions.add(Project.mcfppLoad)
+        FunctionTag.LOAD.functions.add(Project.mcfppInit)
 
         stdNamespaces["mcfpp.lang"]!!.field.addTemplate("DataObject", DataTemplate.baseDataTemplate)
         DataTemplate.baseDataTemplate.getNativeFromClass(DataObjectData::class.java)
