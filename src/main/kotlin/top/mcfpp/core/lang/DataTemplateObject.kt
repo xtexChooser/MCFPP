@@ -20,7 +20,6 @@ import top.mcfpp.util.NBTUtil
 import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 
 /**
@@ -218,12 +217,12 @@ open class DataTemplateObject : Var<DataTemplateObject> {
     override fun getFromStack() {}
 
     override fun getMemberVar(key: String, accessModifier: Member.AccessModifier): Pair<Var<*>?, Boolean> {
-        val v = instanceField.getVar(key)!!.clone(this)
+        val v = instanceField.getVar(key)?.clone(this)
         val property = instanceField.getProperty(key)
         return if(property == null){
             Pair(null, true)
         }else{
-            Pair(PropertyVar(property, v, this), accessModifier >= property.accessModifier)
+            Pair(PropertyVar(property, v!!, this), accessModifier >= property.accessModifier)
         }
     }
 

@@ -126,7 +126,7 @@ class Namespace(val identifier: String): Serializable {
                 }
                 val nf = NativeFunction(method.name, javaMethod = method)
                 //解析MNIMethod注解成员
-                val callerType = MCFPPType.parseFromIdentifier(mniRegister.caller, Function.field)
+                val callerType = MCFPPType.parseFromIdentifier(mniRegister.caller, Function.currField)
                 nf.caller = callerType?: run {
                     LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(mniRegister.caller))
                     MCFPPBaseType.Void

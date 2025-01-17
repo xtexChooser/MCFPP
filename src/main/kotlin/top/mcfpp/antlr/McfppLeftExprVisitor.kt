@@ -57,16 +57,16 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
     override fun visitJvmAccessExpression(ctx: mcfppParser.JvmAccessExpressionContext): Var<*> {
         Project.ctx = ctx
         val re = visit(ctx.primary())
-        if(ctx.Identifier() != null){
-            return re.getJVM(ctx.Identifier().text)
+        return if(ctx.Identifier() != null){
+            re.getJVM(ctx.Identifier().text)
         }else{
-            return re
+            re
         }
     }
 
     override fun visitSelector(ctx: mcfppParser.SelectorContext?): Var<*> {
         //进入visitVar，currSelector作为成员选择的上下文
-        currSelector = visit(ctx!!.`var`())
+        currSelector = visitVar(ctx!!.`var`())
         return currSelector as Var<*>
     }
 
@@ -110,7 +110,7 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
             }else{
                 "this"
             }
-            val re: Var<*>? = Function.field.getVar(s)
+            val re: Var<*>? = Function.currField.getVar(s)
             if (re == null) {
                 LogProcessor.error("$s can only be used in member functions.")
                 return UnknownVar("error_this")
@@ -122,13 +122,13 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
     override fun visitVar(ctx: mcfppParser.VarContext): Var<*> {
         Project.ctx = ctx
         return if (ctx.varWithSuffix() != null) {
-            visit(ctx.varWithSuffix())
+            visitVarWithSuffix(ctx.varWithSuffix())
         } else if (ctx.bucketExpression() != null) {
             // '(' expression ')'
-            visit(ctx.bucketExpression())
+            visitBucketExpression(ctx.bucketExpression())
         } else {
             //函数调用
-            visit(ctx.functionCall())
+            visitFunctionCall(ctx.functionCall())
         }
     }
 

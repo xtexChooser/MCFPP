@@ -1,12 +1,10 @@
 {
-    "files": [
-        "src/main/mcfpp/**"
-    ],
     "sourcePath": "src/main/mcfpp",
-    "description": "",
+    "description": "MCFPP Standard Library",
     "namespace": "mcfpp",
     "targetPath": "src/main/resources/lib",
-    "noDatapack": false,
-    "ignoreStdLib": true,
-    "isLib": true
+    "compileArgs": [
+        "-ignoreStdLib",
+        "-isLib"
+    ]
 }

@@ -56,7 +56,7 @@ abstract class Annotation : Serializable {
     abstract fun forDataTemplate(data: DataTemplate)
 
     companion object {
-        fun newInstance(clazz: java.lang.Class<out Annotation>, args: ArrayList<Any>): Annotation {
+        fun newInstance(clazz: java.lang.Class<out Annotation>, args: ArrayList<Any>): Annotation? {
             //比对参数
             try {
                 val varType = Array(args.size) { i -> args[i]::class.java }
@@ -65,10 +65,10 @@ abstract class Annotation : Serializable {
                 return constructor.newInstance(*args.toArray())
             }catch (e: NoSuchMethodException){
                 LogProcessor.error("Cannot find constructor for annotation ${clazz.name} with param ${args.joinToString(",")}")
-                throw e
+                return null
             }catch (e: Exception){
                 LogProcessor.error("Cannot create instance for annotation ${clazz.name}")
-                throw e
+                return null
             }
         }
     }

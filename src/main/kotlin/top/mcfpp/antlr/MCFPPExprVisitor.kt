@@ -358,7 +358,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             })
         } else {
             //this或者super
-            val re: Var<*>? = Function.field.getVar(ctx.text)
+            val re: Var<*>? = Function.currField.getVar(ctx.text)
             if (re == null) {
                 LogProcessor.error("${ctx.text} can only be used in member functions.")
                 return UnknownVar("error_" + ctx.text)

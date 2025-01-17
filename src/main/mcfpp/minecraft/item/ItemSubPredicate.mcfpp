@@ -1,4 +1,4 @@
-import mcfpp.math;
+import mcfpp.math:*;
 
 data AttributeModifierPredicate {
     AttributeModifiers modifiers;
@@ -16,16 +16,16 @@ data AttributeCountPredicate {
 }
 
 data AttributePredicate {
-    (string | list<string>?) attribute;
+    (string | list<string>)? attribute;
     list<string>? id;
-    (float | DecimalRange?) amount;
+    (float | DecimalRange)? amount;
     AttributeOperation? operation;
     AttributeSlot? slot;
 }
 
 enum AttributeOperation {
     ADD_VALUE = "add_value",
-    ADD_MULTIPLIED_BASE = "add_multiplied_base"
+    ADD_MULTIPLIED_BASE = "add_multiplied_base",
     ADD_MULTIPLIED_TOTAL = "add_multiplied_total"
 }
 
@@ -39,12 +39,6 @@ enum AttributeSlot {
     LEGS = "legs",
     FEET = "feet",
     ARMOR = "armor"
-}
-
-data Test {
-
-    var a : {int b, int c};
-
 }
 
 data BundleContentsPredicate {
@@ -64,7 +58,7 @@ data ItemStackCompoundPredicate {
 data ItemStackPredicate {
     dict<ItemComponent>? components;
     (int | IntRange)? count;
-    (string | list<string>?) items;
+    (string | list<string>)? items;
     dict<nbt>? predicates;
 }
 
@@ -75,7 +69,7 @@ data ItemStackCountPredicate {
 
 data CustomDataPredicate {}
 
-data DamagePredicate: ItemSubPredicate {
+data DamagePredicate {
     (int | IntRange)? damage;
     (int | IntRange)? durability;
 }

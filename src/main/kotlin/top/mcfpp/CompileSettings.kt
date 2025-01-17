@@ -20,4 +20,6 @@ object CompileSettings {
      * 最大循环内联次数
      */
     var maxWhileInline = 32
+
+    var printAll = false
 }

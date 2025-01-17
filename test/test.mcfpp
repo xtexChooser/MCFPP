@@ -2,28 +2,4 @@ namespace test;
 
 
 func main(){
-    Test t1 = Test();
-    Test t2 = Test();
-    print(t1.getId());
-    print(t2.getId());
-    print(Test.s_id);
-}
-
-class Test{
-
-    int id;
-
-    constructor(){
-        this.id = Test.s_id;
-        Test.s_id = Test.s_id + 1;
-    }
-
-    public func getId() -> int{
-        return this.id;
-    }
-
-}
-
-object class Test{
-    int s_id = 0;
 }

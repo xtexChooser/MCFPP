@@ -26,13 +26,7 @@ import top.mcfpp.util.TextTranslator.translate
 /**
  * 所有类型的接口
  */
-open class MCFPPType(
-    /**
-     * 父类型，一个列表
-     */
-    open var parentType: List<MCFPPType> = listOf()
-
-) : CanSelectMember {
+open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelectMember {
 
     open val objectData: CompoundData = CompoundData("unknown", "mcfpp")
 
@@ -214,30 +208,36 @@ open class MCFPPType(
 
     companion object{
 
-        val data = CompoundData("type","mcfpp")
+        val data = CompoundData("Type","mcfpp")
 
         private val typeCache:MutableMap<String, MCFPPType> by lazy { arrayListOf(
             MCFPPBaseType.Void,
-            MCFPPEntityType.Entity,
-            MCFPPConcreteType.Type,
-            MCFPPNBTType.Byte,
-            MCFPPNBTType.Short,
             MCFPPBaseType.Int,
-            MCFPPNBTType.Long,
-            MCFPPNBTType.Double,
             MCFPPBaseType.Float,
             MCFPPBaseType.Bool,
             MCFPPBaseType.String,
+            MCFPPBaseType.Any,
+            MCFPPBaseType.JsonText,
+            MCFPPBaseType.Coordinate2,
+            MCFPPBaseType.Coordinate3,
+
+            MCFPPNBTType.NBT,
+            MCFPPNBTType.Byte,
+            MCFPPNBTType.Short,
+            MCFPPNBTType.Long,
+            MCFPPNBTType.Double,
             MCFPPNBTType.ByteArray,
             MCFPPNBTType.IntArray,
             MCFPPNBTType.LongArray,
-            MCFPPBaseType.Any,
-            MCFPPEntityType.Selector,
+
+            MCFPPConcreteType.Type,
             MCFPPConcreteType.JavaVar,
-            MCFPPBaseType.JsonText,
-            MCFPPNBTType.NBT,
-            MCFPPBaseType.Coordinate2,
-            MCFPPBaseType.Coordinate3,
+
+            MCFPPEntityType.Entity,
+            MCFPPEntityType.Selector,
+
+            MCFPPPrivateType.MCFPPObjectVarType,
+            MCFPPPrivateType.CommandReturn
         ).associateBy { it.typeName }.toMutableMap()}
 
         /**
@@ -272,14 +272,6 @@ open class MCFPPType(
             MCFPPNBTType.NBT
         )
 
-        val privateType: HashMap<String,MCFPPType> = HashMap()
-
-        val baseResourceType: Set<MCFPPResourceType> = setOf()
-
-        val nbtType:Set<MCFPPType> = setOf(
-            MCFPPNBTType.NBT
-        )
-
         ///**
         // * 注册一个类型
         // *
@@ -309,6 +301,7 @@ open class MCFPPType(
                 val qwq = parseFromIdentifier(identifier.substring(0, identifier.length - 1), typeScope)
                 return qwq?.let { MCFPPDeclaredConcreteType(qwq) }
             }
+            //使用泛型
             if(identifier.contains("<")){
                 val charStream: CharStream = CharStreams.fromString(identifier)
                 val tokens = CommonTokenStream(mcfppLexer(charStream))
@@ -386,6 +379,20 @@ open class MCFPPType(
             //list类型
             if(ctx.LIST() != null){
                 return MCFPPListType(parseFromContext(ctx.type(), typeScope)?: run {
+                    LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
+                    MCFPPBaseType.Any
+                })
+            }
+            //dict类型
+            if(ctx.DICT()!= null){
+                return MCFPPDictType(parseFromContext(ctx.type(), typeScope)?: run {
+                    LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
+                    MCFPPBaseType.Any
+                })
+            }
+            //map类型
+            if(ctx.MAP()!= null){
+                return MCFPPMapType(parseFromContext(ctx.type(), typeScope)?: run {
                     LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
                     MCFPPBaseType.Any
                 })

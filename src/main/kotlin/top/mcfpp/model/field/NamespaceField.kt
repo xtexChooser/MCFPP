@@ -2,15 +2,14 @@ package top.mcfpp.model.field
 
 import com.google.common.collect.ArrayListMultimap
 import org.jetbrains.annotations.Nullable
-import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPType
+import top.mcfpp.core.lang.Var
 import top.mcfpp.model.*
+import top.mcfpp.model.Enum
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.model.generic.Generic
 import top.mcfpp.model.generic.GenericClass
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import top.mcfpp.type.MCFPPType
 
 /**
  * 一个域。在编译过程中，编译器读取到的变量，函数等会以键值对的方式储存在其中。键为函数的id或者变量的
@@ -397,5 +396,23 @@ open class NamespaceField(
         }else{
             return hasClass(type)
         }
+    }
+
+    fun getDeclaredType(identifier: String): CompoundData?{
+        return getEnum(identifier) ?: getTemplate(identifier) ?: getInterface(identifier) ?: getClass(identifier)
+    }
+
+    fun addDeclaredType(type: CompoundData): Boolean {
+         return when (type) {
+             is Enum -> addEnum(type.identifier, type)
+
+             is DataTemplate -> addTemplate(type.identifier, type)
+
+             is Interface -> addInterface(type.identifier, type)
+
+             is Class -> addClass(type.identifier, type)
+
+             else -> throw IllegalArgumentException("Unknown type: $type")
+         }
     }
 }

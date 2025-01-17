@@ -9,7 +9,6 @@ import top.mcfpp.antlr.*
 import top.mcfpp.model.Class
 import top.mcfpp.model.field.FileField
 import top.mcfpp.model.field.GlobalField
-import top.mcfpp.model.field.NamespaceField
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.StringHelper
@@ -19,33 +18,37 @@ import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 
-
+/**
+ * 表示一个MCFPP文件
+ */
 class MCFPPFile : File {
 
     val field: FileField = FileField()
 
+    val unsolvedImports = hashMapOf<String, String>()
+
     val inputStream : FileInputStream by lazy { FileInputStream(this) }
 
-    val namespace: String
+    /**
+     * 此文件对应的命名空间，默认为文件的父目录和源代码目录的相对路径
+     */
+    var namespace: String
 
     //TODO 同名文件的顶级函数之间的命名冲突
     val topFunction: Function = Function(StringHelper.toLegalIdentifier(this.name), context = null)
 
-    /**
-     * 此文件引用了的命名空间
-     */
-    val importedNamespace: ArrayList<NamespaceField> = ArrayList()
+    var syntaxError = false
 
     constructor(path: String) : super(path) {
-        val n =
-            Project.config.sourcePath!!.toAbsolutePath().relativize(this.toPath().toAbsolutePath().parent).toString()
-        namespace =
-            Project.config.rootNamespace + "." + StringHelper.toLegalIdentifier(n.replace("\\", ".").replace("/", "."))
+        val n = Project.config.sourcePath!!.toAbsolutePath().relativize(this.toPath().toAbsolutePath().parent).toString()
+        namespace = Project.config.rootNamespace + "." + StringHelper.toLegalIdentifier(
+            n.replace("\\", ".").replace("/", ".")
+        )
     }
 
     constructor(file: File) : this(file.absolutePath)
 
-    constructor(): super("."){
+    internal constructor(): super("."){
         namespace = Project.config.rootNamespace + ".test"
     }
 
@@ -55,6 +58,8 @@ class MCFPPFile : File {
             val charStream: CharStream = CharStreams.fromStream(inputStream)
             val tokens = CommonTokenStream(mcfppLexer(charStream))
             val parser = mcfppParser(tokens)
+            parser.removeErrorListeners()
+            parser.addErrorListener(MCFPPErrorListener())
             Project.trees[this] = parser.compilationUnit()
         }
         return Project.trees[this]!!
@@ -67,25 +72,7 @@ class MCFPPFile : File {
         currFile = this
         Project.currNamespace = namespace
         MCFPPTypeVisitor().visit(tree())
-        for (a in GlobalField.importedLibNamespaces.values){
-            importedNamespace.add(a.field)
-        }
-        //类是否有空继承，以及实例化每个泛型类的类型
-        GlobalField.localNamespaces.forEach { _, u ->
-            u.field.forEachClass { c ->
-                for (p in c.parent){
-                    if(p is Class.Companion.UndefinedClassOrInterface){
-                        val r = p.getDefinedClassOrInterface()
-                        if(r == null){
-                            LogProcessor.error("Undefined class or interface: ${p.namespaceID}")
-                            continue
-                        }
-                        c.unExtends(p)
-                        c.extends(r)
-                    }
-                }
-            }
-        }
+        field.namespaceField = GlobalField.localNamespaces[namespace]!!.field
         Project.currNamespace = Project.config.rootNamespace
         currFile = null
     }
@@ -94,14 +81,53 @@ class MCFPPFile : File {
      * 编制函数索引
      */
     fun resolveField() {
+        if(syntaxError) return
         currFile = this
         Project.currNamespace = namespace
+        //引用
+        for (n in unsolvedImports){
+            val qwq = GlobalField.getNamespace(n.key)
+            if(qwq == null){
+                LogProcessor.error("Namespace '$n' not found")
+                continue
+            }
+            if(n.value == "*"){
+                field.importedNamespaceField.add(qwq.field)
+            }else{
+                val owo = qwq.field.getDeclaredType(n.value)
+                if(owo == null){
+                    LogProcessor.error("Declared type '${n.key}.${n.value}' not found")
+                    continue
+                }
+                val result = field.importField.addDeclaredType(owo)
+                if(!result){
+                    val pwp = field.importField.getDeclaredType(n.value)
+                    LogProcessor.error("Already have import '${pwp!!.namespaceID}")
+                }
+            }
+        }
+        //类是否有空继承，以及实例化每个泛型类的类型
+        field.namespaceField.forEachClass { c ->
+            for (p in c.parent){
+                if(p is Class.Companion.UndefinedClassOrInterface){
+                    val r = p.getDefinedClassOrInterface()
+                    if(r == null){
+                        LogProcessor.error("Undefined class or interface: ${p.namespaceID}")
+                        continue
+                    }
+                    c.unExtends(p)
+                    c.extends(r)
+                }
+            }
+        }
+        //编译
         MCFPPFieldVisitor().visit(tree())
         Project.currNamespace = Project.config.rootNamespace
         currFile = null
     }
 
     fun runAnnotation(){
+        if(syntaxError) return
         currFile = this
         Project.currNamespace = namespace
         MCFPPAnnotationVisitor().visit(tree())
@@ -113,6 +139,7 @@ class MCFPPFile : File {
      * 编译这个文件
      */
     fun compile() {
+        if(syntaxError) return
         currFile = this
         Project.currNamespace = namespace
         //创建默认函数
@@ -173,22 +200,12 @@ class MCFPPFile : File {
             val matcher = FileSystems.getDefault().getPathMatcher("glob:*.mcfpp")
 
             val startPath: Path = Paths.get(inputPath.replaceFirst("[*?].*".toRegex(), ""))
-            val recursive = inputPath.contains("**")
 
             try {
                 Files.walkFileTree(startPath, object : SimpleFileVisitor<Path>() {
-                    @Throws(IOException::class)
                     override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                         if (matcher.matches(file.fileName)) {
                             fileList.add(file)
-                        }
-                        return FileVisitResult.CONTINUE
-                    }
-
-                    @Throws(IOException::class)
-                    override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-                        if (!recursive && dir != startPath) {
-                            return FileVisitResult.SKIP_SUBTREE
                         }
                         return FileVisitResult.CONTINUE
                     }

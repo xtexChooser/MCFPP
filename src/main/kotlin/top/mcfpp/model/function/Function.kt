@@ -501,10 +501,12 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param returnType
      */
     fun buildReturnVar(returnType: MCFPPType): Var<*>{
-        if(returnType is MCFPPConcreteType) {
-            return returnType.build("return", this)
+        return if(returnType is MCFPPPrivateType){
+            returnType.buildReturnVar()
+        }else if(returnType is MCFPPConcreteType) {
+            returnType.build("return", this)
         }else{
-            return returnType.buildUnConcrete("return", this)
+            returnType.buildUnConcrete("return", this)
         }
     }
 
@@ -733,7 +735,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
 
     fun fieldStore(){
         addComment("[Function ${this.namespaceID}] Store vars into the Stack")
-        Companion.field.forEachVar { v ->
+        Companion.currField.forEachVar { v ->
             v.storeToStack()
         }
     }
@@ -746,7 +748,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
     @InsertCommand
     open fun fieldRestore(){
         addComment("[Function ${this.namespaceID}] Take vars out of the Stack")
-        Companion.field.forEachVar { v ->
+        Companion.currField.forEachVar { v ->
             run {
                 v.getFromStack()
             }
@@ -930,7 +932,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         var currFunction: Function = nullFunction
 
         var forcedField: FunctionField? = null
-        val field: FunctionField
+        val currField: FunctionField
             get() = forcedField ?: currFunction.field
 
         /**

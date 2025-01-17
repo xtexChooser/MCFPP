@@ -1,55 +1,24 @@
 package top.mcfpp.antlr
 
+import net.querz.nbt.tag.Tag
 import top.mcfpp.Project
 import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.exception.UndefinedException
-import top.mcfpp.model.Namespace
 import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.ObjectDataTemplate
 import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.NBTUtil.toJava
 import top.mcfpp.util.StringHelper
 
 class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
 
     val annotationCache = ArrayList<Annotation>()
 
-    /**
-     * 遍历整个文件。一个文件包含了命名空间的声明，函数的声明，类的声明以及全局变量的声明。全局变量是可以跨文件调用的。
-     * @param ctx the parse tree
-     * @return null
-     */
-    override fun visitCompilationUnit(ctx: mcfppParser.CompilationUnitContext) {
-        Project.ctx = ctx
-        //命名空间
-        if (ctx.namespaceDeclaration() != null) {
-            //获取命名空间
-            var namespaceStr = ctx.namespaceDeclaration().Identifier()[0].text
-            if(ctx.namespaceDeclaration().Identifier().size > 1){
-                ctx.namespaceDeclaration().Identifier().forEach{e ->
-                    run {
-                        namespaceStr += ".${e.text}"
-                    }
-                }
-            }
-            Project.currNamespace = namespaceStr
-        }
-        //导入库
-        for (lib in ctx.importDeclaration()){
-            visit(lib)
-        }
-        if(!GlobalField.localNamespaces.containsKey(Project.currNamespace)){
-            GlobalField.localNamespaces[Project.currNamespace] = Namespace(Project.currNamespace)
-        }
-        //文件结构，类和函数
-        for (t in ctx.typeDeclaration()) {
-            visit(t)
-        }
-    }
-
     override fun visitAnnotation(ctx: mcfppParser.AnnotationContext?) {
+        Project.ctx = ctx
         //获取注解
         val qwq = StringHelper.splitNamespaceID(ctx!!.Identifier().text)
         val annotation = GlobalField.getAnnotation(qwq.first, qwq.second)
@@ -62,13 +31,17 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
         //参数解析
         for(c in ctx.annotationArgs()?.value()?: emptyList()){
             val a = MCFPPExprVisitor().visitValue(c) as MCFPPValue<*>
-            args.add(a.value!!)
+            if(a.value is Tag<*>){
+                args.add((a.value as Tag<*>).toJava())
+            }else{
+                args.add(a.value!!)
+            }
         }
-        val a = Annotation.newInstance(annotation, args)
-        annotationCache.add(a)
+        Annotation.newInstance(annotation, args)?.let { annotationCache.add(it) }
     }
 
     override fun visitTemplateDeclaration(ctx: mcfppParser.TemplateDeclarationContext) {
+        Project.ctx = ctx
         //注册模板
         val id = ctx.classWithoutNamespace().text
         val namespace1 = GlobalField.localNamespaces[Project.currNamespace]!!
@@ -85,6 +58,7 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
     }
 
     override fun visitObjectTemplateDeclaration(ctx: mcfppParser.ObjectTemplateDeclarationContext) {
+        Project.ctx = ctx
         //注册模板
         val id = ctx.classWithoutNamespace().text
         val namespace1 = GlobalField.localNamespaces[Project.currNamespace]!!
@@ -100,6 +74,7 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
     }
 
     override fun visitObjectClassDeclaration(ctx: mcfppParser.ObjectClassDeclarationContext) {
+        Project.ctx = ctx
         val id = ctx.classWithoutNamespace().text
         val namespace = GlobalField.localNamespaces[Project.currNamespace]!!
         if(ctx.readOnlyParams() != null){
@@ -117,6 +92,7 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
     }
 
     override fun visitClassDeclaration(ctx: mcfppParser.ClassDeclarationContext) {
+        Project.ctx = ctx
         val id = ctx.classWithoutNamespace().text
         val namespace = GlobalField.localNamespaces[Project.currNamespace]!!
         if(ctx.readOnlyParams() != null){
@@ -135,6 +111,7 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
     }
 
     override fun visitFunctionDeclaration(ctx: mcfppParser.FunctionDeclarationContext) {
+        Project.ctx = ctx
         //获取函数对象
         val types = ctx.functionParams()?.let { FunctionParam.parseReadonlyAndNormalParamTypes(it) }
         //获取缓存中的对象

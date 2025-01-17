@@ -48,7 +48,7 @@ class MCFPPGenericClassFieldVisitor(val clazz: Class) : MCFPPFieldVisitor() {
             }
         }
         Class.currClass = null
-        typeScope = MCFPPFile.currFile!!.field
+        typeScope = MCFPPFile.currFile!!.field.namespaceField
         return null
     }
 }

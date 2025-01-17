@@ -1,22 +1,15 @@
 package top.mcfpp.model.function
 
 import top.mcfpp.antlr.mcfppParser
+import top.mcfpp.antlr.mcfppParser.FunctionBodyContext
 import top.mcfpp.core.lang.DataTemplateObject
 import top.mcfpp.core.lang.Var
 import top.mcfpp.model.CanSelectMember
 import top.mcfpp.model.DataTemplate
 import top.mcfpp.type.MCFPPType
 import java.util.*
-import kotlin.collections.ArrayList
 
-class DataTemplateConstructor(val data: DataTemplate): Function("_init_" + data.identifier.lowercase(Locale.getDefault()) + "_" + data.constructors.size, data, false, context = null) {
-
-    init {
-        //添加this指针
-        val thisObj = DataTemplateObject(data,"this")
-        thisObj.identifier = "this"
-        field.putVar("this",thisObj)
-    }
+class DataTemplateConstructor(val data: DataTemplate, ctx: FunctionBodyContext?): Function("_init_" + data.identifier.lowercase(Locale.getDefault()) + "_" + data.constructors.size, data, false, ctx) {
 
     fun addParamsFromContext(ctx: mcfppParser.NormalParamsContext) {
         val n = ctx.parameterList()?:return
@@ -47,10 +40,11 @@ class DataTemplateConstructor(val data: DataTemplate): Function("_init_" + data.
     }
 
     override fun invoke(normalArgs: ArrayList<Var<*>>, caller: CanSelectMember?): Var<*> {
-        field.getVar("this")!!.assignedBy(caller as DataTemplateObject)
+        if(ast == null) return caller as DataTemplateObject
+        field.putVar("this", caller as DataTemplateObject)
         normalArgs.add(0, field.getVar("this")!!)
-        super.invoke(normalArgs, caller)
-        return field.getVar("this")!!
+        super.invoke(normalArgs, caller as CanSelectMember?)
+        return caller
     }
 }
 

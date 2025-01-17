@@ -1,8 +1,5 @@
-import org.gradle.kotlin.dsl.cpp
-import org.jetbrains.kotlin.fir.declarations.builder.buildScript
+
 import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.Optional
 
 plugins {
@@ -46,7 +43,7 @@ dependencies {
     implementation("org.commonmark:commonmark-ext-task-list-items:0.21.0")
     implementation("fr.brouillard.oss:commonmark-ext-notifications:1.1.0")
     implementation("info.debatty:java-string-similarity:2.0.0")
-    antlr("org.antlr:antlr4:4.12.0")
+    antlr("org.antlr:antlr4:4.13.1")
     implementation(kotlin("reflect"))
     testImplementation(kotlin("script-runtime"))
     implementation("com.google.guava:guava:33.2.0-jre")

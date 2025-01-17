@@ -81,6 +81,8 @@ class CommandReturn : Var<CommandReturn> {
         init {
             data.extends(MCAny.data)
         }
+
+        val empty = CommandReturn(Command(), "empty")
     }
 
 }

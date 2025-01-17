@@ -221,7 +221,7 @@ class NativeFunction : Function, Native {
         }
 
         private fun defaultNativeFunction(vararg args: Any?){
-            throw Exception("A nativeFunction hadn't linked to a java method.")
+            LogProcessor.error("A nativeFunction hadn't linked to a java method.")
         }
 
         fun methodToString(method: Method): String {

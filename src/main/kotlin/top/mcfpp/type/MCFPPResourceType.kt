@@ -17,6 +17,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Block"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = BlockConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = BlockConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = BlockConcrete(clazz, "", identifier)
@@ -28,6 +31,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "BlockEntity"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = BlockEntityConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = BlockEntityConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = BlockEntityConcrete(clazz, "", identifier)
@@ -39,6 +45,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Liquid"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = LiquidConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = LiquidConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = LiquidConcrete(clazz, "", identifier)
@@ -50,6 +59,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Item"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = ItemConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = ItemConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = ItemConcrete(clazz, "", identifier)
@@ -61,6 +73,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "EntityType"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = EntityTypeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = EntityTypeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = EntityTypeConcrete(clazz, "", identifier)
@@ -72,6 +87,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Memory"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = MemoryConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = MemoryConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = MemoryConcrete(clazz, "", identifier)
@@ -83,6 +101,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "PaintingVariant"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = PaintingVariantConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = PaintingVariantConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = PaintingVariantConcrete(clazz, "", identifier)
@@ -94,6 +115,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "VillagerProfession"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = VillagerProfessionConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = VillagerProfessionConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = VillagerProfessionConcrete(clazz, "", identifier)
@@ -105,6 +129,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "VillagerType"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = VillagerTypeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = VillagerTypeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = VillagerTypeConcrete(clazz, "", identifier)
@@ -116,6 +143,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Effect"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = EffectConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = EffectConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = EffectConcrete(clazz, "", identifier)
@@ -127,6 +157,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "PotionEffect"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = PotionEffectConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = PotionEffectConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = PotionEffectConcrete(clazz, "", identifier)
@@ -138,6 +171,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Enchant"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = EnchantConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = EnchantConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = EnchantConcrete(clazz, "", identifier)
@@ -149,6 +185,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Particle"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = ParticleConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = ParticleConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = ParticleConcrete(clazz, "", identifier)
@@ -160,6 +199,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Dimension"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = DimensionConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = DimensionConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = DimensionConcrete(clazz, "", identifier)
@@ -171,6 +213,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Biome"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = BiomeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = BiomeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = BiomeConcrete(clazz, "", identifier)
@@ -182,6 +227,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Statistic"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = StatisticConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = StatisticConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = StatisticConcrete(clazz, "", identifier)
@@ -193,6 +241,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "DamageType"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = DamageTypeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = DamageTypeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = DamageTypeConcrete(clazz, "", identifier)
@@ -204,6 +255,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "RecipeType"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = RecipeTypeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = RecipeTypeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = RecipeTypeConcrete(clazz, "", identifier)
@@ -215,6 +269,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "RecipeSerializer"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = RecipeSerializerConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = RecipeSerializerConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = RecipeSerializerConcrete(clazz, "", identifier)
@@ -226,6 +283,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "SoundEvent"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = SoundEventConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = SoundEventConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = SoundEventConcrete(clazz, "", identifier)
@@ -237,6 +297,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Advancement"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = AdvancementConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = AdvancementConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = AdvancementConcrete(clazz, "", identifier)
@@ -248,6 +311,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "LootTable"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = LootTableConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = LootTableConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = LootTableConcrete(clazz, "", identifier)
@@ -259,6 +325,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "LootTablePredicate"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = LootTablePredicateConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = LootTablePredicateConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = LootTablePredicateConcrete(clazz, "", identifier)
@@ -270,6 +339,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "FunctionID"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = FunctionIDConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = FunctionIDConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = FunctionIDConcrete(clazz, "", identifier)
@@ -281,6 +353,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Structure"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = StructureConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = StructureConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = StructureConcrete(clazz, "", identifier)
@@ -292,6 +367,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Recipe"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = RecipeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = RecipeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = RecipeConcrete(clazz, "", identifier)
@@ -303,6 +381,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "BlockTag"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = BlockTagConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = BlockTagConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = BlockTagConcrete(clazz, "", identifier)
@@ -314,6 +395,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "LiquidTag"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = LiquidTagConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = LiquidTagConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = LiquidTagConcrete(clazz, "", identifier)
@@ -325,6 +409,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "ItemTag"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = ItemTagConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = ItemTagConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = ItemTagConcrete(clazz, "", identifier)
@@ -336,6 +423,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "EntityTypeTag"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = EntityTypeTagConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = EntityTypeTagConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = EntityTypeTagConcrete(clazz, "", identifier)
@@ -347,6 +437,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "FunctionTag"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = FunctionTagConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = FunctionTagConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = FunctionTagConcrete(clazz, "", identifier)
@@ -358,6 +451,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "BlockStateFile"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = BlockStateFileConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = BlockStateFileConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = BlockStateFileConcrete(clazz, "", identifier)
@@ -369,6 +465,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Model"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = ModelConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = ModelConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = ModelConcrete(clazz, "", identifier)
@@ -380,6 +479,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Texture"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = TextureConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = TextureConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = TextureConcrete(clazz, "", identifier)
@@ -391,6 +493,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Sound"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = SoundConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = SoundConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = SoundConcrete(clazz, "", identifier)
@@ -402,6 +507,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "BossBar"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = BossBarConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = BossBarConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = BossBarConcrete(clazz, "", identifier)
@@ -413,6 +521,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "Storage"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = StorageConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = StorageConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = StorageConcrete(clazz, "", identifier)
@@ -424,6 +535,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "LootTableFunction"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = LootTableFunctionConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = LootTableFunctionConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = LootTableFunctionConcrete(clazz, "", identifier)
@@ -435,6 +549,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "LootTableCondition"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = LootTableConditionConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = LootTableConditionConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = LootTableConditionConcrete(clazz, "", identifier)
@@ -446,6 +563,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "LootTableType"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = LootTableTypeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = LootTableTypeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = LootTableTypeConcrete(clazz, "", identifier)
@@ -457,6 +577,9 @@ object ResourceID: MCFPPType(parentType = listOf(MCFPPNBTType.NBT)){
         override val typeName: String
             get() = "CommandArgumentType"
 
+        init {
+            registerType()
+        }
         override fun build(identifier: String, container: FieldContainer): Var<*> = CommandArgumentTypeConcrete(container, "", identifier)
         override fun build(identifier: String): Var<*> = CommandArgumentTypeConcrete("", identifier)
         override fun build(identifier: String, clazz: Class): Var<*> = CommandArgumentTypeConcrete(clazz, "", identifier)

@@ -4,8 +4,9 @@ import net.querz.nbt.io.SNBTUtil
 import net.querz.nbt.tag.IntTag
 import top.mcfpp.Project
 import top.mcfpp.core.lang.MCAny
-import top.mcfpp.core.lang.Var
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.Var
+import top.mcfpp.io.MCFPPFile
 import top.mcfpp.model.*
 import top.mcfpp.model.Enum
 import top.mcfpp.model.field.GlobalField
@@ -31,26 +32,20 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
         //命名空间
         if (ctx.namespaceDeclaration() != null) {
             //获取命名空间
-            var namespaceStr = ctx.namespaceDeclaration().Identifier()[0].text
-            if(ctx.namespaceDeclaration().Identifier().size > 1){
-                ctx.namespaceDeclaration().Identifier().forEach{e ->
-                    run {
-                        namespaceStr += ".${e.text}"
-                    }
-                }
-            }
+            val namespaceStr = ctx.namespaceDeclaration().Identifier().joinToString(".") { it.text }
             Project.currNamespace = namespaceStr
-        }
-        //导入库
-        for (lib in ctx.importDeclaration()){
-            visit(lib)
+            MCFPPFile.currFile!!.namespace = namespaceStr
         }
         if(!GlobalField.localNamespaces.containsKey(Project.currNamespace)){
             GlobalField.localNamespaces[Project.currNamespace] = Namespace(Project.currNamespace)
         }
+        //导入库
+        for (lib in ctx.importDeclaration()){
+            visitImportDeclaration(lib)
+        }
         //文件结构，类和函数
         for (t in ctx.typeDeclaration()) {
-            visit(t)
+            visitTypeDeclaration(t)
         }
     }
 
@@ -62,55 +57,10 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
      */
     override fun visitImportDeclaration(ctx: mcfppParser.ImportDeclarationContext) {
         Project.ctx = ctx
-        //获取命名空间
-        var namespace = ctx.Identifier(0).text
-        if (ctx.Identifier().size > 1) {
-            for (n in ctx.Identifier().subList(1, ctx.Identifier().size)) {
-                namespace += ".$n"
-            }
-        }
-        //获取库的命名空间
-        val libNamespace = GlobalField.libNamespaces[namespace]
-        if (libNamespace == null) {
-            LogProcessor.error("Namespace $namespace not found")
-            return
-        }
-        //将库的命名空间加入到importedLibNamespaces中
-        val nsp = Namespace(namespace)
-        GlobalField.importedLibNamespaces[namespace] = nsp
-
-        //这个库被引用的类
-        if(ctx.cls == null){
-            //只导入方法
-            libNamespace.field.forEachFunction { f ->
-                run {
-                    nsp.field.addFunction(f,false)
-                }
-            }
-            return
-        }
-        //导入类和方法
-        if(ctx.cls.text == "*"){
-            //全部导入
-            libNamespace.field.forEachClass { c ->
-                run {
-                    nsp.field.addClass(c.identifier,c)
-                }
-            }
-            libNamespace.field.forEachFunction { f ->
-                run {
-                    nsp.field.addFunction(f,false)
-                }
-            }
-        }else{
-            //只导入声明的类
-            val cls = libNamespace.field.getClass(ctx.cls.text)
-            if(cls != null){
-                nsp.field.addClass(cls.identifier,cls)
-            }else{
-                LogProcessor.error("Class ${ctx.cls.text} not found in namespace $namespace")
-            }
-        }
+        //获取命名空间和导入类型
+        val nsp = ctx.Identifier().joinToString(".") { it.text }
+        val type = ctx.cls.text
+        MCFPPFile.currFile!!.unsolvedImports[nsp] = type
     }
 
     /**

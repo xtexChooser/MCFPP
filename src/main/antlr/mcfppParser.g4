@@ -52,7 +52,7 @@ namespaceDeclaration
     ;
 
 importDeclaration
-    :   IMPORT Identifier ('.' Identifier)* ('.' cls = (Identifier|'*'))? (AS Identifier)? (FROM Identifier)? ';'
+    :   IMPORT Identifier (DOT Identifier)* ':' cls = (Identifier|'*') (AS Identifier)? (FROM Identifier)? ';'
     ;
 
 //类或函数声明
@@ -113,7 +113,7 @@ classBody
 //类成员
 classMember
     :   classFunctionDeclaration
-    |   classFieldDeclaration ';'
+    |   classFieldDeclaration
     |   classConstructorDeclaration
     |   nativeClassFunctionDeclaration
     |   abstractClassFunctionDeclaration
@@ -133,7 +133,7 @@ nativeClassFunctionDeclaration
     ;
 
 classFieldDeclaration
-    :   accessModifier? type fieldDeclarationExpression accessor?
+    :   accessModifier? type fieldDeclarationExpression accessor? ';'
     ;
 
 accessor
@@ -188,7 +188,7 @@ templateFunctionDeclaration
     ;
 
 templateFieldDeclaration
-    :   CONST? (singleTemplateFieldType | unionTemplateFieldType) Identifier ('=' expression)? ';' accessor?
+    :   CONST? (singleTemplateFieldType | unionTemplateFieldType) Identifier ('=' expression)? accessor? ';'
     ;
 
 singleTemplateFieldType
@@ -553,6 +553,8 @@ typeWithoutExcl
     :   normalType
     |   VecType
     |   LIST '<' type '>'
+    |   MAP '<' type '>'
+    |   DICT '<' type '>'
     |   className readOnlyArgs?
     |   Identifier
     |   unionTemplateType
@@ -577,8 +579,6 @@ normalType
     |   NBT
     |   TYPE
     |   ANY
-    |   MAP
-    |   DICT
     |   BYTEARRAY
     |   INTARRAY
     |   LONGARRAY

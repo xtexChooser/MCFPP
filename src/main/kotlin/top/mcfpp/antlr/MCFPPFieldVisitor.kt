@@ -45,19 +45,6 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
      */
     override fun visitCompilationUnit(ctx: mcfppParser.CompilationUnitContext): Any? {
         Project.ctx = ctx
-        //命名空间
-        Project.currNamespace = ctx.namespaceDeclaration()?.let{
-            //获取命名空间
-            var namespaceStr = ctx.namespaceDeclaration().Identifier()[0].text
-            if(ctx.namespaceDeclaration().Identifier().size > 1){
-                ctx.namespaceDeclaration().Identifier().forEach{e ->
-                    run {
-                        namespaceStr += ".${e.text}"
-                    }
-                }
-            }
-            namespaceStr
-        }?: Project.currNamespace
         typeScope = GlobalField.localNamespaces[Project.currNamespace]!!.field
         //文件结构，类和函数
         for (t in ctx.typeDeclaration()) {
@@ -101,7 +88,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         for (m in ctx.interfaceBody().interfaceFunctionDeclaration()){
             visit(m)
         }
-        typeScope = MCFPPFile.currFile!!.field
+        typeScope = MCFPPFile.currFile!!.field.namespaceField
         currClassOrTemplate = null
         return null
     }
@@ -176,6 +163,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         Class.currClass = clazz
         currClassOrTemplate = clazz
         typeScope = Class.currClass!!.field
+        isStatic = false
         //解析类中的成员
         //先解析函数和构造函数
         for (c in ctx.classBody().classMemberDeclaration()) {
@@ -211,7 +199,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         }
         Class.currClass = null
         currClassOrTemplate = null
-        typeScope = MCFPPFile.currFile!!.field
+        typeScope = MCFPPFile.currFile!!.field.namespaceField
         return null
     }
 
@@ -239,6 +227,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         Class.currClass = clazz
         currClassOrTemplate = clazz
         typeScope = Class.currClass!!.field
+        isStatic = true
         //解析类中的成员
         //先解析函数和构造函数
         for (c in ctx.classBody().classMemberDeclaration()) {
@@ -255,7 +244,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         }
         Class.currClass = null
         currClassOrTemplate = null
-        typeScope = MCFPPFile.currFile!!.field
+        typeScope = MCFPPFile.currFile!!.field.namespaceField
         return null
     }
 
@@ -827,6 +816,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 }
             }
         }
+        isStatic = false
         //解析成员
         //先解析函数和构造函数
         for (c in ctx.templateBody().templateMemberDeclaration()) {
@@ -834,19 +824,19 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 visit(c)
             }
         }
-        //如果没有构造函数，生成默认的构造函数
-        if(template.constructors.isEmpty()){
-            template.addMember(DataTemplateConstructor(DataTemplate.currTemplate!!))
-        }
         //再解析变量
         for (c in ctx.templateBody().templateMemberDeclaration()) {
             if (c!!.templateMember().templateFieldDeclaration() != null) {
                 visit(c)
             }
         }
+        //如果没有构造函数，生成默认的构造函数
+        if(template.constructors.isEmpty()){
+            template.addMember(DataTemplateConstructor(DataTemplate.currTemplate!!, null))
+        }
         DataTemplate.currTemplate = null
         currClassOrTemplate = null
-        typeScope = MCFPPFile.currFile!!.field
+        typeScope = MCFPPFile.currFile!!.field.namespaceField
         return null
     }
 
@@ -881,6 +871,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 objectTemplate.extends(s)
             }
         }
+        isStatic = true
         //解析成员
         //先解析函数
         for (c in ctx.templateBody().templateMemberDeclaration()) {
@@ -896,7 +887,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         }
         DataTemplate.currTemplate = null
         currClassOrTemplate = null
-        typeScope = MCFPPFile.currFile!!.field
+        typeScope = MCFPPFile.currFile!!.field.namespaceField
         return null
     }
 
@@ -961,11 +952,6 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         }else{
             MCFPPBaseType.Void
         }
-        if(!isStatic){
-            val varType = DataTemplate.currTemplate!!.getType()
-            val thisObj = varType.build("this", f)
-            f.field.putVar("this",thisObj)
-        }
         //解析参数
         f.addParamsFromContext(ctx.functionParams())
         //注册函数
@@ -1018,7 +1004,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         Project.ctx = ctx
         //类构造函数
         //创建构造函数对象，注册函数
-        val f = DataTemplateConstructor(DataTemplate.currTemplate!!)
+        val f = DataTemplateConstructor(DataTemplate.currTemplate!!, ctx.functionBody())
         f.addParamsFromContext(ctx.normalParams())
         return f
     }

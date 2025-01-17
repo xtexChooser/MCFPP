@@ -33,7 +33,8 @@ fun main(args: Array<String>) {
             LogProcessor.error("Cannot find file: $path")
         }
         compile(Project.readConfig(path)) //读取配置文件
-        GlobalField.printAll()
+
+        if(CompileSettings.printAll) GlobalField.printAll()
     }
 }
 
@@ -44,7 +45,7 @@ fun compile(config: ProjectConfig){
     Project.compileStage = 0
     Project.stageProcessor[0].forEach { it() }
     Project.init() //初始化
-    Project.checkConfig()   //检查配置文件
+    if(!Project.checkConfig()) return   //检查配置文件
     Project.readProject() //读取引用的库的索引
     Project.indexType() //编制类型索引
     Project.resolveField() //编制函数索引
@@ -85,6 +86,10 @@ fun parseArgs(args: List<String>){
 
             if (arg.startsWith("-maxWhileInline=")) arg else "$$arg"
             -> CompileSettings.maxWhileInline = arg.split("=")[1].toInt()
+
+            else -> {
+                LogProcessor.warn("Invalid argument: $arg")
+            }
         }
     }
 

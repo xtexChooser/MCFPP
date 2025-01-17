@@ -153,38 +153,72 @@ object Project {
             val jsonObject: JSONObject = JSONObject.parse(json) as JSONObject
 
             //源代码根目录
-            config.sourcePath = jsonObject.getString("sourcePath")?.let { Path(it) }
+            if(jsonObject.containsKey("sourcePath")){
+                config.sourcePath = Path(jsonObject.getString("sourcePath"))
+                jsonObject.remove("sourcePath")
+            }
 
             //版本
-            config.version = jsonObject.getString("version")?:"1.21"
+            if(jsonObject.containsKey("version")){
+                config.version = jsonObject.getString("version")
+                jsonObject.remove("version")
+            }
 
             //描述
-            config.description = jsonObject.getString("description")?:"A datapack compiled by MCFPP"
+            if(jsonObject.containsKey("description")){
+                config.description = jsonObject.getString("description")
+                jsonObject.remove("description")
+            }
 
             //默认命名空间
-            config.rootNamespace = jsonObject.getString("namespace")?: "default"
+            if(jsonObject.containsKey("namespace")){
+                config.rootNamespace = jsonObject.getString("namespace")
+                jsonObject.remove("namespace")
+            }
 
             //调用库
-            val includesJson: JSONArray = jsonObject.getJSONArray("includes")?: JSONArray()
-            for (i in 0..<includesJson.size) {
-                config.includes.add(includesJson.getString(i))
+            if(jsonObject.containsKey("jars")){
+                val jarsJson: JSONArray = jsonObject.getJSONArray("jars")
+                for (i in 0..<jarsJson.size) {
+                    config.jars.add(jarsJson.getString(i))
+                }
+                jsonObject.remove("jars")
             }
 
             //输出目录
-            config.targetPath = jsonObject.getString("targetPath")?.let { Path(it) }
+            if(jsonObject.containsKey("targetPath")){
+                config.targetPath = Path(jsonObject.getString("targetPath"))
+                jsonObject.remove("targetPath")
+            }
 
             //是否生成数据包
-            config.noDatapack = jsonObject.getBooleanValue("noDatapack")
+            if(jsonObject.containsKey("noDatapack")){
+                config.noDatapack = jsonObject.getBoolean("noDatapack")
+                jsonObject.remove("noDatapack")
+            }
 
             //注释等级
-            config.commentLevel = jsonObject.getString("commentLevel")?.let {
-                try {
-                    CommentLevel.valueOf(it.uppercase())
+            if(jsonObject.containsKey("commentLevel")){
+                val str = jsonObject.getString("commentLevel")
+                config.commentLevel = try {
+                    CommentLevel.valueOf(str.uppercase())
                 }catch (e: Exception){
-                    LogProcessor.error("Unsupported comment level: $it, using default value \"DEBUG\"")
+                    LogProcessor.error("Unsupported comment level: $str, using default value \"DEBUG\"")
                     CommentLevel.DEBUG
                 }
-            }?: config.commentLevel
+                jsonObject.remove("commentLevel")
+            }
+
+            //编译参数
+            if(jsonObject.containsKey("compileArgs")){
+                val compileArgsJson = jsonObject.getJSONArray("compileArgs")
+                parseArgs(compileArgsJson.toList(String::class.java))
+                jsonObject.remove("compileArgs")
+            }
+
+            for (key in jsonObject.keys) {
+                LogProcessor.warn("Unsupported config item: $key")
+            }
 
         } catch (e: Exception) {
             LogProcessor.error("Error while reading project from file \"$path\"")
@@ -194,7 +228,7 @@ object Project {
         return config
     }
 
-    fun checkConfig(){
+    fun checkConfig(): Boolean{
         if (!Utils.version.contains(config.version)){
             LogProcessor.warn("Unsupported version: ${config.version}")
             config.version = Utils.version[0]
@@ -207,6 +241,11 @@ object Project {
             LogProcessor.warn("Set source path default to \"${config.root.pathString}\"")
             config.sourcePath = Path(config.root.pathString)
         }
+        if(config.sourcePath!!.notExists()){
+            LogProcessor.error("Invalid source path: ${config.sourcePath}")
+            return false
+        }
+        return true
     }
 
     /**
@@ -294,6 +333,9 @@ object Project {
             MCFPPFile.findFiles(config.sourcePath!!.absolutePathString()).forEach {
                 files.add(MCFPPFile(it.toFile()))
             }
+        }
+        if(files.isEmpty()){
+            LogProcessor.error("Cannot find any mcfpp file in path: ${config.sourcePath}")
         }
         stageProcessor[compileStage].forEach { it() }
     }

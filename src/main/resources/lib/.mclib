@@ -47,6 +47,215 @@
 					}
 				},
 				{
+					"id":"Player",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"BossBar",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"visible",
+								"type":"bool"
+							},
+							{
+								"id":"max",
+								"type":"int"
+							},
+							{
+								"id":"id",
+								"type":"string"
+							},
+							{
+								"id":"value",
+								"type":"int"
+							}
+						],
+						"functions":[
+							{
+								"id":"remove",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#remove(top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							},
+							{
+								"id":"add",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#add(top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							},
+							{
+								"id":"list",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#list(top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							},
+							{
+								"id":"setName",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#setName(top.mcfpp.core.lang.JsonText,top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									{
+										"id":"name",
+										"type":"text",
+										"isStatic":false
+									}
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							},
+							{
+								"id":"setColor",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#setColor(top.mcfpp.core.lang.EnumVar,top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									{
+										"id":"color",
+										"type":"enum(mcfpp.minecraft:BossBarColor)",
+										"isStatic":false
+									}
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							},
+							{
+								"id":"setVisiblePlayers",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#setVisiblePlayers(top.mcfpp.core.minecraft.PlayerVar,top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									{
+										"id":"players",
+										"type":"template(mcfpp.minecraft:Player)",
+										"isStatic":false
+									}
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							},
+							{
+								"id":"setStyle",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#setStyle(top.mcfpp.core.lang.EnumVar,top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									{
+										"id":"style",
+										"type":"enum(mcfpp.minecraft:BossBarStyle)",
+										"isStatic":false
+									}
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							}
+						]
+					}
+				},
+				{
+					"id":"AttributeModifier",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"id",
+								"type":"string"
+							},
+							{
+								"id":"modifierType",
+								"type":"enum(mcfpp.minecraft:AttributeModifierType)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"AttributePredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"attribute",
+								"type":"list<string>"
+							},
+							{
+								"id":"id",
+								"type":"list<string>"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"BossBar$",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							
+						],
+						"functions":[
+							{
+								"id":"list",
+								"javaMethod":"top.mcfpp.mni.minecraft.BossBarData#list(top.mcfpp.core.lang.DataTemplateObject,top.mcfpp.util.ValueWrapper)",
+								"normalParams":[
+									
+								],
+								"returnType":"CommandReturn",
+								"isAbstract":false,
+								"tags":[
+									
+								]
+							}
+						]
+					}
+				},
+				{
 					"id":"Area$",
 					"parents":[
 						"mcfpp.lang:DataObject"
@@ -121,7 +330,81 @@
 				}
 			],
 			"enum":[
-				
+				{
+					"id":"AttributeModifierType",
+					"values":[
+						{
+							"id":"add_value",
+							"value":0
+						},
+						{
+							"id":"add_multiplied_total",
+							"value":1
+						},
+						{
+							"id":"add_multiplied_base",
+							"value":2
+						}
+					]
+				},
+				{
+					"id":"BossBarStyle",
+					"values":[
+						{
+							"id":"NOTCHED_6",
+							"value":1
+						},
+						{
+							"id":"NOTCHED_12",
+							"value":3
+						},
+						{
+							"id":"PROGRESS",
+							"value":0
+						},
+						{
+							"id":"NOTCHED_20",
+							"value":4
+						},
+						{
+							"id":"NOTCHED_10",
+							"value":2
+						}
+					]
+				},
+				{
+					"id":"BossBarColor",
+					"values":[
+						{
+							"id":"RED",
+							"value":2
+						},
+						{
+							"id":"WHITE",
+							"value":6
+						},
+						{
+							"id":"PINK",
+							"value":0
+						},
+						{
+							"id":"BLUE",
+							"value":1
+						},
+						{
+							"id":"YELLOW",
+							"value":4
+						},
+						{
+							"id":"PURPLE",
+							"value":5
+						},
+						{
+							"id":"GREEN",
+							"value":3
+						}
+					]
+				}
 			]
 		},
 		{
@@ -161,7 +444,7 @@
 				},
 				{
 					"id":"print",
-					"javaMethod":"top.mcfpp.mni.System#print(top.mcfpp.core.lang.nbt.MCString)",
+					"javaMethod":"top.mcfpp.mni.System#info(top.mcfpp.core.lang.nbt.MCString)",
 					"normalParams":[
 						{
 							"id":"s",
@@ -189,22 +472,6 @@
 					"isAbstract":false,
 					"tags":[
 						
-					]
-				},
-				{
-					"id":"print",
-					"javaMethod":"top.mcfpp.mni.System#print(top.mcfpp.core.lang.bool.BaseBool)",
-					"normalParams":[
-						{
-							"id":"a",
-							"type":"bool",
-							"isStatic":false
-						}
-					],
-					"returnType":"void",
-					"isAbstract":false,
-					"tags":[
-
 					]
 				},
 				{
@@ -240,10 +507,74 @@
 					]
 				},
 				{
+					"id":"print",
+					"javaMethod":"top.mcfpp.mni.System#print(top.mcfpp.core.lang.bool.BaseBool)",
+					"normalParams":[
+						{
+							"id":"b",
+							"type":"bool",
+							"isStatic":false
+						}
+					],
+					"returnType":"void",
+					"isAbstract":false,
+					"tags":[
+						
+					]
+				},
+				{
 					"id":"debug",
 					"javaMethod":"top.mcfpp.mni.System#debug()",
 					"normalParams":[
 						
+					],
+					"returnType":"void",
+					"isAbstract":false,
+					"tags":[
+						
+					]
+				},
+				{
+					"id":"info",
+					"javaMethod":"top.mcfpp.mni.System#info(top.mcfpp.core.lang.nbt.MCString)",
+					"normalParams":[
+						{
+							"id":"s",
+							"type":"string",
+							"isStatic":false
+						}
+					],
+					"returnType":"void",
+					"isAbstract":false,
+					"tags":[
+						
+					]
+				},
+				{
+					"id":"warn",
+					"javaMethod":"top.mcfpp.mni.System#info(top.mcfpp.core.lang.nbt.MCString)",
+					"normalParams":[
+						{
+							"id":"s",
+							"type":"string",
+							"isStatic":false
+						}
+					],
+					"returnType":"void",
+					"isAbstract":false,
+					"tags":[
+						
+					]
+				},
+				{
+					"id":"error",
+					"javaMethod":"top.mcfpp.mni.System#info(top.mcfpp.core.lang.nbt.MCString)",
+					"normalParams":[
+						{
+							"id":"s",
+							"type":"string",
+							"isStatic":false
+						}
 					],
 					"returnType":"void",
 					"isAbstract":false,
@@ -263,6 +594,109 @@
 			]
 		},
 		{
+			"id":"mcfpp.minecraft.entity",
+			"functions":[
+				
+			],
+			"classes":[
+				
+			],
+			"template":[
+				{
+					"id":"EntityData",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"passengers",
+								"type":"list<template(mcfpp.minecraft.entity:EntityData)>"
+							},
+							{
+								"id":"silent",
+								"type":"bool"
+							},
+							{
+								"id":"portalCooldown",
+								"type":"int"
+							},
+							{
+								"id":"motion",
+								"type":"list<double>"
+							},
+							{
+								"id":"fallDistance",
+								"type":"float"
+							},
+							{
+								"id":"rotation",
+								"type":"list<float>"
+							},
+							{
+								"id":"customName",
+								"type":"string"
+							},
+							{
+								"id":"air",
+								"type":"short"
+							},
+							{
+								"id":"hasVisualFire",
+								"type":"bool"
+							},
+							{
+								"id":"uuid",
+								"type":"IntArray"
+							},
+							{
+								"id":"tags",
+								"type":"list<string>"
+							},
+							{
+								"id":"invulnerable",
+								"type":"bool"
+							},
+							{
+								"id":"customNameVisible",
+								"type":"bool"
+							},
+							{
+								"id":"glowing",
+								"type":"bool"
+							},
+							{
+								"id":"onGround",
+								"type":"bool"
+							},
+							{
+								"id":"pos",
+								"type":"list<double>"
+							},
+							{
+								"id":"noGravity",
+								"type":"bool"
+							},
+							{
+								"id":"fire",
+								"type":"short"
+							},
+							{
+								"id":"ticksFrozen",
+								"type":"int"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				}
+			],
+			"enum":[
+				
+			]
+		},
+		{
 			"id":"default",
 			"functions":[
 				
@@ -272,6 +706,705 @@
 			],
 			"template":[
 				
+			],
+			"enum":[
+				
+			]
+		},
+		{
+			"id":"mcfpp.minecraft.item",
+			"functions":[
+				
+			],
+			"classes":[
+				
+			],
+			"template":[
+				{
+					"id":"WrittenBookContentPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"generation",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"pages",
+								"type":"template(mcfpp.minecraft.item:PagePredicate)"
+							},
+							{
+								"id":"author",
+								"type":"string"
+							},
+							{
+								"id":"title",
+								"type":"string"
+							},
+							{
+								"id":"resolved",
+								"type":"bool"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"ContainerPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"items",
+								"type":"template(mcfpp.minecraft.item:ItemStackCompoundPredicate)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"AttributeCountPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"test",
+								"type":"template(mcfpp.minecraft.item:AttributePredicate)"
+							},
+							{
+								"id":"count",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"AttributePredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"amount",
+								"type":"UnionType(float, template(mcfpp.math:DecimalRange))"
+							},
+							{
+								"id":"attribute",
+								"type":"UnionType(string, list<string>)"
+							},
+							{
+								"id":"id",
+								"type":"list<string>"
+							},
+							{
+								"id":"slot",
+								"type":"enum(mcfpp.minecraft.item:AttributeSlot)"
+							},
+							{
+								"id":"operation",
+								"type":"enum(mcfpp.minecraft.item:AttributeOperation)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"TrimPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"material",
+								"type":"UnionType(string, list<string>)"
+							},
+							{
+								"id":"pattern",
+								"type":"UnionType(string, list<string>)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"PagePredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"contains",
+								"type":"list<text>"
+							},
+							{
+								"id":"size",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"count",
+								"type":"list<template(mcfpp.minecraft.item:PageCountPredicate)>"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"FireworkExplosionCountPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"test",
+								"type":"template(mcfpp.minecraft.item:FireworkExplosionPredicate)"
+							},
+							{
+								"id":"count",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"PageCountPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"test",
+								"type":"text"
+							},
+							{
+								"id":"count",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"ItemComponent",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"StoredEnchantments",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"enchantments",
+								"type":"UnionType(string, list<string>)"
+							},
+							{
+								"id":"levels",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"AttributeModifierPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"modifiers",
+								"type":"template(mcfpp.minecraft.item:AttributeModifiers)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"JukeboxPlayablePredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"songs",
+								"type":"UnionType(string, list<string>)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"ItemStackCompoundPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"contains",
+								"type":"list<template(mcfpp.minecraft.item:ItemStackPredicate)>"
+							},
+							{
+								"id":"size",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"count",
+								"type":"list<template(mcfpp.minecraft.item:ItemStackCountPredicate)>"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"ItemStackCountPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"test",
+								"type":"template(mcfpp.minecraft.item:ItemStackPredicate)"
+							},
+							{
+								"id":"count",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"FireworkExplosions",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"contains",
+								"type":"list<template(mcfpp.minecraft.item:FireworkExplosionPredicate)>"
+							},
+							{
+								"id":"size",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"count",
+								"type":"list<template(mcfpp.minecraft.item:FireworkExplosionCountPredicate)>"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"FireworkExplosionPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"hasTwinkle",
+								"type":"bool"
+							},
+							{
+								"id":"shape",
+								"type":"enum(mcfpp.minecraft.item:FireworkShape)"
+							},
+							{
+								"id":"hasTrail",
+								"type":"bool"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"DamagePredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"damage",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"durability",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"FireworksPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"flightDuration",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"explosions",
+								"type":"template(mcfpp.minecraft.item:FireworkExplosions)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"WriteableBookContentPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"pages",
+								"type":"template(mcfpp.minecraft.item:PagePredicate)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"ItemPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"itemSubPredicateCheck",
+								"type":"dict[any]"
+							},
+							{
+								"id":"itemSubPredicateMatch",
+								"type":"dict[any]"
+							},
+							{
+								"id":"itemSubPredicateExist",
+								"type":"list<string>"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"EnchantmentPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"enchantments",
+								"type":"UnionType(string, list<string>)"
+							},
+							{
+								"id":"levels",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"CustomDataPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"BundleContentsPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"items",
+								"type":"template(mcfpp.minecraft.item:ItemStackCompoundPredicate)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"ItemStackPredicate",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"components",
+								"type":"dict[any]"
+							},
+							{
+								"id":"predicates",
+								"type":"dict[any]"
+							},
+							{
+								"id":"count",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"items",
+								"type":"UnionType(string, list<string>)"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"AttributeModifiers",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"contains",
+								"type":"list<template(mcfpp.minecraft.item:AttributePredicate)>"
+							},
+							{
+								"id":"size",
+								"type":"UnionType(int, template(mcfpp.math:IntRange))"
+							},
+							{
+								"id":"count",
+								"type":"list<template(mcfpp.minecraft.item:AttributeCountPredicate)>"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				}
+			],
+			"enum":[
+				{
+					"id":"AttributeOperation",
+					"values":[
+						{
+							"id":"ADD_MULTIPLIED_BASE",
+							"value":1
+						},
+						{
+							"id":"ADD_MULTIPLIED_TOTAL",
+							"value":2
+						},
+						{
+							"id":"ADD_VALUE",
+							"value":0
+						}
+					]
+				},
+				{
+					"id":"AttributeSlot",
+					"values":[
+						{
+							"id":"CHEST",
+							"value":5
+						},
+						{
+							"id":"HEAD",
+							"value":4
+						},
+						{
+							"id":"OFFHAND",
+							"value":2
+						},
+						{
+							"id":"ARMOR",
+							"value":8
+						},
+						{
+							"id":"MAINHAND",
+							"value":1
+						},
+						{
+							"id":"LEGS",
+							"value":6
+						},
+						{
+							"id":"ANY",
+							"value":0
+						},
+						{
+							"id":"HAND",
+							"value":3
+						},
+						{
+							"id":"FEET",
+							"value":7
+						}
+					]
+				},
+				{
+					"id":"FireworkShape",
+					"values":[
+						{
+							"id":"SMALL_BALL",
+							"value":0
+						},
+						{
+							"id":"LARGE_BALL",
+							"value":1
+						},
+						{
+							"id":"STAR",
+							"value":2
+						},
+						{
+							"id":"CREEPER",
+							"value":3
+						},
+						{
+							"id":"BURST",
+							"value":4
+						}
+					]
+				}
+			]
+		},
+		{
+			"id":"mcfpp.math",
+			"functions":[
+				
+			],
+			"classes":[
+				
+			],
+			"template":[
+				{
+					"id":"DecimalRange",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"min",
+								"type":"float"
+							},
+							{
+								"id":"max",
+								"type":"float"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				},
+				{
+					"id":"IntRange",
+					"parents":[
+						"mcfpp.lang:DataObject"
+					],
+					"field":{
+						"vars":[
+							{
+								"id":"min",
+								"type":"int"
+							},
+							{
+								"id":"max",
+								"type":"int"
+							}
+						],
+						"functions":[
+							
+						]
+					}
+				}
 			],
 			"enum":[
 				

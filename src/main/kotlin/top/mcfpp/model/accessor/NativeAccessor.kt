@@ -2,13 +2,10 @@ package top.mcfpp.model.accessor
 
 import top.mcfpp.Project
 import top.mcfpp.annotations.MNIAccessor
-import top.mcfpp.annotations.MNIFunction
 import top.mcfpp.core.lang.Var
 import top.mcfpp.model.CanSelectMember
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.Namespace
 import top.mcfpp.model.function.NativeFunction
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 
 class NativeAccessor(javaRefer: String, d: CompoundData, field: Var<*>): AbstractAccessor() {
@@ -21,8 +18,7 @@ class NativeAccessor(javaRefer: String, d: CompoundData, field: Var<*>): Abstrac
         function.owner = d
         try {
             //根据JavaRefer找到类
-            val clsName = javaRefer.substring(0,javaRefer.lastIndexOf('.'))
-            val clazz = Project.classLoader.loadClass(clsName)
+            val clazz = Project.classLoader.loadClass(javaRefer)
             val methods = clazz.methods
             var hasFind = false
             for(method in methods){
@@ -34,10 +30,10 @@ class NativeAccessor(javaRefer: String, d: CompoundData, field: Var<*>): Abstrac
                 }
             }
             if(!hasFind){
-                throw NoSuchMethodException("Cannot find accessor ${field.identifier} in class $clsName")
+                LogProcessor.error("Cannot find accessor ${field.identifier} in class $javaRefer")
             }
         } catch (e: ClassNotFoundException) {
-            LogProcessor.error("Cannot find java class: " + e.message)
+            LogProcessor.error("Cannot find java class: $javaRefer")
         }
     }
 

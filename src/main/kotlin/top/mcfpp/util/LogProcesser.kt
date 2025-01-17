@@ -2,8 +2,7 @@
 
 package top.mcfpp.util
 
-import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -50,7 +49,7 @@ object LogProcessor {
         if(Project.ctx != null){
             logger.warn(
                 "Warning while compiling \n" +
-                        MCFPPFile.currFile!!.absolutePath + ":" + Project.ctx!!.getStart().line + ">>" + msg
+                        MCFPPFile.currFile!!.absolutePath + ">>" + msg
                         + Project.ctx?.let { "\n" + getLineInfo(it) }
             )
             Function.addComment(msg, CommentLevel.WARN)
@@ -91,8 +90,8 @@ object LogProcessor {
     inline fun error(msg: String){
         if(Project.ctx != null){
             logger.error(
-                "Error while compiling \n" +
-                        MCFPPFile.currFile!!.absolutePath + ":" + Project.ctx!!.getStart().line + ">>" + msg
+                "Error while compiling " +
+                        MCFPPFile.currFile!!.absolutePath + ">>\n" + msg
                         + Project.ctx?.let { "\n" + getLineInfo(it) }
             )
             Function.addComment(msg, CommentLevel.ERROR)
@@ -103,7 +102,7 @@ object LogProcessor {
         if(CompileSettings.isDebug){
             val stackTrace = Thread.currentThread().stackTrace
             val sb = StringBuilder("Compiler Stack trace:")
-            for (i in 1 until  min(stackTrace.size, 8)) {
+            for (i in 1..<min(stackTrace.size, 8)) {
                 sb.append("\n    at " + stackTrace[i].toString())
             }
             if(stackTrace.size > 6){
@@ -114,13 +113,13 @@ object LogProcessor {
     }
 
     inline fun error(msg: String, e: Exception){
-        logger.error(msg, e)
+        logger.error("msg\n${e.javaClass}: ${e.message}")
         Function.addComment(msg, CommentLevel.ERROR)
         Project.errorCount++
         if(CompileSettings.isDebug){
             val stackTrace = Thread.currentThread().stackTrace
             val sb = StringBuilder("Compiler Stack trace:")
-            for (i in 1 until  min(stackTrace.size, 8)) {
+            for (i in 1..<min(stackTrace.size, 8)) {
                 sb.append("\n    at " + stackTrace[i].toString())
             }
             if(stackTrace.size > 6){
@@ -132,6 +131,32 @@ object LogProcessor {
 
     inline fun castError(type1: String, type2: String){
         error("Cannot cast [$type1] to [$type2]")
+    }
+
+    fun syntaxError(
+        recognizer: Recognizer<*, *>,
+        msg: String,
+        offendingSymbol: Token,
+        line: Int,
+        charPositionInLine: Int
+    ){
+        MCFPPFile.currFile?.syntaxError = true
+        logger.error(
+            "Syntax Error in " +
+                    MCFPPFile.currFile!!.absolutePath + ">>\n" + msg + "\n"
+                    + getLineInfo(recognizer, offendingSymbol, line, charPositionInLine)
+        )
+        Project.errorCount++
+    }
+
+    fun getLineInfo(recognizer: Recognizer<*, *>, offendingSymbol: Token, line: Int, charPositionInLine: Int): String{
+        val tokens = recognizer.inputStream as CommonTokenStream
+        val input = tokens.tokenSource.inputStream.toString()
+        val errorLine = input.split("\n")[line - 1]
+
+        //构建上下文指示
+        val indicator = " ".repeat(charPositionInLine) + "^"
+        return "$line | $errorLine\n${" ".repeat(line.toString().length)} | $indicator"
     }
 
     fun getLineInfo(ctx: ParserRuleContext): String {
@@ -150,10 +175,10 @@ object LogProcessor {
 
         // 构建上下文位置指示
         val indicator = " ".repeat(startColumn) + "^" + "~".repeat(stopColumn - startColumn - 1)
-        if(lineText.endsWith("\n")){
-            return "$lineNumber | $lineText${" ".repeat(lineNumber.toString().length)} | $indicator"
+        return if(lineText.endsWith("\n")){
+            "$lineNumber | $lineText${" ".repeat(lineNumber.toString().length)} | $indicator"
         }else{
-            return "$lineNumber | $lineText\n${" ".repeat(lineNumber.toString().length)} | $indicator"
+            "$lineNumber | $lineText\n${" ".repeat(lineNumber.toString().length)} | $indicator"
         }
     }
 

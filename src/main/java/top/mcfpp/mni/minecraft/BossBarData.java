@@ -60,7 +60,7 @@ public class BossBarData {
     }
 
     @MNIFunction(caller = "BossBar", isObject = true, returnType = "CommandReturn")
-    public static void list(ValueWrapper<CommandReturn> returnValue){
+    public static void list(DataTemplateObject bossbar, ValueWrapper<CommandReturn> returnValue){
         var command = new Command("bossbar list");
         returnValue.setValue(new CommandReturn(command,"bossbar_list"));
         Function.Companion.addCommand(command);
@@ -236,7 +236,7 @@ public class BossBarData {
         }
     }
 
-    @MNIFunction(normalParams = "BossBarColor", caller = "BossBar", returnType = "CommandReturn")
+    @MNIFunction(normalParams = "BossBarColor color", caller = "BossBar", returnType = "CommandReturn")
     public static void setColor(EnumVar color, DataTemplateObject caller, ValueWrapper<CommandReturn> re){
         var id = Objects.requireNonNull(caller.getMemberVarWithT("id", MCString.class));
         Command command = new Command("bossbar set");;
@@ -262,7 +262,7 @@ public class BossBarData {
         }
     }
 
-    @MNIFunction(normalParams = "JsonText", caller = "BossBar", returnType = "CommandReturn")
+    @MNIFunction(normalParams = "text name", caller = "BossBar", returnType = "CommandReturn")
     public static void setName(JsonText name, DataTemplateObject caller, ValueWrapper<CommandReturn> re){
         var id = Objects.requireNonNull(caller.getMemberVarWithT("id", MCString.class));
         Command command = new Command("bossbar set");
@@ -283,7 +283,7 @@ public class BossBarData {
         }
     }
 
-    @MNIFunction(normalParams = "Player", caller = "BossBar", returnType = "CommandReturn")
+    @MNIFunction(normalParams = "Player players", caller = "BossBar", returnType = "CommandReturn")
     public static void setVisiblePlayers(PlayerVar players, DataTemplateObject bossbar, ValueWrapper<CommandReturn> returnValue) {
         var id = Objects.requireNonNull(bossbar.getMemberVarWithT("id", MCString.class));
         Command command = new Command("bossbar set");
@@ -309,7 +309,7 @@ public class BossBarData {
         }
     }
 
-    @MNIFunction(normalParams = "BossBarStyle", caller = "BossBar", returnType = "CommandReturn")
+    @MNIFunction(normalParams = "BossBarStyle style", caller = "BossBar", returnType = "CommandReturn")
     public static void setStyle(EnumVar style, DataTemplateObject caller, ValueWrapper<CommandReturn> re){
         var id = Objects.requireNonNull(caller.getMemberVarWithT("id", MCString.class));
         Command command = new Command("bossbar set");

@@ -13,7 +13,11 @@ class PlayerInventory(val player: PlayerVar): PrivateVar<PlayerInventory>() {
     override var type: MCFPPType = object : MCFPPPrivateType() {
         override val typeName: String = "PlayerInventory"
         init {
-            privateType[this.typeName] = this
+            registerType()
+        }
+
+        override fun buildReturnVar(): Var<*> {
+            TODO("Not yet implemented")
         }
     }
 

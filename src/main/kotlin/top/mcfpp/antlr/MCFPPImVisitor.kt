@@ -19,7 +19,10 @@ import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.io.MCFPPFile
 import top.mcfpp.lib.Execute
 import top.mcfpp.lib.NBTPath
-import top.mcfpp.model.*
+import top.mcfpp.model.Class
+import top.mcfpp.model.CompoundData
+import top.mcfpp.model.Namespace
+import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.accessor.FunctionAccessor
 import top.mcfpp.model.accessor.FunctionMutator
 import top.mcfpp.model.accessor.Property
@@ -111,22 +114,6 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
     }
 
     /**
-     * 进入命名空间声明的时候
-     * @param ctx the parse tree
-     */
-    override fun visitNamespaceDeclaration(ctx: mcfppParser.NamespaceDeclarationContext):Any? {
-        Project.ctx = ctx
-        Project.currNamespace = ctx.Identifier(0).text
-        if(ctx.Identifier().size > 1){
-            for (n in ctx.Identifier().subList(1,ctx.Identifier().size-1)){
-                Project.currNamespace += ".$n"
-            }
-        }
-        MCFPPFile.currFile!!.topFunction.namespace = Project.currNamespace
-        return null
-    }
-
-    /**
      * 变量声明
      * @param ctx the parse tree
      */
@@ -152,7 +139,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
             //变量赋值
             `var` = `var`.assignedBy(init)
             //一定是函数变量
-            if (!Function.field.putVar(ctx.Identifier().text, `var`, false)) {
+            if (!Function.currField.putVar(ctx.Identifier().text, `var`, false)) {
                 LogProcessor.error("Duplicate defined variable name:" + ctx.Identifier().text)
             }
             when(fieldModifier){
@@ -185,7 +172,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                 }
                 //变量注册
                 //一定是函数变量
-                if (Function.field.containVar(c.Identifier().text)) {
+                if (Function.currField.containVar(c.Identifier().text)) {
                     LogProcessor.error("Duplicate defined variable name:" + c.Identifier().text)
                 }
                 Function.addComment("field: " + ctx.type().text + " " + c.Identifier().text + if (c.expression() != null) " = " + c.expression().text else "")
@@ -210,7 +197,7 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
                         }
                     }
                 }
-                Function.field.putVar(`var`.identifier, `var`, true)
+                Function.currField.putVar(`var`.identifier, `var`, true)
             }
         }
         return null
@@ -1019,61 +1006,13 @@ open class MCFPPImVisitor: mcfppParserBaseVisitor<Any?>() {
      */
 
     override fun visitTemplateBody(ctx: mcfppParser.TemplateBodyContext): Any? {
-        enterTemplateBody(ctx)
-        super.visitTemplateBody(ctx)
-        exitTemplateBody(ctx)
+        //什么都不做哦
         return null
-    }
-    
-    private fun enterTemplateBody(ctx: mcfppParser.TemplateBodyContext) {
-        Project.ctx = ctx
-        //获取类的对象
-        val parent = ctx.parent
-        if(parent is mcfppParser.TemplateDeclarationContext){
-            val identifier = parent.classWithoutNamespace().text
-            DataTemplate.currTemplate = GlobalField.getTemplate(Project.currNamespace, identifier)
-        }else if(parent is mcfppParser.ObjectTemplateDeclarationContext){
-            val identifier = parent.classWithoutNamespace().text
-            DataTemplate.currTemplate = GlobalField.getObject(Project.currNamespace, identifier) as ObjectDataTemplate
-        }else{
-            throw Exception("Unknown parent")
-        }
-        //设置作用域
-    }
-
-    /**
-     * 离开类体。将缓存重新指向全局
-     * @param ctx the parse tree
-     */
-    private fun exitTemplateBody(ctx: mcfppParser.TemplateBodyContext) {
-        Project.ctx = ctx
-        DataTemplate.currTemplate = null
     }
 
     override fun visitObjectTemplateDeclaration(ctx: mcfppParser.ObjectTemplateDeclarationContext?): Any? {
-
-        return super.visitObjectTemplateDeclaration(ctx)
-    }
-
-    override fun visitTemplateFunctionDeclaration(ctx: mcfppParser.TemplateFunctionDeclarationContext): Any? {
-        enterTemplateFunctionDeclaration(ctx)
-        super.visitTemplateFunctionDeclaration(ctx)
-        exitTemplateFunctionDeclaration(ctx)
+        //什么都不做哦
         return null
-    }
-
-    private fun enterTemplateFunctionDeclaration(ctx: mcfppParser.TemplateFunctionDeclarationContext) {
-        Project.ctx = ctx
-        //解析参数
-        val types = FunctionParam.parseReadonlyAndNormalParamTypes(ctx.functionParams())
-        //获取缓存中的对象
-        val f = DataTemplate.currTemplate!!.field.getFunction(ctx.Identifier().text, types.first.map { it.build("") }, types.second.map { it.build("") })
-        Function.currFunction = f
-    }
-
-    fun exitTemplateFunctionDeclaration(ctx: mcfppParser.TemplateFunctionDeclarationContext) {
-        Project.ctx = ctx
-        Function.currFunction = Function.nullFunction
     }
 
     //endregion

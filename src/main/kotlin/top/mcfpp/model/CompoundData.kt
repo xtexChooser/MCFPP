@@ -227,6 +227,9 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
                 }
                 val readOnlyType = mniRegister.readOnlyParams.map {
                     var qwq = it.split(" ", limit = 3)
+                    if(qwq.size < 2){
+                        LogProcessor.error("Missing type or identifier in native function parameter definition: '$it'")
+                    }
                     if(qwq.size == 3) qwq = qwq.subList(1, 3)
                     val type = MCFPPType.parseFromIdentifier(qwq[0], nf.field)?: run {
                         LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(qwq[0]))
@@ -236,6 +239,9 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
                 }
                 val normalType = mniRegister.normalParams.map {
                     var qwq = it.split(" ", limit = 3)
+                    if(qwq.size < 2) {
+                        LogProcessor.error("Missing type or identifier in native function parameter definition: '$it'")
+                    }
                     if(qwq.size == 3) qwq = qwq.subList(1, 3)
                     val type = MCFPPType.parseFromIdentifier(qwq[0], nf.field)?: run {
                         LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(qwq[0]))

@@ -9,7 +9,9 @@ import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.util.LogProcessor
 
-open class MCFPPPrivateType(parentType: List<MCFPPType> = listOf()) : MCFPPType(parentType) {
+abstract class MCFPPPrivateType(parentType: List<MCFPPType> = listOf()) : MCFPPType(parentType) {
+
+    abstract fun buildReturnVar(): Var<*>
 
     final override fun build(identifier: String, container: FieldContainer): Var<*> {
         LogProcessor.error("Cannot build var for type: $typeName")
@@ -43,6 +45,10 @@ open class MCFPPPrivateType(parentType: List<MCFPPType> = listOf()) : MCFPPType(
 
     object CommandReturn: MCFPPPrivateType(parentType = listOf(MCFPPBaseType.Any)){
 
+        override fun buildReturnVar(): Var<*> {
+            return top.mcfpp.core.lang.CommandReturn.empty
+        }
+
         override val objectData: CompoundData
             get() = top.mcfpp.core.lang.CommandReturn.data
 
@@ -56,10 +62,18 @@ open class MCFPPPrivateType(parentType: List<MCFPPType> = listOf()) : MCFPPType(
     object MCFPPObjectVarType: MCFPPPrivateType() {
         override val typeName: String
             get() = "ObjectVar"
+
+        override fun buildReturnVar(): Var<*> {
+            TODO("Not yet implemented")
+        }
     }
 
     object MCFPPCoordinateDimension: MCFPPPrivateType(){
         override val typeName: String
             get() = "CoordinateDimension"
+
+        override fun buildReturnVar(): Var<*> {
+            TODO("Not yet implemented")
+        }
     }
 }

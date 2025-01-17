@@ -2,6 +2,7 @@ package top.mcfpp.model.field
 
 import top.mcfpp.Project
 import top.mcfpp.core.lang.Var
+import top.mcfpp.io.MCFPPFile
 import top.mcfpp.lib.SbObject
 import top.mcfpp.mni.DataObjectData
 import top.mcfpp.mni.MinecraftData
@@ -87,30 +88,34 @@ object GlobalField : FieldContainer, IField {
         Project.mcfppTick = Function("tick","mcfpp", context = null)
         Project.mcfppLoad = Function("load","mcfpp", context = null)
         Project.mcfppInit = Function("init", "mcfpp", context = null)
-        stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppLoad,true)
-        stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppTick,true)
-        stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppInit, true)
-        stdNamespaces["mcfpp"]!!.field.addFunction(Project.mcfppSystemTick, true)
+        stdNamespaces["mcfpp"]?.field?.addFunction(Project.mcfppLoad,true)
+        stdNamespaces["mcfpp"]?.field?.addFunction(Project.mcfppTick,true)
+        stdNamespaces["mcfpp"]?.field?.addFunction(Project.mcfppInit, true)
+        stdNamespaces["mcfpp"]?.field?.addFunction(Project.mcfppSystemTick, true)
 
         FunctionTag.TICK.functions.add(Project.mcfppTick)
         FunctionTag.TICK.functions.add(Project.mcfppSystemTick)
         FunctionTag.LOAD.functions.add(Project.mcfppLoad)
         FunctionTag.LOAD.functions.add(Project.mcfppInit)
 
-        stdNamespaces["mcfpp.lang"]!!.field.addTemplate("DataObject", DataTemplate.baseDataTemplate)
+        stdNamespaces["mcfpp.lang"]?.field?.addTemplate("DataObject", DataTemplate.baseDataTemplate)
         DataTemplate.baseDataTemplate.getNativeFromClass(DataObjectData::class.java)
-        stdNamespaces["mcfpp.lang"]!!.field.addClass("Object", Class.baseClass)
+        stdNamespaces["mcfpp.lang"]?.field?.addClass("Object", Class.baseClass)
 
         stdNamespaces["mcfpp.minecraft"]!!.getNativeFunctionFromClass(MinecraftData::class.java)
 
-        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("From", From::class.java)
-        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("ConcreteOnly", ConcreteOnly::class.java)
-        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("NoInstance", NoInstance::class.java)
-        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("To", To::class.java)
-        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("Base", Base::class.java)
-        stdNamespaces["mcfpp.annotation"]!!.field.addAnnotation("Dynamic", Dynamic::class.java)
+        stdNamespaces["mcfpp.annotation"]?.field?.addAnnotation("From", From::class.java)
+        stdNamespaces["mcfpp.annotation"]?.field?.addAnnotation("ConcreteOnly", ConcreteOnly::class.java)
+        stdNamespaces["mcfpp.annotation"]?.field?.addAnnotation("NoInstance", NoInstance::class.java)
+        stdNamespaces["mcfpp.annotation"]?.field?.addAnnotation("To", To::class.java)
+        stdNamespaces["mcfpp.annotation"]?.field?.addAnnotation("Base", Base::class.java)
+        stdNamespaces["mcfpp.annotation"]?.field?.addAnnotation("Dynamic", Dynamic::class.java)
 
         return this
+    }
+
+    fun getNamespace(namespace: String): Namespace?{
+        return localNamespaces[namespace]?: importedLibNamespaces[namespace]?: stdNamespaces[namespace]
     }
 
     /**
@@ -125,12 +130,8 @@ object GlobalField : FieldContainer, IField {
      */
     fun getFunction(namespace:String?, identifier: String, readOnlyParams: List<Var<*>>, normalParams : List<Var<*>>): Function {
         if(namespace == null){
-            val f = localNamespaces[Project.currNamespace]?.field?.getFunction(identifier, readOnlyParams, normalParams)
-            if(f !is UnknownFunction && f != null) return f
-            for (n in importedLibNamespaces.values){
-                val f1 = n.field.getFunction(identifier, readOnlyParams, normalParams)
-                if(f1 !is UnknownFunction) return f1
-            }
+            val f = MCFPPFile.currFile?.field?.getFunction(identifier, readOnlyParams, normalParams)
+            if(f != null && f !is UnknownFunction) return f
             for (n in stdNamespaces.values){
                 val f1 = n.field.getFunction(identifier, readOnlyParams, normalParams)
                 if(f1 !is UnknownFunction) return f1
@@ -159,12 +160,8 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var cls: Class?
             //命名空间为空，从全局寻找
-            cls = localNamespaces[Project.currNamespace]?.field?.getClass(identifier, readOnlyParams)
+            cls = MCFPPFile.currFile?.field?.getClass(identifier, readOnlyParams)
             if(cls != null) return cls
-            for (nsp in importedLibNamespaces.values){
-                cls = nsp.field.getClass(identifier, readOnlyParams)
-                if(cls != null) return cls
-            }
             for (nsp in stdNamespaces.values){
                 cls = nsp.field.getClass(identifier, readOnlyParams)
                 if(cls != null) return cls
@@ -194,12 +191,8 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var cls: Class?
             //命名空间为空，从全局寻找
-            cls = localNamespaces[Project.currNamespace]?.field?.getClass(identifier)
+            cls = MCFPPFile.currFile?.field?.getClass(identifier)
             if(cls != null) return cls
-            for (nsp in importedLibNamespaces.values){
-                cls = nsp.field.getClass(identifier)
-                if(cls != null) return cls
-            }
             for (nsp in stdNamespaces.values){
                 cls = nsp.field.getClass(identifier)
                 if(cls != null) return cls
@@ -229,12 +222,8 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var itf: Interface?
             //命名空间为空，从全局寻找
-            itf = localNamespaces[Project.currNamespace]?.field?.getInterface(identifier)
+            itf = MCFPPFile.currFile?.field?.getInterface(identifier)
             if(itf != null) return itf
-            for (nsp in importedLibNamespaces.values){
-                itf = nsp.field.getInterface(identifier)
-                if(itf != null) return itf
-            }
             for (nsp in stdNamespaces.values){
                 itf = nsp.field.getInterface(identifier)
                 if(itf != null) return itf
@@ -264,12 +253,8 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var template: DataTemplate?
             //命名空间为空，从全局寻找
-            template = localNamespaces[Project.currNamespace]?.field?.getTemplate(identifier)
+            template = MCFPPFile.currFile?.field?.getTemplate(identifier)
             if(template != null) return template
-            for (nsp in importedLibNamespaces.values){
-                template = nsp.field.getTemplate(identifier)
-                if(template != null) return template
-            }
             for (nsp in stdNamespaces.values){
                 template = nsp.field.getTemplate(identifier)
                 if(template != null) return template
@@ -291,12 +276,8 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var enum: Enum?
             //命名空间为空，从全局寻找
-            enum = localNamespaces[Project.currNamespace]?.field?.getEnum(identifier)
+            enum = MCFPPFile.currFile?.field?.getEnum(identifier)
             if(enum != null) return enum
-            for (nsp in importedLibNamespaces.values){
-                enum = nsp.field.getEnum(identifier)
-                if(enum != null) return enum
-            }
             for (nsp in stdNamespaces.values){
                 enum = nsp.field.getEnum(identifier)
                 if(enum != null) return enum
@@ -326,12 +307,8 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var obj: CompoundData?
             //命名空间为空，从全局寻找
-            obj = localNamespaces[Project.currNamespace]!!.field.getObject(identifier)
+            obj = MCFPPFile.currFile?.field?.getObject(identifier)
             if(obj != null) return obj
-            for (nsp in importedLibNamespaces.values){
-                obj = nsp.field.getObject(identifier)
-                if(obj != null) return obj
-            }
             for (nsp in stdNamespaces.values){
                 obj = nsp.field.getObject(identifier)
                 if(obj != null) return obj
@@ -353,12 +330,8 @@ object GlobalField : FieldContainer, IField {
         if(namespace == null){
             var annotation: java.lang.Class<out Annotation>?
             //命名空间为空，从全局寻找
-            annotation = localNamespaces[Project.currNamespace]!!.field.getAnnotation(identifier)
+            annotation = MCFPPFile.currFile?.field?.getAnnotation(identifier)
             if(annotation != null) return annotation
-            for (nsp in importedLibNamespaces.values){
-                annotation = nsp.field.getAnnotation(identifier)
-                if(annotation != null) return annotation
-            }
             for (nsp in stdNamespaces.values){
                 annotation = nsp.field.getAnnotation(identifier)
                 if(annotation != null) return annotation
