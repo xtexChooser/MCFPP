@@ -1,0 +1,4 @@
+data SmallFireball: EntityData, ProjectileData, FireballData {
+    @Name<"Item">
+    list<Item> item;
+}

@@ -1,0 +1,2 @@
+data CaveSpider: EntityData, CreatureData, AIMobData {
+}

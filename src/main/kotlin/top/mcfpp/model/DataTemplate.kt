@@ -6,16 +6,14 @@ import top.mcfpp.core.lang.DataTemplateObject
 import top.mcfpp.core.lang.MCAny
 import top.mcfpp.core.lang.UnknownVar
 import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPDataTemplateType
-import top.mcfpp.mni.DataObjectData
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.field.CompoundDataField
 import top.mcfpp.model.function.DataTemplateConstructor
 import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPDataTemplateType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
-import kotlin.collections.ArrayList
 
 /**
  * 结构体是一种和类的语法极为相似的数据结构。在结构体中，只能有int类型的数据，或者说记分板的数据作为结构体的成员。
@@ -116,30 +114,37 @@ open class DataTemplate : FieldContainer, CompoundData {
             is Property -> {
                 field.putProperty(member.identifier, member)
             }
-            else -> TODO()
+            else -> {
+                throw IllegalArgumentException("")
+            }
         }
     }
 
     override fun extends(compoundData: CompoundData): CompoundData {
         super.extends(compoundData)
+        if(parent.contains(compoundData)){
+            LogProcessor.warn("Already extends template '${compoundData.identifier}'")
+            return this
+        }
         //把所有成员都塞进去
         compoundData.field.forEachVar {
             val b = field.getVar(it.identifier) != null
             if(b){
-                LogProcessor.warn("Duplicate var ${it.identifier} in template ${compoundData.identifier}. Overriding it.")
+                LogProcessor.warn("Duplicate var '${it.identifier}' in template '${compoundData.identifier}'. Overriding it.")
             }
             field.putVar(it.identifier, it, true)
         }
         compoundData.field.forEachProperty {
             val b = field.getProperty(it.identifier) != null
             if(b){
-                LogProcessor.warn("Duplicate property ${it.identifier} in template ${compoundData.identifier}. Overriding it.")
+                LogProcessor.warn("Duplicate property '${it.identifier}' in template '${compoundData.identifier}'. Overriding it.")
             }
             field.putProperty(it.identifier, it, true)
         }
         return this
     }
 
+    //TODO 不能正常检测循环引用
     fun ifInfinitiveReference(template: DataTemplate): Boolean{
         return template == this && reference.any { it == template || it.ifInfinitiveReference(template) }
     }

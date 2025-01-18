@@ -1,0 +1,4 @@
+data Trident: EntityData, ProjectileData, ArrowData {
+    @Name<"DealtDamage">
+    bool dealtDamage;
+}

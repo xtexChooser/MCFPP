@@ -1,0 +1,51 @@
+data Allay: EntityData, AIMobData, CreatureData {
+    @Name<"CanDuplicate">
+    byte canDuplicate;
+
+    @Name<"DuplicationCooldown">
+    long duplicationCooldown;
+
+    @Name<"Inventory">
+    list<Item> inventory;
+
+    @Name<"Listener">
+    Listener listener;
+}
+
+data Listener {
+        data event {
+            float distance;
+
+            @Name<"game_event">
+            string gameEvent;
+            
+            list<double> pos;
+            
+            @Name<"projectile_owner">
+            IntArray projectileOwner;
+
+            IntArray source;
+        }
+
+        @Name<"event_delay">
+        int eventDelay;
+
+        @Name<"selector">
+        data _selector {
+            long tick;
+
+            data event {
+                float distance;
+
+                @Name<"game_event">
+                string gameEvent;
+
+                list<double> pos;
+
+                @Name<"projectile_owner">
+                IntArray projectileOwner;
+
+                IntArray source;
+            }
+        }
+    }

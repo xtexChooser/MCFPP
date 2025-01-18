@@ -1,0 +1,10 @@
+data Hoglin: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"CannotBeHunted">
+    bool cannotBehunted;
+
+    @Name<"IsImmuneToZombification">
+    bool isImmuneToZombification;
+
+    @Name<"TimeInOverworld">
+    int timeInOverworld;
+}

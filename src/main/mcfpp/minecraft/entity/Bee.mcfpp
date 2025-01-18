@@ -1,0 +1,22 @@
+data Bee: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, NeutralData {
+    @Name<"CannotEnterHiveTicks">
+    int cannotEnterHiveTicks;
+
+    @Name<"CropsGrownSincePollination">
+    int cropsGrownSincePollination;
+
+    @Name<"flower_pos">
+    IntArray flowerPos;
+
+    @Name<"HasNectar">
+    byte hasNectar;
+
+    @Name<"HasStung">
+    byte hasStung;
+
+    @Name<"hive_pos">
+    IntArray hivePos;
+
+    @Name<"TicksSincePollination">
+    int ticksSincePollination;
+}

@@ -1,0 +1,2 @@
+data ExperienceBottle: EntityData, ProjectileData, MissileData {
+}

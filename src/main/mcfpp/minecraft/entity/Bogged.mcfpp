@@ -1,0 +1,3 @@
+data Bogged: EntityData, CreatureData, AIMobData {
+    
+}

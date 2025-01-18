@@ -1,0 +1,10 @@
+data Ravager: EntityData, CreatureData, AIMobData, RaiderData {
+    @Name<"AttackTick">
+    int attackTick;
+
+    @Name<"RoarTick">
+    int roarTick;
+
+    @Name<"StunTick">
+    int stunTick;
+}

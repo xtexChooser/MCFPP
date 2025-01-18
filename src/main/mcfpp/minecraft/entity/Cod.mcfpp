@@ -1,0 +1,4 @@
+data Cod: EntityData, CreatureData, AIMobData {
+    @Name<"FromBucket">
+    bool fromBucket;
+}

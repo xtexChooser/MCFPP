@@ -1,0 +1,17 @@
+data Attribute {
+    string id;
+    double base;
+    list<AttributeModifier> modifiers;
+}
+
+data AttributeModifier {
+    AttributeModifierType type;
+    double amount;
+    string id;
+}
+
+enum AttributeModifierType {
+    add_value,
+    add_multiplied_base,
+    add_multiplied_total
+}

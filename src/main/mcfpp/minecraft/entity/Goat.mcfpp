@@ -1,0 +1,10 @@
+data Goat: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"HasLeftHorn">
+    bool hasLeftHorn;
+
+    @Name<"HasRightHorn">
+    bool hasRightHorn;
+
+    @Name<"IsScreamingGoat">
+    bool isScreamingGoat;
+}

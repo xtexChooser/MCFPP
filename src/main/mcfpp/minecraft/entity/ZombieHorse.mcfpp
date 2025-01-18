@@ -1,0 +1,3 @@
+data ZombieHorse: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, HorseData {
+    
+}

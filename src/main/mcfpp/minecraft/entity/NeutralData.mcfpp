@@ -1,0 +1,8 @@
+data NeutralData {
+
+    @Name<"AngryAt">
+    IntArray angryAt;
+
+    @Name<"AngerTime">
+    int angerTime;
+}

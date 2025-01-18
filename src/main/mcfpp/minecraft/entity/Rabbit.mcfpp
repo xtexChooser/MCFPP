@@ -1,0 +1,7 @@
+data Rabbit: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"MoreCarrotTicks">
+    int moreCarrotTicks;
+
+    @Name<"RabbitType">
+    int rabbitType;
+}

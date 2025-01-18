@@ -1,0 +1,21 @@
+data Llama: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, HorseData {
+
+    @Name<"ChestedHorse">
+    bool chestedHorse;
+
+    @Name<"DespawnDelay">
+    int despawnDelay;
+
+    @Name<"Items">
+    list<Item> items;
+
+    @Name<"Variant">
+    LlamaVariant variant;
+}
+
+enum LlamaVariant {
+    creamy = 0,
+    white = 1,
+    brown = 2,
+    gray = 3
+}

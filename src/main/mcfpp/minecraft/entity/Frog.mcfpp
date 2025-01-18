@@ -1,0 +1,8 @@
+data Frog: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"Variant">
+    FrogVariant variant;
+}
+
+enum FrogVariant {
+    temperate, warm, cold
+}

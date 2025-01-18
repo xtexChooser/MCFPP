@@ -1,0 +1,2 @@
+data Giant: EntityData, CreatureData, AIMobData {
+}

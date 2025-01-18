@@ -1,0 +1,13 @@
+data Vex: EntityData, CreatureData, AIMobData {
+    @Name<"BoundX">
+    int boundX;
+
+    @Name<"BoundY">
+    int boundY;
+
+    @Name<"BoundZ">
+    int boundZ;
+
+    @Name<"LifeTicks">
+    int lifeTicks;
+}

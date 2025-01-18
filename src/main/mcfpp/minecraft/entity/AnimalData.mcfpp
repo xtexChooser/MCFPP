@@ -1,0 +1,7 @@
+data AnimalData{
+    @Name<"InLove">
+    int inLove;
+
+    @Name<"LoveCause">
+    IntArray loveCause;
+}

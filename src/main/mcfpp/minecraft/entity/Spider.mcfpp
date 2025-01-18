@@ -1,0 +1,3 @@
+data Spider: EntityData, CreatureData, AIMobData{
+    
+}

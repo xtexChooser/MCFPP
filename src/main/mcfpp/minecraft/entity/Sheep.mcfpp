@@ -1,0 +1,7 @@
+data Sheep: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"Color">
+    byte color;
+
+    @Name<"Sheared">
+    bool sheared;
+}

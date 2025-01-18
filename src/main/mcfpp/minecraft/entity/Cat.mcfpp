@@ -1,0 +1,7 @@
+data Cat: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, TameableData {
+    @Name<"CollarColor">
+    byte collarColor;
+
+    @Name<"Variant">
+    string variant;
+}

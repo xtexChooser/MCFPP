@@ -1,0 +1,13 @@
+data Armadillo: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"Scute_Time">
+    int scuteTime;
+
+    @Name<"State">
+    ArmadilloState state;
+}
+
+enum ArmadilloState {
+    idle,
+    rolling,
+    scared
+}

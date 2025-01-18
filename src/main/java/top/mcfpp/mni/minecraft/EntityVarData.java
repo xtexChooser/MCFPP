@@ -66,11 +66,11 @@ public class EntityVarData {
             );
         }
         ArrayList<Command> commandList = new ArrayList<>(Arrays.asList(commands));
-        var last = commandList.get(commandList.size() - 1);
+        var last = commandList.getLast();
         if(last.isMacro()){
-            commandList.remove(commandList.size() - 1);
+            commandList.removeLast();
             commandList.addAll(Arrays.asList(last.buildMacroFunction()));
-            returnValue.setValue(new CommandReturn(commandList.get(commandList.size() - 1), "return"));
+            returnValue.setValue(new CommandReturn(commandList.getLast(), "return"));
         }else {
             returnValue.setValue(new CommandReturn(last, "return"));
         }
@@ -85,11 +85,11 @@ public class EntityVarData {
             buildingCommand = buildingCommand.buildMacro(scale, true);
         }
         ArrayList<Command> commands = new ArrayList<>(Arrays.stream(Commands.INSTANCE.runAsEntity(caller, buildingCommand)).toList());
-        var last = commands.get(commands.size() - 1);
+        var last = commands.getLast();
         if(last.isMacro()){
-            commands.remove(commands.size() - 1);
+            commands.removeLast();
             commands.addAll(Arrays.stream(last.buildMacroFunction()).toList());
-            returnValue.setValue(new CommandReturn(commands.get(commands.size() - 1), "return"));
+            returnValue.setValue(new CommandReturn(commands.getLast(), "return"));
         }else {
             returnValue.setValue(new CommandReturn(last, "return"));
         }
@@ -104,11 +104,11 @@ public class EntityVarData {
             buildingCommand = buildingCommand.buildMacro(scale, true);
         }
         ArrayList<Command> commands = new ArrayList<>(Arrays.stream(Commands.INSTANCE.runAsEntity(caller, buildingCommand)).toList());
-        var last = commands.get(commands.size() - 1);
+        var last = commands.getLast();
         if(last.isMacro()){
-            commands.remove(commands.size() - 1);
+            commands.removeLast();
             commands.addAll(Arrays.stream(last.buildMacroFunction()).toList());
-            returnValue.setValue(new CommandReturn(commands.get(commands.size() - 1), "return"));
+            returnValue.setValue(new CommandReturn(commands.getLast(), "return"));
         }else {
             returnValue.setValue(new CommandReturn(last, "return"));
         }
@@ -121,9 +121,8 @@ public class EntityVarData {
             commands = Commands.INSTANCE.runAsEntity(caller,
                     new Command("return run attribute @s " + AttributeData.attributeMap.get(attribute) + " modifier add "
                             + modifierC.getValue().get("id", StringTag.class).getValue() + " "
-                            + modifierC.getValue().get("value", DoubleTag.class).asDouble() + " "
-                            + modifierC.getValue().get("operation", StringTag.class).getValue() + " "
-                            + modifierC.getValue().get("mode", StringTag.class).getValue())
+                            + modifierC.getValue().get("amount", DoubleTag.class).asDouble() + " "
+                            + modifierC.getValue().get("operation", StringTag.class).getValue())
             );
         } else {
             var buildingCommand = new Command("return run attribute @s " + AttributeData.attributeMap.get(attribute) + " modifier add");
@@ -133,7 +132,7 @@ public class EntityVarData {
             }else {
                 buildingCommand = buildingCommand.buildMacro(id, true);
             }
-            var value = modifier.getMemberVar("value", Member.AccessModifier.PUBLIC).getFirst();
+            var value = modifier.getMemberVar("amount", Member.AccessModifier.PUBLIC).getFirst();
             if(value instanceof MCFloatConcrete valueC){
                 buildingCommand = buildingCommand.build(valueC.getValue().toString(), true);
             }else {
@@ -145,18 +144,12 @@ public class EntityVarData {
             }else {
                 buildingCommand = buildingCommand.buildMacro(operation, true);
             }
-            var mode = modifier.getMemberVar("mode", Member.AccessModifier.PUBLIC).getFirst();
-            if(mode instanceof MCStringConcrete modeC){
-                buildingCommand = buildingCommand.build(modeC.getValue().getValue(), true);
-            }else {
-                buildingCommand = buildingCommand.buildMacro(mode, true);
-            }
             ArrayList<Command> commandArrayList = new ArrayList<>(Arrays.stream(Commands.INSTANCE.runAsEntity(caller, buildingCommand)).toList());
-            var last = commandArrayList.get(commandArrayList.size() - 1);
+            var last = commandArrayList.getLast();
             if(last.isMacro()){
-                commandArrayList.remove(commandArrayList.size() - 1);
+                commandArrayList.removeLast();
                 commandArrayList.addAll(Arrays.stream(last.buildMacroFunction()).toList());
-                returnValue.setValue(new CommandReturn(commandArrayList.get(commandArrayList.size() - 1), "return"));
+                returnValue.setValue(new CommandReturn(commandArrayList.getLast(), "return"));
             }else {
                 returnValue.setValue(new CommandReturn(last, "return"));
             }
@@ -182,11 +175,11 @@ public class EntityVarData {
                 buildingCommand = buildingCommand.buildMacro(id, true);
             }
             ArrayList<Command> commandArrayList = new ArrayList<>(Arrays.stream(Commands.INSTANCE.runAsEntity(caller, buildingCommand)).toList());
-            var last = commandArrayList.get(commandArrayList.size() - 1);
+            var last = commandArrayList.getLast();
             if(last.isMacro()){
-                commandArrayList.remove(commandArrayList.size() - 1);
+                commandArrayList.removeLast();
                 commandArrayList.addAll(Arrays.stream(last.buildMacroFunction()).toList());
-                returnValue.setValue(new CommandReturn(commandArrayList.get(commandArrayList.size() - 1), "return"));
+                returnValue.setValue(new CommandReturn(commandArrayList.getLast(), "return"));
             }else {
                 returnValue.setValue(new CommandReturn(last, "return"));
             }
@@ -197,7 +190,6 @@ public class EntityVarData {
     }
 
     public static void getAttributeModifier(String attribute, EntityVar caller, DataTemplateObject modifier, MCFloat scale, ValueWrapper<CommandReturn> returnValue){
-        Command[] commands;
         var buildingCommand = new Command("attribute @s " + AttributeData.attributeMap.get(attribute) + " modifier value get");
         var id = modifier.getMemberVar("id", Member.AccessModifier.PUBLIC).getFirst();
 
@@ -218,12 +210,12 @@ public class EntityVarData {
             buildingCommand.prepend("return run", true);
         }
         var commandArrayList = new ArrayList<>(Arrays.asList(Commands.INSTANCE.runAsEntity(caller, buildingCommand)));
-        var last = commandArrayList.get(commandArrayList.size() - 1);
+        var last = commandArrayList.getLast();
         if(last.isMacro()){
-            commandArrayList.remove(commandArrayList.size() - 1);
+            commandArrayList.removeLast();
             commandArrayList.addAll(Arrays.stream(last.buildMacroFunction()).toList());
         }
-        returnValue.setValue(new CommandReturn(commandArrayList.get(commandArrayList.size() - 1), "return"));
+        returnValue.setValue(new CommandReturn(commandArrayList.getLast(), "return"));
         Function.Companion.addCommands(commandArrayList.toArray(new Command[0]));
     }
 }

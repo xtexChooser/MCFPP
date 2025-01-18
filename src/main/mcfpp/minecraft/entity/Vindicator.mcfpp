@@ -1,0 +1,4 @@
+data Vindicator: EntityData, CreatureData, AIMobData, RaiderData{
+    @Name<"Johnny">
+    bool johnny;
+}

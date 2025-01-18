@@ -1,0 +1,7 @@
+data Chicken: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"EggLayTime">
+    int eggLayTime;
+
+    @Name<"IsChickenJockey">
+    bool isChickenJockey;
+}

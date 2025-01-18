@@ -1,0 +1,2 @@
+data Egg: EntityData, ProjectileData, MissileData {
+}

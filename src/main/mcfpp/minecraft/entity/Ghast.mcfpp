@@ -1,0 +1,4 @@
+data Ghast: EntityData, CreatureData, AIMobData {
+    @Name<"ExplosionPower">
+    bool explosionPower;
+}

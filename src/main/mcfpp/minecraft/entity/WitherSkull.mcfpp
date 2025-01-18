@@ -1,0 +1,3 @@
+data WitherSkull: EntityData, ProjectileData, FireballData {
+    bool dangerous;
+}

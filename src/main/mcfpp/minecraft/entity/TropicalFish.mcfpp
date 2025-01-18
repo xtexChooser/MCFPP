@@ -1,0 +1,7 @@
+data TropicalFish: EntityData, CreatureData, AIMobData {
+    @Name<"FromBucket">
+    bool fromBucket;
+
+    @Name<"Variant">
+    int variant;
+}

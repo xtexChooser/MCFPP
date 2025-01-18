@@ -1,0 +1,13 @@
+data Experience_Orb {
+    @Name<"Age">
+    short age;
+
+    @Name<"Count">
+    int count;
+
+    @Name<"Health">
+    short health;
+
+    @Name<"Value">
+    short value;
+}

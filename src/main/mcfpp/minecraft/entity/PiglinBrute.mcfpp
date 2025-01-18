@@ -1,0 +1,7 @@
+data PiglinBrute: EntityData, CreatureData, AIMobData {
+    @Name<"IsImmuneToZombification">
+    bool isImmuneToZombification;
+
+    @Name<"TimeInOverworld">
+    int timeInOverworld;
+}

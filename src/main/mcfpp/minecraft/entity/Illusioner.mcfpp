@@ -1,0 +1,4 @@
+data Illusioner: EntityData, CreatureData, AIMobData, RaiderData {
+    @Name<"SpellTicks">
+    int spellTicks;
+}

@@ -1,0 +1,7 @@
+data Slime: EntityData, CreatureData, AIMobData {
+    @Name<"Size">
+    int size;
+
+    @Name<"WasOnGround">
+    bool wasOnGround;
+}

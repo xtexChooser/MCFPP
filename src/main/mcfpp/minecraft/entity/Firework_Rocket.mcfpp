@@ -1,0 +1,13 @@
+data Firework_Rocket {
+    @Name<"FireworksItem">
+    list<Firework_Rocket> fireworksItem;
+
+    @Name<"Life">
+    int life;
+
+    @Name<"LifeTime">
+    int lifeTime;
+
+    @Name<"ShotAtAngle">
+    byte shotAtAngle;
+}

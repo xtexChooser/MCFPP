@@ -1,0 +1,7 @@
+data Donkey: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, HorseData {
+    @Name<"ChestedHorse">
+    bool chestedHorse;
+
+    @Name<"Items">
+    list<Item> items;
+}

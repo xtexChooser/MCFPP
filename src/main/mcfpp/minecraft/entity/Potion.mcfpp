@@ -1,0 +1,2 @@
+data Potion: EntityData, ProjectileData, MissileData {
+}

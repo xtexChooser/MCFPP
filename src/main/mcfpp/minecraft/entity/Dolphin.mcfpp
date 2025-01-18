@@ -1,0 +1,16 @@
+data Dolphin: EntityData, CreatureData, AIMobData, GrowableData {
+    @Name<"Moistness">
+    int moistness;
+
+    @Name<"GotFish">
+    byte gotFish;
+
+    @Name<"TreasurePosX">
+    int treasurePosX;
+
+    @Name<"TreasurePosY">
+    int treasurePosY;
+
+    @Name<"TreasurePosZ">
+    int treasurePosZ;
+}

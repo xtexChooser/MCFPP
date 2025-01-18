@@ -1,0 +1,3 @@
+data Sniffer: EntityData, CreatureData, AIMobData, GrowableData, AnimalData{
+    
+}

@@ -1,0 +1,4 @@
+data Pillager: EntityData, CreatureData, AIMobData, RaiderData {
+    @Name<"Inventory">
+    list<Item> inventory;
+}

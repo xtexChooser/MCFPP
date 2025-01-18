@@ -39,15 +39,19 @@ open class ClassConstructor
             }
             funcs.append("}")
             //对象实体创建
-            if(target.baseEntity == Class.ENTITY_MARKER){
-                addCommand("data merge entity @s {Tags:[${target.tag},${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
-            }else if(target.baseEntity == Class.ENTITY_ITEM_DISPLAY){
-                addCommand("data modify entity @s item.components.\"minecraft:custom_data\".mcfppData set value {Tags:[${target.tag},${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
-            }else{
-                addCommand("tag @s add ${target.tag}")
-                addCommand("summon marker ~ ~ ~ {Tags:[${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
-                addCommand("ride @n[tag=just, type=marker] mount @s")
-                addCommand("tag @n[tag=just, type=marker] remove just")
+            when (target.baseEntity) {
+                Class.ENTITY_MARKER -> {
+                    addCommand("data merge entity @s {Tags:[${target.tag},${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
+                }
+                Class.ENTITY_ITEM_DISPLAY -> {
+                    addCommand("data modify entity @s item.components.\"minecraft:custom_data\".mcfppData set value {Tags:[${target.tag},${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
+                }
+                else -> {
+                    addCommand("tag @s add ${target.tag}")
+                    addCommand("summon marker ~ ~ ~ {Tags:[${target.tag}_data,mcfpp_ptr,just],data:{$funcs}}")
+                    addCommand("ride @n[tag=just, type=marker] mount @s")
+                    addCommand("tag @n[tag=just, type=marker] remove just")
+                }
             }
             //初始指针
             addCommand(Command("data modify").build(Class.tempPtr.toCommandPart()).build("set from entity @s UUID"))

@@ -1,0 +1,75 @@
+data Villager: EntityData, CreatureData, AIMobData, GrowableData {
+
+    @Name<"AssignProfessionWhenSpawned">
+    bool assignProfessionWhenSpawned;
+
+    @Name<"FoodLevel">
+    byte foodLevel;
+
+    @Name<"Inventory">
+    list<Item> inventory;
+
+    @Name<"Gossips">
+    list<VillagerGossip> gossips;
+
+    @Name<"LastRestock">
+    long lastRestock;
+
+    @Name<"LastGossipDecay">
+    long lastGossipDecay;
+
+    @Name<"Offers">
+    data offers {
+        @Name<"Recipes">
+        list<VillagerRecipe> recipes;
+    }
+
+    @Name<"RestocksToday">
+    int restocksToday;
+
+    @Name<"VillagerData">
+    data villagerData {
+        int level;
+
+        string profession;
+
+        string type;
+    }
+
+    @Name<"Xp">
+    int xp;
+
+}
+
+enum GossipType {
+    major_negative,
+    minor_negative,
+    major_positive,
+    minor_positive,
+    trading
+}
+
+data VillagerGossip {
+    IntArray target;
+    GossipType type;
+    int value;
+}
+
+data VillagerRecipe {
+    data buy {
+        string id;
+        nbt components;
+    }
+    data buyB {
+        string id;
+        nbt components;
+    }
+    int demand;
+    int maxUses;
+    float priceMultiplier;
+    bool rewardExp;
+    Item sell;
+    int specialPrice;
+    int uses;
+    int xp;
+}

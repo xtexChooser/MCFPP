@@ -1,0 +1,7 @@
+data EnderDragon: EntityData, CreatureData {
+    @Name<"DragonDeathTime">
+    int dragonDeathTime;
+
+    @Name<"DragonPhase">
+    int dragonPhase;
+}

@@ -1,0 +1,4 @@
+data SnowGolem: EntityData, CreatureData, AIMobData {
+    @Name<"Pumpkin">
+    bool pumpkin;
+}

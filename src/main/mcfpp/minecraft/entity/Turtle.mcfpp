@@ -1,0 +1,22 @@
+data Turtle: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"HasEgg">
+    bool hasEgg;
+
+    @Name<"HomePosX">
+    int homePosx;
+
+    @Name<"HomePosY">
+    int homePosy;
+
+    @Name<"HomePosZ">
+    int homePosz;
+
+    @Name<"TravelPosX">
+    int travelPosx;
+
+    @Name<"TravelPosY">
+    int travelPosy;
+
+    @Name<"TravelPosZ">
+    int travelPosz;
+}

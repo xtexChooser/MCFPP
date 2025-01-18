@@ -1,0 +1,20 @@
+data ShulkerBullet: EntityData, ProjectileData {
+
+    @Name<"Dir">
+    int dir;
+
+    @Name<"Steps">
+    int steps;
+
+    @Name<"Target">
+    IntArray target;
+
+    @Name<"TXD">
+    double TXD;
+
+    @Name<"TYD">
+    double TYD;
+
+    @Name<"TZD">
+    double TZD;
+}

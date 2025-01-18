@@ -1,0 +1,20 @@
+data Fox: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"Crouching">
+    bool crouching;
+
+    @Name<"Sitting">
+    bool sitting;
+
+    @Name<"Sleeping">
+    bool sleeping;
+
+    @Name<"Trusted">
+    list<IntArray> trusted;
+
+    @Name<"Type">
+    FoxType type;
+}
+
+enum FoxType {
+    red, snow
+}

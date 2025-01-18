@@ -1,0 +1,10 @@
+data Shulker: EntityData, CreatureData, AIMobData {
+    @Name<"AttachFace">
+    byte attachFace;
+
+    @Name<"Color">
+    byte color;
+
+    @Name<"Peek">
+    byte peek;
+}

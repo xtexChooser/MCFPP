@@ -1,0 +1,11 @@
+data Panda: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"HiddenGene">
+    PandaGene hiddenGene;
+
+    @Name<"MainGene">
+    PandaGene mainGene;
+}
+
+enum PandaGene{
+    normal, aggressive, lazy, worried, playful, weak, brown
+}

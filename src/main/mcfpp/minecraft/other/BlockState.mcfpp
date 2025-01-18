@@ -1,0 +1,8 @@
+data BlockState {
+    @Name<"Name">
+    string name;
+
+    @Name<"Properties">
+    nbt properties;
+
+}

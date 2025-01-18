@@ -1,0 +1,4 @@
+data Strider: EntityData, CreatureData, AIMobData, GrowableData, AnimalData{
+    @Name<"Saddle">
+    bool saddle;
+}

@@ -1,0 +1,156 @@
+import mcfpp.minecraft.other:*;
+
+data Player: EntityData, CreatureData {
+
+    @Name<"DataVersion">
+    int dataVersion;
+
+    @Name<"Abilities">
+    data abilities{
+        @Name<"Flying">
+        bool flying;
+
+        @Name<"FlySpeed">
+        float flySpeed;
+
+        @Name<"Instabuild">
+        bool instabuild;
+
+        @Name<"Invulnerable">
+        bool invulnerable;
+
+        @Name<"MayBuild">
+        bool mayBuild;
+
+        @Name<"MayFly">
+        bool mayFly;
+
+        @Name<"WalkSpeed">
+        float walkSpeed;
+    }
+
+    @Name<"current_explosion_impact_pos">
+    list<double> currentExplosionImpactPos;
+
+    @Name<"current_impulse_context_reset_grace_time">
+    int currentImpulseContextResetGraceTime;
+
+    @Name<"Dimension">
+    string dimension;
+
+    @Name<"ender_pearls">
+    list<data> enderPearls: EnderPearl {
+        @Name<"ender_pearl_dimension">
+        string enderPearlDimension;
+    }
+
+    @Name<"EnderItems">
+    list<Item> enderItems;
+
+    list<double> enteredNetherPosition;
+
+    float foodExhaustionLevel;
+
+    int foodLevel;
+
+    float foodSaturationLevel;
+
+    int foodTickTimer;
+
+    @Name<"ignore_fall_damage_from_current_explosion">
+    bool ignoreFallDamageFromCurrentExplosion;
+
+    @Name<"Inventory">
+    list<Item> inventory;
+
+    @Name<"LastDeathLocation">
+    data lastDeathLocation {
+        string dimension;
+        IntArray pos;
+    }
+
+    int playerGameType;
+
+    int previousplayerGameType;
+
+    @Name<"raid_omen_position">
+    IntArray raidOmenPosition;
+
+    @Name<"RecipeBook">
+    list<RecipeBook> recipeBook;
+
+    @Name<"RootVehicle">
+    data rootVehicle {
+
+        @Name<"Attach">
+        IntArray attach;
+
+        @Name<"Entity">
+        EntityData _entity;
+    }
+
+    @Name<"Score">
+    int score;
+
+    byte seenCredits;
+
+    @Name<"SelectedItem">
+    Item selectedItem;
+
+    @Name<"SelectedItemSlot">
+    int selectedItemSlot;
+
+    @Name<"ShoulderEntityLeft">
+    EntityData shoulderEntityLeft;
+
+    @Name<"ShoulderEntityRight">
+    EntityData shoulderEntityRight;
+
+    @Name<"SleepTimer">
+    short sleepTimer;
+
+    @Name<"spawn_extra_particles_on_fall">
+    bool spawnExtraParticlesOnFall;
+
+    @Name<"SpawnAngle">
+    float spawnAngle;
+
+    @Name<"SpawnDimension">
+    string spawnDimension;
+
+    @Name<"SpawnForced">
+    bool spawnForced;
+
+    @Name<"SpawnX">
+    int spawnX;
+
+    @Name<"SpawnY">
+    int spawnY;
+
+    @Name<"SpawnZ">
+    int spawnZ;
+
+    @Name<"warden_spawn_tracker">
+    data wardenSpawnTracker {
+        @Name<"cooldown_ticks">
+        int cooldownTicks;
+
+        @Name<"ticks_since_last_warning">
+        int ticksSinceLastWarning;
+
+        @Name<"warning_level">
+        int warningLevel;
+    }
+
+    @Name<"XpLevel">
+    int xpLevel;
+
+    @Name<"XpP">
+    float xpP;
+
+    @Name<"XpSeed">
+    int xpSeed;
+
+    @Name<"XpTotal">
+    int xpTotal;
+}

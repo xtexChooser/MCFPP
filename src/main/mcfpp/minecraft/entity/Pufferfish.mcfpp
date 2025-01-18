@@ -1,0 +1,7 @@
+data Pufferfish: EntityData, CreatureData, AIMobData {
+    @Name<"FromBucket">
+    bool fromBucket;
+
+    @Name<"PuffState">
+    int puffState;
+}

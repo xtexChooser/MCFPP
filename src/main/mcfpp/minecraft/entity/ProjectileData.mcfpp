@@ -1,0 +1,12 @@
+data ProjectileData {
+
+    @Name<"HasBeenShot">
+    bool hasBeenShot;
+
+    @Name<"LeftOwner">
+    bool leftOwner;
+
+    @Name<"Owner">
+    IntArray owner;
+
+}

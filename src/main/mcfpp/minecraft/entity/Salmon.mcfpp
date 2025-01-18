@@ -1,0 +1,11 @@
+data Salmon: EntityData, CreatureData, AIMobData{
+    @Name<"FromBucket">
+    bool fromBucket;
+
+    @Name<"Type">
+    SalmonType type;
+}
+
+enum SalmonType {
+    small, medium, large
+}

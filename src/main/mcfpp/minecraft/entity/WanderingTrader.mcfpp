@@ -1,0 +1,17 @@
+data WanderingTrader: EntityData, CreatureData, AIMobData, GrowableData {
+
+    @Name<"DespawnDelay">
+    int despawnDelay;
+
+    @Name<"Offers">
+    data offers {
+        @Name<"Recipes">
+        list<Recipe> recipes;
+    }
+
+    @Name<"Inventory">
+    list<Item> inventory;
+
+    @Name<"wander_target">
+    IntArray wanderTarget;
+}

@@ -1,0 +1,7 @@
+data Wolf: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, TameableData, NeutralData {
+    @Name<"CollarColor">
+    byte CollarColor;
+
+    @Name<"Variant">
+    string variant;
+}

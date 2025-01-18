@@ -1,0 +1,7 @@
+data SkeletonHorse: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, HorseData{
+    @Name<"SkeletonTrap">
+    bool skeletonTrap;
+
+    @Name<"SkeletonTrapTime">
+    int skeletonTrapTime;
+}

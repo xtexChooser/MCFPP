@@ -1,0 +1,7 @@
+data GrowableData {
+    @Name<"Age">
+    int age;
+
+    @Name<"ForcedAge">
+    int forcedAge;
+}

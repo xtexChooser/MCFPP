@@ -180,6 +180,8 @@ templateMember
     :   templateFunctionDeclaration
     |   templateFieldDeclaration
     |   templateConstructorDeclaration
+    |   innerTemplateDeclaration
+    |   innerTemplateListDeclaration
     |   annotation
     ;
 
@@ -197,6 +199,14 @@ singleTemplateFieldType
 
 unionTemplateFieldType
     :   '(' type (PIPE type)* ')' QUEST?
+    ;
+
+innerTemplateDeclaration
+    :   DATA Identifier (COLON className (',' className)*)? templateBody
+    ;
+
+innerTemplateListDeclaration
+    :   LIST '<' DATA '>' Identifier (COLON className (',' className)*)? templateBody
     ;
 
 //接口声明
@@ -622,7 +632,7 @@ annotation
     ;
 
 annotationArgs
-    :   '<' value* '>'
+    :   '<' (value (',' value)*)? '>'
     ;
 
 range
@@ -630,11 +640,6 @@ range
     |   num1=var '..'
     |   '..' num2=var
     ;
-
-namespacePath
-    :   Identifier ':' Identifier ('/' Identifier)*
-    ;
-
 
 nbtValue
     :   LineString

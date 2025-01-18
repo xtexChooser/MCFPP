@@ -1,0 +1,40 @@
+import mcfpp.minecraft.other:*;
+data CreatureData{
+    @Name<"AbsorptionAmount">
+    float absorptionAmount;
+
+    @Name<"active_effects">
+    list<PotionEffect> activeEffects;
+
+    list<Attribute> attributes;
+
+    @Name<"Brain">
+    nbt brain;
+
+    @Name<"DeathTime">
+    short deathTime;
+
+    @Name<"FallFlying">
+    bool fallFlying;
+
+    @Name<"Health">
+    float health;
+
+    @Name<"HurtByTimestamp">
+    int hurtByTimestamp;
+
+    @Name<"HurtTime">
+    short hurtTime;
+
+    @Name<"SleepingX">
+    int sleepingX;
+
+    @Name<"SleepingY">
+    int sleepingY;
+
+    @Name<"SleepingZ">
+    int sleepingZ;
+
+    @Name<"Team">
+    string team;
+}

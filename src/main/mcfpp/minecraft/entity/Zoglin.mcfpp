@@ -1,0 +1,3 @@
+data Zoglin: EntityData, CreatureData, AIMobData, ZombieData, NeutralData {
+    
+}

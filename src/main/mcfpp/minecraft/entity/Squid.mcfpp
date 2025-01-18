@@ -1,0 +1,3 @@
+data Squid: EntityData, CreatureData, AIMobData, GrowableData{
+    
+}

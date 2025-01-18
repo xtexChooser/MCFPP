@@ -1,0 +1,19 @@
+data Item {
+    @Name<"Age">
+    short age;
+
+    @Name<"Health">
+    short health;
+
+    @Name<"Item">
+    list<Item> item;
+
+    @Name<"Owner">
+    IntArray owner;
+
+    @Name<"PickupDelay">
+    short pickupDelay;
+
+    @Name<"Thrower">
+    IntArray thrower;
+}

@@ -1,0 +1,7 @@
+data Tadpole: EntityData, CreatureData, AIMobData{
+    @Name<"Age">
+    int age;
+
+    @Name<"FromBucket">
+    bool fromBucket;
+}

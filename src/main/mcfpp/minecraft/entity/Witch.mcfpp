@@ -1,0 +1,3 @@
+data Witch: EntityData, CreatureData, AIMobData, RaiderData{
+    
+}

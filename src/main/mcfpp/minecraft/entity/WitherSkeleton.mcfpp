@@ -1,0 +1,3 @@
+data WitherSkeleton: EntityData, CreatureData, AIMobData {
+    
+}

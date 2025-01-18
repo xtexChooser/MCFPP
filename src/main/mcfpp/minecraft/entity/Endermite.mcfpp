@@ -1,0 +1,4 @@
+data Endermite: EntityData, CreatureData, AIMobData {
+    @Name<"Lifetime">
+    int lifetime;
+}

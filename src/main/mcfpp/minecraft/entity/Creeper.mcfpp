@@ -1,0 +1,11 @@
+data Creeper: EntityData, CreatureData, AIMobData {
+    @Name<"ExplosionRadius">
+    byte explosionRadius;
+
+    @Name<"Fuse">
+    short fuse;
+
+    bool ignited;
+
+    bool powered;
+}

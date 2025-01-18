@@ -1,0 +1,13 @@
+data Phantom: EntityData, CreatureData, AIMobData {
+    @Name<"AX">
+    int ax;
+
+    @Name<"AY">
+    int ay;
+
+    @Name<"AZ">
+    int az;
+
+    @Name<"Size">
+    int size;
+}

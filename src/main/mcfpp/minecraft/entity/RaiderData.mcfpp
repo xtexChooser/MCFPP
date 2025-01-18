@@ -1,0 +1,20 @@
+data RaiderData {
+    @Name<"CanJoinRaid">
+    bool canJoinRaid;
+
+    @Name<"patrol_target">
+    IntArray patrolTarget;
+
+    @Name<"PatrolLeader">
+    bool patrolLeader;
+
+    @Name<"Patrolling">
+    bool patrolling;
+
+    @Name<"RaidID">
+    int raidID;
+
+    @Name<"Wave">
+    int wave;
+
+}

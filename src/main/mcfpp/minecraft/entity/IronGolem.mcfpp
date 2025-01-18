@@ -1,0 +1,4 @@
+data IronGolem: EntityData, CreatureData, AIMobData, NeutralData {
+    @Name<"PlayerCreated">
+    bool playerCreated;
+}

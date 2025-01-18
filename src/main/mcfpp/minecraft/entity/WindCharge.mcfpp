@@ -1,0 +1,3 @@
+data WindCharge: EntityData, ProjectileData, FireballData{
+    
+}

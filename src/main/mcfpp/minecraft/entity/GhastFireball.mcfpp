@@ -1,0 +1,7 @@
+data GhastFireball: EntityData, ProjectileData, FireballData {
+    @Name<"ExplosionPower">
+    byte explosionPower;
+
+    @Name<"Item">
+    Item item;
+}

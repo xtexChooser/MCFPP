@@ -1,0 +1,7 @@
+data Axolotl: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"FromBucket">
+    bool fromBucket;
+
+    @Name<"Variant">
+    int variant;
+}

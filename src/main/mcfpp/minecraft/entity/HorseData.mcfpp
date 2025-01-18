@@ -1,0 +1,19 @@
+data HorseData {
+    @Name<"Bred">
+    bool bred;
+
+    @Name<"EatingHaystack">
+    bool eatingHaystack;
+
+    @Name<"Owner">
+    IntArray owner;
+
+    @Name<"SaddleItem">
+    Item saddleItem;
+
+    @Name<"Tame">
+    bool tame;
+
+    @Name<"Temper">
+    int temper;    
+}

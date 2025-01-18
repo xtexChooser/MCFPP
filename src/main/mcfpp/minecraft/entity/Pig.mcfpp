@@ -1,0 +1,4 @@
+data Pig: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
+    @Name<"Saddle">
+    bool saddle;
+}

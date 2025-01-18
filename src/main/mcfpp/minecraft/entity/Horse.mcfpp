@@ -1,0 +1,4 @@
+data Horse: EntityData, CreatureData, AIMobData, GrowableData, AnimalData, HorseData {
+    @Name<"Variant">
+    int variant;
+}

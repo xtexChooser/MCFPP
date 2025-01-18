@@ -1,0 +1,3 @@
+data Zombie: EntityData, CreatureData, AIMobData, ZombieData {
+    
+}
