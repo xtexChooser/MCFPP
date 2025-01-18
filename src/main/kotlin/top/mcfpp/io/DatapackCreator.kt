@@ -6,8 +6,9 @@ import top.mcfpp.Project
 import top.mcfpp.model.*
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.ExtensionFunction
+import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.toSnakeCase
 import top.mcfpp.util.Utils
 import java.io.*
 import java.nio.file.*
@@ -113,152 +114,81 @@ object DatapackCreator {
         }
     }
 
+    private fun genFunction(currPath: String, f: Function){
+        if (f is Native) return
+        LogProcessor.debug("Writing File: $currPath\\${f.nameWithNamespace}.mcfunction")
+        f.commands.analyzeAll()
+        val path = if(f is ExtensionFunction){
+            "$currPath\\ex"
+        }else{
+            currPath
+        }
+        Files.createDirectories(Paths.get(path))
+        Files.write(Paths.get("$path\\${f.identifier}.mcfunction"), f.cmdStr.toByteArray())
+        if(f.compiledFunctions.isNotEmpty()){
+            for (cf in f.compiledFunctions.values) {
+                LogProcessor.debug("Writing File: $currPath\\${cf.identifier}.mcfunction")
+                f.commands.analyzeAll()
+                Files.write(Paths.get("$path\\${f.identifier}.mcfunction"), cf.cmdStr.toByteArray())
+            }
+        }
+    }
+
+    private fun genTemplateFunction(currPath: String, f: Function){
+        if (f is Native) return
+        val path = if(f is ExtensionFunction) "$currPath\\ex" else currPath
+        Files.createDirectories(Paths.get(path))
+        for (cf in f.compiledFunctions.values) {
+            LogProcessor.debug("Writing File: $currPath\\${cf.identifier}.mcfunction")
+            f.commands.analyzeAll()
+            Files.write(Paths.get("$path\\${f.identifier}.mcfunction"), cf.cmdStr.toByteArray())
+        }
+    }
+
+    private fun genObject(currPath: String, obj: CompoundData){
+        //成员
+        obj.field.forEachFunction {
+            genFunction("${currPath}\\function\\${obj.identifier.toSnakeCase()}\\static", it)
+        }
+    }
+
+    private fun genTemplate(currPath: String, t: DataTemplate){
+        //成员
+        t.field.forEachFunction {
+            genTemplateFunction("$currPath\\function\\${t.identifier.toSnakeCase()}", it)
+        }
+        t.constructors.forEach {
+            genTemplateFunction("$currPath\\function\\${t.identifier.toSnakeCase()}", it)
+        }
+    }
+
+    private fun genClass(currPath: String, cls: Class) {
+        //成员
+        cls.field.forEachFunction {
+            genFunction("$currPath\\function\\${cls.identifier.toSnakeCase()}", it)
+        }
+        cls.constructors.forEach {
+            genFunction("$currPath\\function\\${cls.identifier.toSnakeCase()}", it)
+        }
+    }
+
     private fun genNamespace(path: String, namespace: MutableMap.MutableEntry<String, Namespace>) {
         val currPath = "$path\\${Project.config.name}\\data\\${namespace.key}"
-        namespace.value.field.forEachFunction {f ->
-            run {
-                if (f is Native) {
-                    return@run
-                }
-                LogProcessor.debug("Writing File: $currPath\\function\\${f.nameWithNamespace}.mcfunction")
-                f.commands.analyzeAll()
-                Files.createDirectories(Paths.get("$currPath/function"))
-                Files.write(
-                    Paths.get("$currPath/function/${f.nameWithNamespace}.mcfunction"),
-                    f.cmdStr.toByteArray()
-                )
-                if(f.compiledFunctions.isNotEmpty()){
-                    for (cf in f.compiledFunctions.values){
-                        LogProcessor.debug("Writing File: $currPath\\function\\${cf.nameWithNamespace}.mcfunction")
-                        f.commands.analyzeAll()
-                        Files.createDirectories(Paths.get("$currPath/function"))
-                        Files.write(
-                            Paths.get("$currPath/function/${cf.nameWithNamespace}.mcfunction"),
-                            cf.cmdStr.toByteArray()
-                        )
-                    }
 
-                }
-            }
-        }
-        namespace.value.field.forEachClass { cls ->
-            run {
-                //成员
-                cls.field.forEachFunction { f->
-                    run {
-                        if (f is Native) {
-                            return@run
-                        }
-                        LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
-                        f.commands.analyzeAll()
-                        //TODO 可能无法正确创建文件夹
-                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                        if (f is ExtensionFunction){
-                            Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier) + "/ex"))
-                        }
-                        Files.write(
-                            Paths.get("$currPath/function/"  + f.nameWithNamespace + ".mcfunction"),
-                            f.cmdStr.toByteArray()
-                        )
-                        if(f.compiledFunctions.isNotEmpty()){
-                            for (cf in f.compiledFunctions.values) {
-                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                f.commands.analyzeAll()
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                                Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                            }
-                        }
-                    }
-                }
-                //构造函数
-                cls.constructors.forEach{ c ->
-                    run {
-                        LogProcessor.debug("Writing File: $currPath\\function\\"  + c.nameWithNamespace + ".mcfunction")
-                        c.commands.analyzeAll()
-                        //TODO 可能无法正确创建文件夹
-                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                        Files.write(
-                            Paths.get("$currPath/function/" + c.nameWithNamespace + ".mcfunction"),
-                            c.cmdStr.toByteArray()
-                        )
-                        if(c.compiledFunctions.isNotEmpty()){
-                            for (cf in c.compiledFunctions.values) {
-                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                c.commands.analyzeAll()
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(cls.identifier)))
-                                Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                            }
-                        }
-                    }
-                }
-            }
+        namespace.value.field.forEachFunction {
+            genFunction("$currPath\\function", it)
         }
 
-        namespace.value.field.forEachTemplate { t ->
-            run {
-                //成员
-                t.field.forEachFunction { f->
-                    run {
-                        if (f is Native) {
-                            return@run
-                        }
-                        LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
-                        f.commands.analyzeAll()
-                        //TODO 可能无法正确创建文件夹
-                        Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
-                        if (f is ExtensionFunction){
-                            Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier) + "/ex"))
-                        }
-                        Files.write(
-                            Paths.get("$currPath/function/"  + f.nameWithNamespace + ".mcfunction"),
-                            f.cmdStr.toByteArray()
-                        )
-                        if(f.compiledFunctions.isNotEmpty()){
-                            for (cf in f.compiledFunctions.values) {
-                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                f.commands.analyzeAll()
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath/function/" + StringHelper.toLowerCase(t.identifier)))
-                                Files.write(Paths.get("$currPath/function/" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                            }
-                        }
-                    }
-                }
-            }
+        namespace.value.field.forEachClass {
+            genClass(currPath, it)
         }
-        namespace.value.field.forEachObject { obj ->
-            run {
-                //成员
-                obj.field.forEachFunction { f->
-                    run {
-                        if (f is Native) {
-                            return@run
-                        }
-                        LogProcessor.debug("Writing File: $currPath\\function\\" + f.nameWithNamespace + ".mcfunction")
-                        f.commands.analyzeAll()
-                        //TODO 可能无法正确创建文件夹
-                        Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier) + "\\static"))
-                        if (f is ExtensionFunction){
-                            Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier) + "\\static\\ex"))
-                        }
-                        Files.write(
-                            Paths.get("$currPath\\function\\"  + f.nameWithNamespace + ".mcfunction"),
-                            f.cmdStr.toByteArray()
-                        )
-                        if(f.compiledFunctions.isNotEmpty()){
-                            for (cf in f.compiledFunctions.values) {
-                                LogProcessor.debug("Writing File: $currPath\\function\\" + cf.nameWithNamespace + ".mcfunction")
-                                f.commands.analyzeAll()
-                                //TODO 可能无法正确创建文件夹
-                                Files.createDirectories(Paths.get("$currPath\\function\\" + StringHelper.toLowerCase(obj.identifier)))
-                                Files.write(Paths.get("$currPath\\function\\" + cf.nameWithNamespace + ".mcfunction"), cf.cmdStr.toByteArray())
-                            }
-                        }
-                    }
-                }
-            }
+
+        namespace.value.field.forEachTemplate {
+            genTemplate(currPath, it)
+        }
+
+        namespace.value.field.forEachObject {
+            genObject(currPath, it)
         }
     }
 

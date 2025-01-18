@@ -19,7 +19,7 @@ import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.generic.Generic
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.toSnakeCase
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.io.Serializable
@@ -238,7 +238,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             for (p in normalParams) {
                 re.append("_").append(p.typeIdentifier)
             }
-            return StringHelper.toLowerCase(re.toString())
+            return re.toString().toSnakeCase()
         }
 
     /**
@@ -258,7 +258,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
             for (p in normalParams) {
                 re.append("_").append(p.typeIdentifier)
             }
-            return StringHelper.toLowerCase(re.toString())
+            return re.toString().toSnakeCase()
         }
 
     /**

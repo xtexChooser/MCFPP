@@ -11,7 +11,8 @@ import top.mcfpp.model.field.FileField
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.pathToNamespace
+import top.mcfpp.util.StringHelper.toSnakeCase
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -35,15 +36,13 @@ class MCFPPFile : File {
     var namespace: String
 
     //TODO 同名文件的顶级函数之间的命名冲突
-    val topFunction: Function = Function(StringHelper.toLegalIdentifier(this.name), context = null)
+    val topFunction: Function = Function(this.name.toSnakeCase(), context = null)
 
     var syntaxError = false
 
     constructor(path: String) : super(path) {
         val n = Project.config.sourcePath!!.toAbsolutePath().relativize(this.toPath().toAbsolutePath().parent).toString()
-        namespace = Project.config.rootNamespace + "." + StringHelper.toLegalIdentifier(
-            n.replace("\\", ".").replace("/", ".")
-        )
+        namespace = Project.config.rootNamespace + "." + n.pathToNamespace().toSnakeCase()
     }
 
     constructor(file: File) : this(file.absolutePath)
@@ -144,7 +143,7 @@ class MCFPPFile : File {
         Project.currNamespace = namespace
         //创建默认函数
         val func = Function(
-            StringHelper.toLowerCase(nameWithoutExtension + "_default"), Project.currNamespace,
+            (nameWithoutExtension + "_default").toSnakeCase(), Project.currNamespace,
             context = null
         )
         Function.currFunction = func

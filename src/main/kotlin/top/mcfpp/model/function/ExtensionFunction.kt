@@ -2,10 +2,8 @@ package top.mcfpp.model.function
 
 import top.mcfpp.Project
 import top.mcfpp.antlr.mcfppParser.FunctionBodyContext
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.CompoundData
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.toSnakeCase
 
 open class ExtensionFunction: Function {
 
@@ -32,7 +30,7 @@ open class ExtensionFunction: Function {
             for (p in normalParams) {
                 re.append("_").append(p.typeIdentifier)
             }
-            return StringHelper.toLowerCase(re.toString())
+            return re.toString().toSnakeCase()
         }
 
     /**
@@ -49,7 +47,7 @@ open class ExtensionFunction: Function {
             for (p in normalParams) {
                 re.append("_").append(p.typeIdentifier)
             }
-            return StringHelper.toLowerCase(re.toString())
+            return re.toString().toSnakeCase()
         }
 
     /**
