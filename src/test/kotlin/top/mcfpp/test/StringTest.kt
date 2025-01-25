@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import top.mcfpp.antlr.mcfppLexer
 import top.mcfpp.antlr.mcfppParser
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.toSnakeCase
 import kotlin.test.Test
 
 class StringTest{
@@ -17,7 +17,7 @@ class StringTest{
 
     @Test
     fun test1() {
-        println(StringHelper.toSnakeCase("你好qwq000AAA"))
+        println("你好qwq000AAA".toSnakeCase())
     }
 
     @Test

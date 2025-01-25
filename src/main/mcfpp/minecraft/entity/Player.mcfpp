@@ -6,7 +6,7 @@ data Player: EntityData, CreatureData {
     int dataVersion;
 
     @Name<"Abilities">
-    data abilities{
+    data {
         @Name<"Flying">
         bool flying;
 
@@ -27,7 +27,7 @@ data Player: EntityData, CreatureData {
 
         @Name<"WalkSpeed">
         float walkSpeed;
-    }
+    } abilities;
 
     @Name<"current_explosion_impact_pos">
     list<double> currentExplosionImpactPos;
@@ -39,10 +39,10 @@ data Player: EntityData, CreatureData {
     string dimension;
 
     @Name<"ender_pearls">
-    list<data> enderPearls: EnderPearl {
+    list<data: EnderPearl {
         @Name<"ender_pearl_dimension">
         string enderPearlDimension;
-    }
+    }> enderPearls;
 
     @Name<"EnderItems">
     list<Item> enderItems;
@@ -64,10 +64,10 @@ data Player: EntityData, CreatureData {
     list<Item> inventory;
 
     @Name<"LastDeathLocation">
-    data lastDeathLocation {
+    data {
         string dimension;
         IntArray pos;
-    }
+    } lastDeathLocation;
 
     int playerGameType;
 
@@ -80,14 +80,13 @@ data Player: EntityData, CreatureData {
     list<RecipeBook> recipeBook;
 
     @Name<"RootVehicle">
-    data rootVehicle {
-
+    data {
         @Name<"Attach">
         IntArray attach;
 
         @Name<"Entity">
         EntityData _entity;
-    }
+    } rootVehicle;
 
     @Name<"Score">
     int score;
@@ -131,7 +130,7 @@ data Player: EntityData, CreatureData {
     int spawnZ;
 
     @Name<"warden_spawn_tracker">
-    data wardenSpawnTracker {
+    data {
         @Name<"cooldown_ticks">
         int cooldownTicks;
 
@@ -140,7 +139,7 @@ data Player: EntityData, CreatureData {
 
         @Name<"warning_level">
         int warningLevel;
-    }
+    } wardenSpawnTracker;
 
     @Name<"XpLevel">
     int xpLevel;

@@ -19,7 +19,7 @@ data ArmorStand: EntityData, CreatureData {
     bool noBasePlate;
 
     @Name<"Pose">
-    data pose {
+    data {
         @Name<"Body">
         list<float> body;
 
@@ -37,7 +37,7 @@ data ArmorStand: EntityData, CreatureData {
 
         @Name<"RightLeg">
         list<float> rightLeg;
-    }
+    } pose;
 
     @Name<"ShowArms">
     bool showArms;

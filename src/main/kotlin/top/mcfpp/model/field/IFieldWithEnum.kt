@@ -2,7 +2,7 @@ package top.mcfpp.model.field
 
 import top.mcfpp.model.Enum
 
-interface IFieldWithEnum {
+interface IFieldWithEnum: IField {
     /**
      * 向域中添加一个枚举
      *

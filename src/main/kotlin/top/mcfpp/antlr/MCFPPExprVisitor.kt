@@ -23,12 +23,16 @@ import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPEnumType
 import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.util.*
+import top.mcfpp.util.BoolTag
+import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil.toNBTByte
 import top.mcfpp.util.NBTUtil.toNBTDouble
 import top.mcfpp.util.NBTUtil.toNBTFloat
 import top.mcfpp.util.NBTUtil.toNBTLong
 import top.mcfpp.util.NBTUtil.toNBTShort
+import top.mcfpp.util.StringHelper.splitNamespaceID
+import top.mcfpp.util.TempPool
+import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
 
@@ -230,7 +234,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
     override fun visitCastExpression(ctx: mcfppParser.CastExpressionContext): Var<*> {
         Project.ctx = ctx
         val a: Var<*> = visitUnaryExpression(ctx.unaryExpression())
-        return a.explicitCast(MCFPPType.parseFromIdentifier(ctx.type().text, Function.currFunction.field)?: run {
+        return a.explicitCast(MCFPPType.parseFromString(ctx.type().text, Function.currFunction.field)?: run {
             LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
             MCFPPBaseType.Any
         })
@@ -266,7 +270,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             currSelector = visitJvmAccessExpression(ctx.jvmAccessExpression())
             if(currSelector is UnknownVar){
                 val typeStr = ctx.jvmAccessExpression().text
-                val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
+                val type = MCFPPType.parseFromString(typeStr, Function.currFunction.field)
                 if(type == null){
                     LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
                 }else{
@@ -275,7 +279,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             }
         }else{
             val typeStr = ctx.type().text
-            val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
+            val type = MCFPPType.parseFromString(typeStr, Function.currFunction.field)
             if(type == null){
                 if(ctx.selector().size == 0){
                     LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
@@ -352,7 +356,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
                 return UnknownVar("range_" + UUID.randomUUID())
             }
         } else if (ctx.type() != null){
-            return MCFPPTypeVar(MCFPPType.parseFromIdentifier(ctx.type().text, Function.currFunction.field)?: run {
+            return MCFPPTypeVar(MCFPPType.parseFromString(ctx.type().text, Function.currFunction.field)?: run {
                 LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
                 MCFPPBaseType.Any
             })
@@ -417,7 +421,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
             normalArgs.add(arg)
         }
         //获取函数
-        val p = StringHelper.splitNamespaceID(ctx.namespaceID().text)
+        val p = ctx.namespaceID().text.splitNamespaceID()
         val func = if(currSelector == null){
             GlobalField.getFunction(p.first, p.second, readOnlyArgs, normalArgs)
         }else{
@@ -553,6 +557,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
         }
     }
 
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE", "UNUSED_VALUE")
     override fun visitValue(ctx: mcfppParser.ValueContext): Var<*> {
         //常量
         if (ctx.LineString() != null) {

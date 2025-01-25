@@ -25,7 +25,12 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
     /**
      * 父结构
      */
-    var parent: List<CompoundData> = ArrayList()
+    var parent = ArrayList<CompoundData>()
+
+    /**
+     * 子结构
+     */
+    var children = ArrayList<CompoundData>()
 
     /**
      * 标识符
@@ -40,7 +45,13 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
     /**
      * 成员变量和成员函数
      */
+    @Transient
     var field: CompoundDataField
+
+    /**
+     * 注解
+     */
+    val annotations = ArrayList<Annotation>()
 
     open val namespaceID : String
         get() = "$namespace:$identifier"
@@ -52,31 +63,26 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
     override val prefix: String
         get() = namespace + "_data_" + identifier
 
-    /**
-     * 注解
-     */
-    val annotations = ArrayList<Annotation>()
+    open fun getType(): MCFPPType =
+        object :MCFPPType(ArrayList(parent.map { it.getType() }.toList())){
+            override val objectData: CompoundData
+                get() = this@CompoundData
+        }
 
+    @Transient
     override var document: Document = Document()
 
     constructor(identifier: String, namespace: String = Project.currNamespace){
         this.identifier = identifier
         this.namespace = namespace
-        field = CompoundDataField(ArrayList(), this)
+        field = CompoundDataField(ArrayList())
     }
 
     protected constructor(){
-        field = CompoundDataField(ArrayList(),this)
+        field = CompoundDataField(ArrayList())
     }
 
     open fun initialize(){}
-
-    open val getType :() -> MCFPPType = {
-        object :MCFPPType(parent.map { it.getType() }.toList()){
-            override val objectData: CompoundData
-                get() = this@CompoundData
-        }
-    }
 
     /**
      * 返回一个成员字段。如果没有，则从父类中寻找
@@ -183,7 +189,8 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
     }
 
     open fun extends(compoundData: CompoundData): CompoundData{
-        (parent as ArrayList).add(compoundData)
+        parent.add(compoundData)
+        compoundData.children.add(this)
         field.parent.add(compoundData.field)
         return this
     }
@@ -193,7 +200,7 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
     }
 
     fun unExtends(compoundData: CompoundData): CompoundData{
-        (parent as ArrayList).remove(compoundData)
+        parent.remove(compoundData)
         field.parent.remove(compoundData.field)
         return this
     }
@@ -218,9 +225,9 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
                 val nf = NativeFunction(method.name, javaMethod = method)
                 //解析MNIMethod注解成员
                 mniRegister.genericType.map {
-                    nf.field.putType(it, MCFPPGenericParamType(it, listOf()))
+                    nf.field.putType(it, MCFPPGenericParamType(it, arrayListOf()))
                 }
-                val callerType = MCFPPType.parseFromIdentifier(mniRegister.caller, nf.field)
+                val callerType = MCFPPType.parseFromString(mniRegister.caller, nf.field)
                 nf.caller = callerType?: run {
                     LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(mniRegister.caller))
                     MCFPPBaseType.Void
@@ -231,7 +238,7 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
                         LogProcessor.error("Missing type or identifier in native function parameter definition: '$it'")
                     }
                     if(qwq.size == 3) qwq = qwq.subList(1, 3)
-                    val type = MCFPPType.parseFromIdentifier(qwq[0], nf.field)?: run {
+                    val type = MCFPPType.parseFromString(qwq[0], nf.field)?: run {
                         LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(qwq[0]))
                         MCFPPBaseType.Any
                     }
@@ -243,13 +250,13 @@ open class CompoundData : FieldContainer, Serializable, WithDocument {
                         LogProcessor.error("Missing type or identifier in native function parameter definition: '$it'")
                     }
                     if(qwq.size == 3) qwq = qwq.subList(1, 3)
-                    val type = MCFPPType.parseFromIdentifier(qwq[0], nf.field)?: run {
+                    val type = MCFPPType.parseFromString(qwq[0], nf.field)?: run {
                         LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(qwq[0]))
                         MCFPPBaseType.Any
                     }
                     qwq[1] to type to it.startsWith("static")
                 }
-                val returnType = MCFPPType.parseFromIdentifier(mniRegister.returnType, nf.field)?: run {
+                val returnType = MCFPPType.parseFromString(mniRegister.returnType, nf.field)?: run {
                     LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(mniRegister.returnType))
                     MCFPPBaseType.Any
                 }

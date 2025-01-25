@@ -12,6 +12,7 @@ import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.NBTUtil.toJava
 import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.splitNamespaceID
 
 class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
 
@@ -20,7 +21,7 @@ class MCFPPAnnotationVisitor: mcfppParserBaseVisitor<Unit>(){
     override fun visitAnnotation(ctx: mcfppParser.AnnotationContext?) {
         Project.ctx = ctx
         //获取注解
-        val qwq = StringHelper.splitNamespaceID(ctx!!.Identifier().text)
+        val qwq = ctx!!.Identifier().text.splitNamespaceID()
         val annotation = GlobalField.getAnnotation(qwq.first, qwq.second)
         if(annotation == null){
             //注解不存在

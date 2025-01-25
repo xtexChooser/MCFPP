@@ -1,22 +1,15 @@
 package top.mcfpp.model.field
 
 import top.mcfpp.core.lang.Var
-import top.mcfpp.model.FieldContainer
 
 
 /**
  * 内联函数的域。内联函数的域的父级可能是一个内联函数域，也可能是一个普通函数的域。
  *
- * @see InternalFunction
+ * @see top.mcfpp.model.function.InternalFunction
  */
-class InternalFunctionField: FunctionField {
-
-    /**
-     * 创建一个缓存，并指定它的父级
-     * @param parent 父级缓存。若没有则设置为null
-     * @param cacheContainer 此缓存所在的容器
-     */
-    constructor(parent: FunctionField?, cacheContainer: FieldContainer?): super(parent,cacheContainer){
+class InternalFunctionField(parent: FunctionField?) : FunctionField(parent) {
+    init {
         parent?.let { fieldVarSet.addAll(it.fieldVarSet) }
     }
 
@@ -67,7 +60,7 @@ class InternalFunctionField: FunctionField {
          * @param functionField 原来的域
          */
         fun clone(functionField: InternalFunctionField): InternalFunctionField {
-            val newFunctionField = InternalFunctionField(null,null)
+            val newFunctionField = InternalFunctionField(null)
             newFunctionField.parent = functionField.parent
             //变量复制
             for (key in functionField.vars.keys) {

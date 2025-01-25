@@ -1,12 +1,8 @@
 package top.mcfpp.type
 
 import net.querz.nbt.tag.*
-import org.antlr.v4.runtime.CharStream
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
 import top.mcfpp.antlr.MCFPPExprVisitor
-import top.mcfpp.antlr.mcfppLexer
-import top.mcfpp.antlr.mcfppParser
+import top.mcfpp.antlr.MCFPPFieldVisitor
 import top.mcfpp.antlr.mcfppParser.TypeContext
 import top.mcfpp.antlr.mcfppParser.TypeWithoutExclContext
 import top.mcfpp.core.lang.UnknownVar
@@ -19,14 +15,15 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.splitNamespaceID
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 
 /**
  * 所有类型的接口
  */
-open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelectMember {
+open class MCFPPType(open var parentType: ArrayList<out MCFPPType> = ArrayList()) : CanSelectMember {
 
     open val objectData: CompoundData = CompoundData("unknown", "mcfpp")
 
@@ -39,6 +36,7 @@ open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelec
     open val nbtType: java.lang.Class<out Tag<*>>
         get() = CompoundTag::class.java
 
+    open fun tryResolve(){}
 
     /**
      * 是否是指定类型的子类型
@@ -129,6 +127,11 @@ open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelec
     open fun build(identifier: String, clazz: Class): Var<*>{
         LogProcessor.error("Unknown type: $typeName")
         return UnknownVar(identifier)
+    }
+
+    open fun build(value: Any): Var<*>{
+        LogProcessor.error("Unknown type: $typeName")
+        return UnknownVar(TempPool.getVarIdentify())
     }
 
     open fun buildUnConcrete(identifier: String, container: FieldContainer): Var<*>{
@@ -244,10 +247,10 @@ open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelec
          * 类型注册缓存。键值对的第一个元素判断字符串是否满足条件，而第二个元素则是用于从一个字符串中解析出一个类型
          */
         private val genericTypeCache = mutableMapOf(
-            "list" to {generic: Array<MCFPPType> -> MCFPPListType(generic[0]) },
-            "dict" to {generic: Array<MCFPPType> -> MCFPPDictType(generic[0])},
-            "map" to {generic: Array<MCFPPType> -> MCFPPMapType(generic[0])},
-            "ImmutableList" to {generic: Array<MCFPPType> -> MCFPPImmutableListType(generic[0])},
+            "list" to {generic: MCFPPType -> MCFPPListType(generic) },
+            "dict" to {generic: MCFPPType -> MCFPPDictType(generic)},
+            "map" to {generic: MCFPPType -> MCFPPMapType(generic)},
+            "ImmutableList" to {generic: MCFPPType -> MCFPPImmutableListType(generic)},
         )
 
         private val genericTypeClassCache = mutableMapOf(
@@ -293,59 +296,78 @@ open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelec
             typeCache[this.typeName] = this
         }
 
+        private fun parseGenericTypeString(typeStr: String, typeScope: IFieldWithType): MCFPPType? {
+            //去掉了尾括号)和]
+            val a = typeStr.split("[")
+            var type = MCFPPType()
+            for (aa in a.asReversed()){
+                //内置泛型
+                if(genericTypeCache.contains(aa)){
+                    type = genericTypeCache[aa]!!(type)
+                    continue
+                }
+                //类泛型
+                val clazz = GlobalField.getClass(null, aa)
+                if(clazz != null){
+                    if(clazz !is GenericClass){
+                        LogProcessor.error("Class $clazz is not a generic class")
+                        return null
+                    }
+                    return clazz.getType()
+                }
+            }
+            return null
+        }
+
         /**
          * 根据类型标识符中获取一个类型
          */
-        fun parseFromIdentifier(identifier: String, typeScope: IFieldWithType): MCFPPType? {
-            if(identifier.last() == '!'){
-                val qwq = parseFromIdentifier(identifier.substring(0, identifier.length - 1), typeScope)
+        fun parseFromString(typeStr: String, typeScope: IFieldWithType): MCFPPType? {
+            if(typeStr.last() == '!'){
+                val qwq = parseFromString(typeStr.substring(0, typeStr.length - 1), typeScope)
                 return qwq?.let { MCFPPDeclaredConcreteType(qwq) }
             }
-            //使用泛型
-            if(identifier.contains("<")){
-                val charStream: CharStream = CharStreams.fromString(identifier)
-                val tokens = CommonTokenStream(mcfppLexer(charStream))
-                val parser = mcfppParser(tokens)
-                return parseFromContext(parser.type(), typeScope)
+            if(typeCache.contains(typeStr)) {
+                return typeCache[typeStr]!!
             }
-            if(typeCache.contains(identifier)) {
-                return typeCache[identifier]!!
-            }
-            if(genericTypeCache.contains(identifier)){
+            if(genericTypeCache.contains(typeStr)){
                 //未被解析的泛型
-                return MCFPPNotCompiledGenericType(genericTypeClassCache[identifier]!!)
+                return MCFPPNotCompiledGenericType(genericTypeClassCache[typeStr]!!)
             }
             //类和模板
+            if(typeStr.contains('[')){
+                //return parseGenericTypeString(typeStr.substring(0, typeStr.lastIndexOfAny(charArrayOf(')', ']'))), typeScope)
+            }
             //正则匹配
-            val clsResult = MCFPPClassType.regex.find(identifier)
+            val clsResult = MCFPPClassType.regex.find(typeStr)
             if(clsResult != null){
                 val (first, second) = clsResult.destructured
                 val clazz = GlobalField.getClass(first, second)
                 if(clazz != null){
                     return clazz.getType()
                 }else{
-                    LogProcessor.warn("Unknown type: $identifier")
+                    LogProcessor.warn("Unknown type: $typeStr")
                     return MCFPPBaseType.Any
                 }
             }
-            val templateResult = MCFPPDataTemplateType.regex.find(identifier)
+            val templateResult = MCFPPDataTemplateType.regex.find(typeStr)
             if(templateResult != null){
                 val (first, second) = templateResult.destructured
                 val template = GlobalField.getTemplate(first, second)
                 if(template != null){
                     return template.getType()
                 }else{
-                    LogProcessor.warn("Unknown type: $identifier")
+                    LogProcessor.warn("Unknown type: $typeStr")
                     return MCFPPBaseType.Any
                 }
             }
-            val vecResult = MCFPPVectorType.regex.find(identifier)
+            val vecResult = MCFPPVectorType.regex.find(typeStr)
             if(vecResult != null){
-                val dimension = identifier.substring(3).toInt()
+                val dimension = typeStr.substring(3).toInt()
                 return MCFPPVectorType(dimension)
             }
             //普通匹配
-            val nspID = StringHelper.splitNamespaceID(identifier)
+            val nspID = typeStr.splitNamespaceID()
             val clazz = GlobalField.getClass(nspID.first, nspID.second)
             if(clazz != null) return clazz.getType()
             val template = GlobalField.getTemplate(nspID.first, nspID.second)
@@ -353,8 +375,8 @@ open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelec
             val enum = GlobalField.getEnum(nspID.first, nspID.second)
             if(enum != null) return enum.getType()
             //泛型
-            if(typeScope.containType(identifier)){
-                return typeScope.getType(identifier)!!
+            if(typeScope.containType(typeStr)){
+                return typeScope.getType(typeStr)!!
             }
             return null
         }
@@ -399,7 +421,7 @@ open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelec
             }
             //自定义类型
             if(ctx.className() != null){
-                val nspID = StringHelper.splitNamespaceID(ctx.className().text)
+                val nspID = ctx.className().text.splitNamespaceID()
                 //类
                 val clazz = GlobalField.getClass(nspID.first, nspID.second)
                 if(clazz != null) {
@@ -437,6 +459,11 @@ open class MCFPPType(open var parentType: List<MCFPPType> = listOf()) : CanSelec
                     }
                 }
                 return MCFPPDataTemplateType(UnionDataTemplate(types.map { it.template }), types)
+            }
+            //匿名内部模板
+            if(ctx.anonymousTemplateType() != null){
+                val template = MCFPPFieldVisitor().visitAnonymousTemplateType(ctx.anonymousTemplateType()) as DataTemplate
+                return template.getType()
             }
             //泛型类型
             if(typeScope.containType(ctx.text)){

@@ -9,7 +9,7 @@ import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 
-class MCFPPVectorType(val dimension: Int): MCFPPType(listOf(MCFPPBaseType.Any)) {
+class MCFPPVectorType(val dimension: Int): MCFPPType(arrayListOf(MCFPPBaseType.Any)) {
 
     override val objectData: CompoundData
         get() = VectorVar.data

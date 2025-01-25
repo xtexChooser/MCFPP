@@ -21,7 +21,6 @@ import top.mcfpp.util.NBTUtil
 import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.io.Serializable
 import java.util.*
 
 /**
@@ -33,18 +32,19 @@ import java.util.*
  * 对于固定的值，编译器会尽可能计算出他们的值。例如`int i = 6 + 7 + p`，
  * 编译器会提前计算为`int i = 13 + p`，从而减少命令的使用量。
  *
+ *
  * 除此之外，变量还有临时变量的区别，对于匿名的变量，编译器一般会默认它为临时
  * 的变量，从而在各种处理上进行优化。当然，匿名变量的声明往往在编译过程中声明。
  * mcfpp本身的语法并不支持匿名变量。
  */
-abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember, Serializable{
+abstract class Var<Self: Var<Self>> : Member, Cloneable, CanSelectMember{
 
     /**
      * 在mcfpp中的标识符，在域中的键名
      */
     var identifier: String
 
-    private val stackFrameRegex = Regex("^stack_frame\\[\\d+]\$\n")
+    private val stackFrameRegex get() = Regex("^stack_frame\\[\\d+]\$\n")
 
     /**
      * 变量在栈里面的位置

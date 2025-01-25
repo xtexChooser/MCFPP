@@ -16,13 +16,11 @@ import top.mcfpp.model.generic.ClassParam
 import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.model.generic.GenericFunction
 import top.mcfpp.util.SerializableClassBodyContext
-import top.mcfpp.util.SerializableFunctionBodyContext
 import top.mcfpp.util.Utils
 import java.io.FileWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.name
 
 object LibWriter {
     fun write(path: String) : JSONObject{
@@ -117,7 +115,7 @@ object FunctionWriter: ILibJsonWriter<Function> {
                 readonlyParam.add(FunctionParamWriter.toJson(v))
                 json["readonlyParam"] = readonlyParam
             } }
-            json["context"] = Utils.toByteArrayString(SerializableFunctionBodyContext(t.ctx))
+            json["context"] = Utils.toByteArrayString(t.ast!!)
         }
         if(t is NativeFunction){
             val readonlyParam = JSONArray()

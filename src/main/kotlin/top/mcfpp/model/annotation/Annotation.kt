@@ -43,6 +43,7 @@ abstract class Annotation : Serializable {
      */
     val params = ArrayList<String>()
 
+    @Suppress("ConvertSecondaryConstructorToPrimary")
     internal constructor(identifier: String, namespace: String, param: ArrayList<String> = ArrayList()) {
         this.identifier = identifier
         this.namespace = namespace

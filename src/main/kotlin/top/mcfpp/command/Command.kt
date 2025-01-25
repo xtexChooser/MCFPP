@@ -8,6 +8,7 @@ import top.mcfpp.exception.CommandException
 import top.mcfpp.lib.MemberPath
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.function.Function
+import java.io.Serializable
 import java.util.*
 
 /**
@@ -24,7 +25,7 @@ import java.util.*
  * @see CommandPart
  * @see MacroPart
  */
-open class Command {
+open class Command: Serializable {
 
     /**
      * 命令片段的列表
@@ -327,7 +328,7 @@ open class Command {
     /**
      * 表示一个命令片段，作为命令的一部分。一个命令对象中包含数个命令片段。
      */
-    protected interface ICommandPart
+    protected interface ICommandPart: Serializable
 
     /**
      * 一个普通的命令片段，由一个固定的字符串构成

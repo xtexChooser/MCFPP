@@ -23,7 +23,7 @@ import top.mcfpp.model.CompoundData
  */
 class MCFPPGenericParamType(
     var identifier:String,
-    override var parentType: List<MCFPPType>
+    parentType: ArrayList<out MCFPPType>
 ) : MCFPPType(parentType) {   //TODO: 泛型的CompoundData
 
     override val objectData: CompoundData

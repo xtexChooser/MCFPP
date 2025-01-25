@@ -3,7 +3,6 @@ package top.mcfpp.model
 import top.mcfpp.Project
 import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.model.field.GlobalField
-import top.mcfpp.model.generic.GenericObjectClass
 import top.mcfpp.type.MCFPPObjectClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
@@ -24,11 +23,10 @@ open class ObjectClass(identifier: String, namespace: String = Project.currNames
     override val tag: String
         get() = namespace + "_object_class_" + identifier
 
-    override var getType : () -> MCFPPType = {
+    override fun getType(): MCFPPType =
         MCFPPObjectClassType(this,
-            parent.filterIsInstance<Class>().map { it.getType() }
+            ArrayList(parent.filterIsInstance<Class>().map { it.getType() })
         )
-    }
 
     override fun newPointer(): ClassPointer {
         LogProcessor.error("Cannot instantiate an object class")
@@ -51,6 +49,3 @@ open class ObjectClass(identifier: String, namespace: String = Project.currNames
         }
     }
 }
-class CompiledGenericObjectClass(identifier: String, namespace: String = Project.currNamespace,
-                           var originClass: GenericObjectClass
-) : ObjectClass(identifier, namespace)

@@ -1,10 +1,9 @@
 package top.mcfpp.model.field
 
 import top.mcfpp.core.lang.Var
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.type.MCFPPType
 
-class NoStackFunctionField(parent: FunctionField, cacheContainer: FieldContainer?) : FunctionField(parent, cacheContainer) {
+class NoStackFunctionField(parent: FunctionField) : FunctionField(parent) {
 
     override fun forEachVar(action: (Var<*>) -> Unit) {
         allVars.forEach { action(it) }

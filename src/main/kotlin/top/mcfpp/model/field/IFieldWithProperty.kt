@@ -2,7 +2,7 @@ package top.mcfpp.model.field
 
 import top.mcfpp.model.accessor.Property
 
-interface IFieldWithProperty {
+interface IFieldWithProperty: IField {
 
     fun putProperty(key: String, property: Property, forced: Boolean = false): Boolean
 

@@ -166,6 +166,8 @@ class NBTPath(var source: NBTSource): Serializable {
 
         val stack = NBTPath(StorageSource("mcfpp:system")).memberIndex("stack_frame")
 
+        val global = NBTPath(StorageSource("mcfpp:system")).memberIndex("global")
+
         val STORAGE = "storage"
         val ENTITY = "entity"
         val BLOCK = "block"

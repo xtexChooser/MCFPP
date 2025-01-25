@@ -13,7 +13,7 @@ import top.mcfpp.model.FieldContainer
 
 class MCFPPEntityType {
 
-    object EntityBase: MCFPPType(listOf(MCFPPBaseType.Any)){
+    object EntityBase: MCFPPType(arrayListOf(MCFPPBaseType.Any)){
 
             override val objectData: CompoundData
                 get() = EntityVar.data
@@ -22,7 +22,7 @@ class MCFPPEntityType {
                 get() = "entitybase"
     }
 
-    object Entity: MCFPPType(listOf(EntityBase)){
+    object Entity: MCFPPType(arrayListOf(EntityBase)){
 
         override val objectData: CompoundData
             get() = EntityVar.data
@@ -45,7 +45,7 @@ class MCFPPEntityType {
         override fun buildUnConcrete(identifier: String, clazz: Class): Var<*> = EntityVar(identifier)
     }
 
-    object Selector: MCFPPConcreteType(listOf(EntityBase)){
+    object Selector: MCFPPConcreteType(arrayListOf(EntityBase)){
 
         override val objectData: CompoundData
             get() = SelectorVar.data
@@ -64,7 +64,7 @@ class MCFPPEntityType {
 
     }
 
-    class LimitedSelectorType(val limit: Int): MCFPPConcreteType(listOf(Entity)){
+    class LimitedSelectorType(val limit: Int): MCFPPConcreteType(arrayListOf(Entity)){
 
         override val objectData: CompoundData
             get() = SelectorVar.data

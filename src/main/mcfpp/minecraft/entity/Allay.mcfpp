@@ -13,39 +13,30 @@ data Allay: EntityData, AIMobData, CreatureData {
 }
 
 data Listener {
-        data event {
+    data {
+        float distance;
+        @Name<"game_event">
+        string gameEvent;
+        
+        list<double> pos;
+        
+        @Name<"projectile_owner">
+        IntArray projectileOwner;
+        IntArray source;
+    } event;
+    @Name<"event_delay">
+    int eventDelay;
+    @Name<"selector">
+    data {
+        long tick;
+        data {
             float distance;
-
             @Name<"game_event">
             string gameEvent;
-            
             list<double> pos;
-            
             @Name<"projectile_owner">
             IntArray projectileOwner;
-
             IntArray source;
-        }
-
-        @Name<"event_delay">
-        int eventDelay;
-
-        @Name<"selector">
-        data _selector {
-            long tick;
-
-            data event {
-                float distance;
-
-                @Name<"game_event">
-                string gameEvent;
-
-                list<double> pos;
-
-                @Name<"projectile_owner">
-                IntArray projectileOwner;
-
-                IntArray source;
-            }
-        }
-    }
+        } event;
+    } _selector;
+}

@@ -19,22 +19,22 @@ data Villager: EntityData, CreatureData, AIMobData, GrowableData {
     long lastGossipDecay;
 
     @Name<"Offers">
-    data offers {
+    data {
         @Name<"Recipes">
         list<VillagerRecipe> recipes;
-    }
+    } offers;
 
     @Name<"RestocksToday">
     int restocksToday;
 
     @Name<"VillagerData">
-    data villagerData {
+    data {
         int level;
 
         string profession;
 
         string type;
-    }
+    } villagerData;
 
     @Name<"Xp">
     int xp;
@@ -56,14 +56,14 @@ data VillagerGossip {
 }
 
 data VillagerRecipe {
-    data buy {
+    data {
         string id;
         nbt components;
-    }
-    data buyB {
+    } buy;
+    data {
         string id;
         nbt components;
-    }
+    } buyB;
     int demand;
     int maxUses;
     float priceMultiplier;

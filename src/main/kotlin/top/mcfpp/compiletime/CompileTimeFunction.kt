@@ -12,13 +12,13 @@ class CompileTimeFunction : Function {
     constructor(name:String, namespace:String, context:mcfppParser.FunctionBodyContext):super(name,namespace, context)
 
     fun setField(parent: IField){
-        this.field = CompileTimeFunctionField(parent,this)
+        this.field = CompileTimeFunctionField(parent)
     }
 
     private fun makeField():CompileTimeFunctionField{
         return (this.field as CompileTimeFunctionField).clone()
     }
-    private fun argPass(field:CompileTimeFunctionField, /*readOnlyArgs: ArrayList<Var<*>>, */normalArgs: ArrayList<Var<*>>) {
+    private fun argPass(field:CompileTimeFunctionField, normalArgs: List<Var<*>>) {
         for (argi in normalArgs.withIndex()){
             field.putVar(normalParams[argi.index].identifier,argi.value,true)
         }
@@ -29,7 +29,7 @@ class CompileTimeFunction : Function {
          */
     }
 
-    override fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
+    override fun invoke(normalArgs: List<Var<*>>, callerClassP: ClassPointer) {
         val field = makeField()
         argPass(field, normalArgs)
         val visitor = MCFPPCompileTimeVisitor(field)

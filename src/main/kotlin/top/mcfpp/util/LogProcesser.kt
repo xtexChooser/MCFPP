@@ -144,12 +144,12 @@ object LogProcessor {
         logger.error(
             "Syntax Error in " +
                     MCFPPFile.currFile!!.absolutePath + ">>\n" + msg + "\n"
-                    + getLineInfo(recognizer, offendingSymbol, line, charPositionInLine)
+                    + getLineInfo(recognizer, line, charPositionInLine)
         )
         Project.errorCount++
     }
 
-    fun getLineInfo(recognizer: Recognizer<*, *>, offendingSymbol: Token, line: Int, charPositionInLine: Int): String{
+    fun getLineInfo(recognizer: Recognizer<*, *>, line: Int, charPositionInLine: Int): String{
         val tokens = recognizer.inputStream as CommonTokenStream
         val input = tokens.tokenSource.inputStream.toString()
         val errorLine = input.split("\n")[line - 1]

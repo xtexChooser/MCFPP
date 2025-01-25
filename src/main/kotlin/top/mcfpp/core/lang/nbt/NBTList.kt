@@ -222,7 +222,7 @@ open class NBTList : NBTBasedData {
     companion object {
         val data by lazy {
             CompoundData("list", "mcfpp.lang").apply {
-                field.putType("E", MCFPPGenericParamType("E", listOf(MCFPPBaseType.Any)))
+                field.putType("E", MCFPPGenericParamType("E", arrayListOf(MCFPPBaseType.Any)))
                 extends(NBTBasedData.data)
                 getNativeFromClass(NBTListData::class.java)
             }

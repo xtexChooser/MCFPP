@@ -7,7 +7,6 @@ import top.mcfpp.core.lang.EnumVar
 import top.mcfpp.model.EnumMember
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.NoStackFunction
-import java.util.*
 import kotlin.math.ceil
 import kotlin.math.log
 import kotlin.math.pow
@@ -30,7 +29,6 @@ object FunctionUtil {
          * @param num 分割的数量
          */
         fun divideFunction(function: NoStackFunction, num: Int = 3){
-            val id = UUID.randomUUID().toString()
             //确认分块大小
             val log = log(function.commands.size.toDouble(), num.toDouble()).toInt()
             var partSize = num.toDouble().pow(log).toInt()

@@ -47,7 +47,9 @@ object MCFPPStringTest {
         val context = parser.compilationUnit()
         MCFPPFile.currFile = MCFPPFile()
         LogProcessor.debug("Generate Type Index...")
-        MCFPPTypeVisitor().visit(context)
+        Project.currNamespace = MCFPPFile.currFile!!.namespace
+        MCFPPTypeVisitor().visitCompilationUnit(context)
+        MCFPPFile.currFile!!.field.namespaceField = GlobalField.localNamespaces[Project.currNamespace]!!.field
         LogProcessor.debug("Generate Function Index...")
         MCFPPFieldVisitor().visit(context)
         GlobalField.importedLibNamespaces.clear()
@@ -97,7 +99,7 @@ object MCFPPStringTest {
             //解析文件
             //添加默认库的域
             if(!CompileSettings.ignoreStdLib){
-                GlobalField.importedLibNamespaces["mcfpp.sys"] = GlobalField.libNamespaces["mcfpp.sys"]
+                GlobalField.importedLibNamespaces["mcfpp.sys"] = GlobalField.libNamespaces["mcfpp.sys"]!!
             }
             var charStream: CharStream = CharStreams.fromString(code)
             var tokens = CommonTokenStream(mcfppLexer(charStream))
@@ -107,7 +109,7 @@ object MCFPPStringTest {
             GlobalField.importedLibNamespaces.clear()
             //添加默认库域
             if(!CompileSettings.ignoreStdLib){
-                GlobalField.importedLibNamespaces["mcfpp.sys"] = GlobalField.libNamespaces["mcfpp.sys"]
+                GlobalField.importedLibNamespaces["mcfpp.sys"] = GlobalField.libNamespaces["mcfpp.sys"]!!
             }
             val visitor = MCFPPImVisitor()
             visitor.visit(context)

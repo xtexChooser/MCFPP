@@ -1,11 +1,11 @@
 data Warden: EntityData, CreatureData, AIMobData {
     @Name<"Anger">
-    data anger {
-        list<data> suspects {
+    data {
+        list<data{
             int anger;
             IntArray uuid;
-        }
-    }
+        }> offers;
+    } anger;
 
     Listener listener;
 }

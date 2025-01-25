@@ -1,17 +1,16 @@
 package top.mcfpp.model.generic
 
-import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.Project
 import top.mcfpp.antlr.MCFPPGenericClassFieldVisitor
 import top.mcfpp.antlr.MCFPPGenericClassImVisitor
+import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.core.lang.MCFPPTypeVar
+import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPClassType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompiledGenericClass
 import top.mcfpp.model.accessor.Property
-import top.mcfpp.model.field.GlobalField
+import top.mcfpp.type.MCFPPType
 
 /**
  * 泛型类，即携带只读参数的类。mcfpp中的泛型借助只读参数实现，只读参数和函数的只读参数完全一致。通常来说，可以使用Class<类型 标识符>这样的形式
@@ -24,11 +23,11 @@ import top.mcfpp.model.field.GlobalField
  *
  * 泛型类的只读参数是不能被继承的，它在编译的过程中即被确定，也不会作为成员储存在数据包中。
  */
-class GenericClass : Class {
+open class GenericClass : Class {
 
     val ctx : mcfppParser.ClassBodyContext
 
-    val compiledClasses: HashMap<List<Var<*>>, Class> = HashMap()
+    val compiledClasses: HashMap<List<Any?>, CompiledGenericClass> = HashMap()
 
     var index = 0
 
@@ -52,12 +51,28 @@ class GenericClass : Class {
      * @param identifier 类的标识符
      * @param namespace 类的命名空间
      */
+    @Suppress("ConvertSecondaryConstructorToPrimary")
     constructor(identifier: String, namespace: String = Project.currNamespace, ctx : mcfppParser.ClassBodyContext):super(identifier, namespace) {
         this.ctx = ctx
     }
 
-    fun compile(readOnlyArgs: List<Var<*>>) : Class{
-        val cls = CompiledGenericClass("${identifier}_${readOnlyParams.joinToString("_") { it.typeIdentifier }}_$index", namespace, this)
+    open fun compile(readonlyArgs: List<Var<*>>) : CompiledGenericClass {
+        //只读属性
+        val args = ArrayList<Var<*>>()
+        for (i in readOnlyParams.indices) {
+            val r = readonlyArgs[i].implicitCast(readOnlyParams[i].type!!)
+            r.isConst = true
+            args.add(r)
+        }
+        val values = args.map { (it as MCFPPValue<*>).value }
+        compiledClasses[values]?.let { return it }
+
+        val cls = CompiledGenericClass(
+            "${identifier}_${readOnlyParams.joinToString("_") { it.typeIdentifier }}_$index",
+            namespace,
+            this,
+            args.map { it as MCFPPValue<*> }
+        )
         cls.initialize()
         for (parent in this.parent){
             cls.extends(parent)
@@ -67,27 +82,21 @@ class GenericClass : Class {
 
         //只读属性
         for (i in readOnlyParams.indices) {
-            val r = readOnlyArgs[i].implicitCast(readOnlyParams[i].type!!)
-            r.isConst = true
-            if(r is MCFPPTypeVar){
-                cls.field.putType(readOnlyParams[i].identifier, r.value)
+            if(args[i] is MCFPPTypeVar){
+                cls.field.putType(readOnlyParams[i].identifier, (args[i] as MCFPPTypeVar).value)
             }
-            cls.field.putVar(readOnlyParams[i].identifier, r, false)
-            cls.field.putProperty(readOnlyParams[i].identifier, Property.buildSimpleProperty(r))
+            cls.field.putVar(readOnlyParams[i].identifier, args[i], false)
+            cls.field.putProperty(readOnlyParams[i].identifier, Property.buildSimpleProperty(args[i]))
         }
 
         //注册
-        val namespace = GlobalField.localNamespaces[namespace]!!
-        namespace.field.addClass(cls.identifier, cls)
         Class.currClass = cls
         MCFPPGenericClassFieldVisitor(cls).visitClassDeclaration(ctx.parent as mcfppParser.ClassDeclarationContext)
         Class.currClass = cls
         MCFPPGenericClassImVisitor().visitClassBody(ctx)
         index ++
 
-        cls.getType = { MCFPPClassType(cls, this.getType().parentType) }
-
-        compiledClasses[readOnlyArgs] = cls
+        compiledClasses[args.map { (it as MCFPPValue<*>).value }] = cls
 
         return cls
     }

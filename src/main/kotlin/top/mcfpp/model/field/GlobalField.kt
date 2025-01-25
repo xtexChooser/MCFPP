@@ -3,6 +3,9 @@ package top.mcfpp.model.field
 import top.mcfpp.Project
 import top.mcfpp.core.lang.Var
 import top.mcfpp.io.MCFPPFile
+import top.mcfpp.io.info.FunctionTagInfo
+import top.mcfpp.io.info.GlobalFieldInfo
+import top.mcfpp.io.info.NamespaceInfo
 import top.mcfpp.lib.SbObject
 import top.mcfpp.mni.DataObjectData
 import top.mcfpp.mni.MinecraftData
@@ -30,22 +33,22 @@ object GlobalField : FieldContainer, IField {
     /**
      * 当前项目内声明的命名空间
      */
-    val localNamespaces = Hashtable<String, Namespace>()
+    val localNamespaces = HashMap<String, Namespace>()
 
     /**
      * 每个文件中，使用import语句引用库以后的库命名空间，只作用于当前编译的文件
      */
-    val importedLibNamespaces = Hashtable<String, Namespace>()
+    val importedLibNamespaces = HashMap<String, Namespace>()
 
     /**
      * 库的命名空间域。在分析项目前，使用readLib函数读取所有在项目配置文件中被声明引用的库，并将所有的命名空间存放进去
      */
-    val libNamespaces = Hashtable<String, Namespace>()
+    val libNamespaces = HashMap<String, Namespace>()
 
     /**
      * 标准库命名。无论如何，这个命名空间都会被加入工程
      */
-    val stdNamespaces = Hashtable<String, Namespace>()
+    val stdNamespaces = HashMap<String, Namespace>()
 
     /**
      * 函数的标签
@@ -56,6 +59,9 @@ object GlobalField : FieldContainer, IField {
      * 记分板
      */
     var scoreboards: HashMap<String , SbObject> = HashMap()
+
+    override val prefix: String
+        get() = Project.config.rootNamespace + "_global_"
 
     fun init(): GlobalField {
 
@@ -349,9 +355,30 @@ object GlobalField : FieldContainer, IField {
         return np?.field?.getAnnotation(identifier)
     }
 
-    @get:Override
-    override val prefix: String
-        get() = Project.config.rootNamespace + "_global_"
+    fun getInfo(): GlobalFieldInfo {
+        return GlobalFieldInfo(
+            localNamespaces.mapValues { NamespaceInfo.from(it.value) },
+            functionTags.mapValues { FunctionTagInfo.from(it.value) },
+            scoreboards
+        )
+    }
+
+    fun mergeInfo(info: GlobalFieldInfo){
+
+        for((id, namespace) in info.localNamespaces){
+            if(stdNamespaces.containsKey(id)) {
+                stdNamespaces[id]!!.merge(namespace.get())
+            }else if(libNamespaces.containsKey(id)){
+                libNamespaces[id]!!.merge(namespace.get())
+            }else{
+                libNamespaces[id] = namespace.get()
+            }
+        }
+        functionTags.putAll(info.functionTags.mapValues { it.value.get() })
+        scoreboards.putAll(info.scoreboards)
+    }
+
+    private fun readResolve(): Any = GlobalField
 
     /**
      * TODO:DEBUG
@@ -362,7 +389,7 @@ object GlobalField : FieldContainer, IField {
             namespace.field.forEachFunction { s ->
                 run {
                     if (s is NativeFunction) {
-                        println(s.namespaceID + " = " + s.javaClassName +  "." + s.javaMethodName )
+                        println(s.namespaceID + " = " + s.javaMethodName )
                     } else {
                         val n = StringBuilder("")
                         for(tag in s.tags){

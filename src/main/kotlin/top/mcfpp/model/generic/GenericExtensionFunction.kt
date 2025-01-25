@@ -3,24 +3,16 @@ package top.mcfpp.model.generic
 import top.mcfpp.Project
 import top.mcfpp.antlr.MCFPPImVisitor
 import top.mcfpp.antlr.mcfppParser
-import top.mcfpp.model.CanSelectMember
-import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.core.lang.MCFPPValue
-import top.mcfpp.model.Class
+import top.mcfpp.core.lang.Var
+import top.mcfpp.model.CanSelectMember
 import top.mcfpp.model.CompoundData
-import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.ExtensionFunction
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.util.LogProcessor
 
 class GenericExtensionFunction: ExtensionFunction, Generic<ExtensionFunction> {
-
-    override lateinit var ctx: mcfppParser.FunctionBodyContext
-
-    override var index: Int = 0
 
     override val readOnlyParams: ArrayList<FunctionParam> = ArrayList()
 
@@ -30,10 +22,11 @@ class GenericExtensionFunction: ExtensionFunction, Generic<ExtensionFunction> {
      * 创建一个函数
      * @param name 函数的标识符
      */
+    @Suppress("ConvertSecondaryConstructorToPrimary")
     constructor(name: String, owner: CompoundData, namespace: String = Project.currNamespace, ctx: mcfppParser.FunctionBodyContext):super(name, owner, namespace, ctx)
+
     override fun invoke(readOnlyArgs: ArrayList<Var<*>>, normalArgs: ArrayList<Var<*>>, caller: CanSelectMember?): Var<*> {
-        val f = compile(readOnlyArgs)
-        return f.invoke(normalArgs, caller)
+        return compile(readOnlyArgs).invoke(normalArgs, caller)
     }
 
     override fun addParamsFromContext(ctx: mcfppParser.FunctionParamsContext) {
@@ -58,47 +51,60 @@ class GenericExtensionFunction: ExtensionFunction, Generic<ExtensionFunction> {
         }
     }
 
-    override fun compile(readOnlyArgs: ArrayList<Var<*>>): ExtensionFunction {
-        if(compiledFunctions.containsKey(readOnlyArgs)){
-            return (compiledFunctions[readOnlyArgs.map { (it as MCFPPValue<*>).value }] as ExtensionFunction?)!!
+    override fun compile(args: List<Var<*>>): Function{
+        //函数参数已知条件下的编译
+        val readOnlyArgs = args.subList(0, readOnlyParams.size)
+        val readOnlyValues = readOnlyArgs.map { (it as MCFPPValue<*>).value }
+        val normalArgs = args.subList(readOnlyArgs.size, args.size)
+        val normalValues = normalArgs.map { if (it is MCFPPValue<*>) it.value else null }
+        val values = readOnlyValues + normalValues
+        compiledFunctions[values]?.let { return it }
+        val cf = Function(this)
+        //去除原来的function在编译的时候添加的变量
+        for (v in ArrayList(cf.field.allVars).subList(cf.normalParams.size, cf.field.allVars.size)) {
+            cf.field.removeVar(v.identifier)
         }
-        //创建新的函数
-        val compiledFunction : ExtensionFunction = when(ownerType){
-            Companion.OwnerType.CLASS -> {
-                ExtensionFunction("${identifier}_${index}", owner as Class, namespace, ctx)
-            }
-            //TODO Template的拓展方法好像还没做欸
-            Companion.OwnerType.TEMPLATE -> {
-                TODO()
-            }
-            Companion.OwnerType.BASIC -> {
-                ExtensionFunction("${identifier}_${index}", owner as CompoundData, namespace, ctx)
-            }
-            else -> {
-                //拓展函数必定有成员
-                throw Exception()
+        //替换变量
+        for (i in readOnlyValues.indices){
+            cf.field.putVar(
+                readOnlyParams[i].identifier,
+                cf.field.getVar(readOnlyParams[i].identifier)!!.assignedBy(readOnlyArgs[i]),
+                true
+            )
+        }
+        for (i in normalValues.indices) {
+            if (normalValues[i] != null) {
+                cf.field.putVar(
+                    normalParams[i].identifier,
+                    cf.field.getVar(normalParams[i].identifier)!!.assignedBy(normalArgs[i]),
+                    true
+                )
             }
         }
-        compiledFunction.returnType = returnType
-        //传递普通参数
-        for (i in normalParams.indices) {
-            val r = field.getVar(normalParams[i].identifier)!!
-            compiledFunction.field.putVar(normalParams[i].identifier, r, false)
+        //去除确定的参数
+        val params = ArrayList<FunctionParam>()
+        for (i in normalArgs.indices) {
+            if (normalArgs[i] !is MCFPPValue<*>) {
+                params.add(normalParams[i])
+            }else{
+                cf.excludedArgIndex.add(i.toByte())
+            }
         }
-        //传递只读参数
-        for (i in readOnlyArgs.indices) {
-            val r = field.getVar(readOnlyParams[i].identifier)
-            compiledFunction.field.putVar(readOnlyParams[i].identifier, r!!.assignedBy(readOnlyArgs[i]), false)
+        cf.normalParams = params
+        cf.commands.clear()
+        cf.identifier = this.identifier + "_" + compiledFunctions.size
+        compiledFunctions[values] = cf
+        cf.ast = null
+        cf.runInFunction {
+            val qwq = buildString {
+                for ((index, np) in normalParams.withIndex()) {
+                    append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
+                }
+            }
+            addComment(qwq)
+            MCFPPImVisitor().visitFunctionBody(ast!!)
         }
-        index ++
-        //编译这个函数
-        currFunction = compiledFunction
-        val visitor = MCFPPImVisitor()
-        visitor.visit(ctx)
-        currFunction = nullFunction
-        //注册这个函数
-        GlobalField.localNamespaces[namespace]!!.field.addFunction(compiledFunction, false)
-        return compiledFunction
+        return cf
     }
 
     override fun isSelf(key: String, readOnlyArgs: List<Var<*>>, normalArgs: List<Var<*>>): Boolean {

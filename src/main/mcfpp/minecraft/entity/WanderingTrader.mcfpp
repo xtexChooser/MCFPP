@@ -4,10 +4,10 @@ data WanderingTrader: EntityData, CreatureData, AIMobData, GrowableData {
     int despawnDelay;
 
     @Name<"Offers">
-    data offers {
+    data {
         @Name<"Recipes">
-        list<Recipe> recipes;
-    }
+        list<VillagerRecipe> recipes;
+    } offers;
 
     @Name<"Inventory">
     list<Item> inventory;

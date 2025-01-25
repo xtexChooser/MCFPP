@@ -6,10 +6,7 @@ import top.mcfpp.core.lang.DataTemplateObjectConcrete
 import top.mcfpp.core.lang.UnknownVar
 import top.mcfpp.core.lang.Var
 import top.mcfpp.mni.annotation.NoInstance
-import top.mcfpp.model.Class
-import top.mcfpp.model.CompoundData
-import top.mcfpp.model.DataTemplate
-import top.mcfpp.model.FieldContainer
+import top.mcfpp.model.*
 import top.mcfpp.util.LogProcessor
 
 /**
@@ -18,7 +15,7 @@ import top.mcfpp.util.LogProcessor
  */
 open class MCFPPDataTemplateType(
     var template: DataTemplate,
-    override var parentType: List<MCFPPType>
+    parentType: ArrayList<out MCFPPType>
 ) : MCFPPType(parentType) {
 
     override val objectData: CompoundData
@@ -26,6 +23,12 @@ open class MCFPPDataTemplateType(
 
     override val typeName: String
         get() = "template(${template.namespace}:${template.identifier})"
+
+    override fun tryResolve() {
+        if(template is UnsolvedTemplate){
+            template = (template as UnsolvedTemplate).resolve()
+        }
+    }
 
     override fun defaultValue(): CompoundTag {
         val tag = CompoundTag()

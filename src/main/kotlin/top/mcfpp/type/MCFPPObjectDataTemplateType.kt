@@ -1,12 +1,9 @@
 package top.mcfpp.type
 
-import top.mcfpp.model.Class
-import top.mcfpp.model.DataTemplate
-import top.mcfpp.model.FieldContainer
-import top.mcfpp.model.ObjectDataTemplate
-import top.mcfpp.util.LogProcessor
 import top.mcfpp.core.lang.UnknownVar
 import top.mcfpp.core.lang.Var
+import top.mcfpp.model.*
+import top.mcfpp.util.LogProcessor
 
 
 /**
@@ -15,20 +12,16 @@ import top.mcfpp.core.lang.Var
  */
 class MCFPPObjectDataTemplateType(
     template: ObjectDataTemplate,
-    parentType: List<MCFPPType>
+    parentType: ArrayList<out MCFPPType>
 ) : MCFPPDataTemplateType(template, parentType) {
 
     override val typeName: String
         get() = "template(${template.namespace}:${template.identifier})"
 
-    init {
-        //registerType({it.contains(regex)}){
-        //    val matcher = regex.find(it)!!.groupValues
-        //    MCFPPTemplateType(
-        //        Template(matcher[2], LazyWrapper(MCFPPBaseType.Int),matcher[1]), //TODO: 这里肯定有问题
-        //        parentType
-        //    )
-        //}
+    override fun tryResolve() {
+        if(template is UnsolvedObjectTemplate){
+            template = (template as UnsolvedObjectTemplate).resolve()
+        }
     }
 
     override fun build(identifier: String, container: FieldContainer): Var<*> {

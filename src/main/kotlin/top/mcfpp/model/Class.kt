@@ -5,6 +5,7 @@ package top.mcfpp.model
 import top.mcfpp.Project
 import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.MCAny
+import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.lib.StorageSource
 import top.mcfpp.model.field.GlobalField
@@ -13,6 +14,7 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.type.MCFPPBaseType
 import top.mcfpp.type.MCFPPClassType
+import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 
@@ -86,8 +88,13 @@ open class Class : CompoundData {
             if(invalidBaseEntity.contains(value)){
                 LogProcessor.error("Invalid base entity: $value")
             }
+            if(!silentBaseEntity.contains(value) && !isStaticClass){
+                isStaticClass = true
+            }
         }
+
     private val invalidBaseEntity = listOf("player", "leash_knot", "lightning_bolt", "fishing_bobber", "creaking_transient")
+    private val silentBaseEntity = listOf("marker", "item_display", "block_display", "text_display")
 
     /**
      * 生成一个类，它拥有指定的标识符和命名空间
@@ -116,7 +123,7 @@ open class Class : CompoundData {
 
     fun getConstructorByString(normalParams: List<String>): ClassConstructor?{
         return getConstructorByType(
-            ArrayList(normalParams.map { MCFPPType.parseFromIdentifier(it, field)?: MCFPPBaseType.Any })
+            ArrayList(normalParams.map { MCFPPType.parseFromString(it, field)?: MCFPPBaseType.Any })
         )
     }
 
@@ -181,9 +188,9 @@ open class Class : CompoundData {
     /**
      * 获取这个类对于的classType
      */
-    override var getType: () -> MCFPPType = {
-        MCFPPClassType(this,
-            parent.filterIsInstance<Class>().map { it.getType() }
+    override fun getType(): MCFPPType {
+        return MCFPPClassType(this,
+            ArrayList(parent.filterIsInstance<Class>().map { it.getType() })
         )
     }
 
@@ -225,5 +232,9 @@ open class Class : CompoundData {
 }
 
 @Suppress("unused")
-class CompiledGenericClass(identifier: String, namespace: String = Project.currNamespace,
-                           var originClass: GenericClass) : Class(identifier, namespace)
+open class CompiledGenericClass(identifier: String, namespace: String = Project.currNamespace, var originClass: GenericClass, val args: List<MCFPPValue<*>>) : Class(identifier, namespace) {
+    override fun getType(): MCFPPType {
+        val t = super.getType() as MCFPPClassType
+        return MCFPPGenericClassType(t.cls, ArrayList(args), t.parentType)
+    }
+}

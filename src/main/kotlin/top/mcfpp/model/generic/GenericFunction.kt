@@ -1,72 +1,49 @@
 package top.mcfpp.model.generic
 
 import top.mcfpp.Project
-import top.mcfpp.antlr.MCFPPExprVisitor
 import top.mcfpp.antlr.MCFPPImVisitor
-import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPType
-import top.mcfpp.model.Class
-import top.mcfpp.model.Interface
-import top.mcfpp.model.DataTemplate
 import top.mcfpp.antlr.mcfppParser
-import top.mcfpp.model.CanSelectMember
-import top.mcfpp.core.lang.MCFPPTypeVar
-import top.mcfpp.core.lang.Var
 import top.mcfpp.core.lang.MCFPPValue
-import top.mcfpp.model.field.GlobalField
+import top.mcfpp.core.lang.Var
+import top.mcfpp.model.CanSelectMember
+import top.mcfpp.model.Class
+import top.mcfpp.model.DataTemplate
+import top.mcfpp.model.Interface
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.FunctionParam
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.TextTranslator
-import top.mcfpp.util.TextTranslator.translate
 
 class GenericFunction : Function, Generic<Function> {
 
-    override lateinit var ctx: mcfppParser.FunctionBodyContext
-
-    override var index: Int = 0
-
     override val readOnlyParams: ArrayList<FunctionParam> = ArrayList()
-
-    override val compiledFunctions: HashMap<List<Any?>, Function> = HashMap()
 
     /**
      * 创建一个全局函数，它有指定的命名空间
      * @param identifier 函数的标识符
      * @param namespace 函数的命名空间
      */
-    constructor(identifier: String, namespace: String = Project.currNamespace, ctx: mcfppParser.FunctionBodyContext) : super(identifier, namespace, ctx){
-        this.ctx = ctx
-    }
+    constructor(identifier: String, namespace: String = Project.currNamespace, ctx: mcfppParser.FunctionBodyContext) : super(identifier, namespace, ctx)
 
     /**
      * 创建一个函数，并指定它所属的类。
      * @param identifier 函数的标识符
      */
-    constructor(identifier: String, cls: Class, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(identifier, cls, isStatic, ctx){
-        this.ctx = ctx
-    }
+    constructor(identifier: String, cls: Class, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(identifier, cls, isStatic, ctx)
 
     /**
      * 创建一个函数，并指定它所属的接口。接口的函数总是抽象并且公开的
      * @param identifier 函数的标识符
      */
-    constructor(identifier: String, itf: Interface, ctx: mcfppParser.FunctionBodyContext) : super(identifier, itf, ctx){
-        this.ctx = ctx
-    }
+    constructor(identifier: String, itf: Interface, ctx: mcfppParser.FunctionBodyContext) : super(identifier, itf, ctx)
 
     /**
      * 创建一个函数，并指定它所属的结构体。
      * @param name 函数的标识符
      */
-    constructor(name: String, template: DataTemplate, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(name, template, isStatic, ctx){
-        this.ctx = ctx
-    }
+    constructor(name: String, template: DataTemplate, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(name, template, isStatic, ctx)
 
     override fun invoke(readOnlyArgs: ArrayList<Var<*>>, normalArgs: ArrayList<Var<*>>, caller: CanSelectMember?): Var<*> {
-        val f = compile(readOnlyArgs)
-        f.parent.add(currFunction)
-        return f.invoke(normalArgs, caller)
+        return compile(readOnlyArgs + normalArgs).invoke(normalArgs, caller)
     }
 
     override fun addParamsFromContext(ctx: mcfppParser.FunctionParamsContext) {
@@ -91,60 +68,60 @@ class GenericFunction : Function, Generic<Function> {
         }
     }
 
-    override fun compile(readOnlyArgs: ArrayList<Var<*>>): Function {
-        if(compiledFunctions.containsKey(readOnlyArgs.map { (it as MCFPPValue<*>).value })){
-            return compiledFunctions[readOnlyArgs.map { (it as MCFPPValue<*>).value }]!!
+    override fun compile(args: List<Var<*>>): Function{
+        //函数参数已知条件下的编译
+        val readOnlyArgs = args.subList(0, readOnlyParams.size)
+        val readOnlyValues = readOnlyArgs.map { (it as MCFPPValue<*>).value }
+        val normalArgs = args.subList(readOnlyArgs.size, args.size)
+        val normalValues = normalArgs.map { if (it is MCFPPValue<*>) it.value else null }
+        val values = readOnlyValues + normalValues
+        compiledFunctions[values]?.let { return it }
+        val cf = Function(this)
+        //去除原来的function在编译的时候添加的变量
+        for (v in ArrayList(cf.field.allVars).subList(cf.normalParams.size, cf.field.allVars.size)) {
+            cf.field.removeVar(v.identifier)
         }
-        //创建新的函数
-        val compiledFunction = when(ownerType){
-            Companion.OwnerType.NONE -> {
-                Function("${identifier}_${index}", namespace, ctx)
+        //替换变量
+        for (i in readOnlyValues.indices){
+            cf.field.putVar(
+                readOnlyParams[i].identifier,
+                cf.field.getVar(readOnlyParams[i].identifier)!!.assignedBy(readOnlyArgs[i]),
+                true
+            )
+        }
+        for (i in normalValues.indices) {
+            if (normalValues[i] != null) {
+                cf.field.putVar(
+                    normalParams[i].identifier,
+                    cf.field.getVar(normalParams[i].identifier)!!.assignedBy(normalArgs[i]),
+                    true
+                )
             }
-            //interface是和Class一起处理的
-            Companion.OwnerType.CLASS -> {
-                if(owner is Class){
-                    Function("${identifier}_${index}", owner as Class, isStatic, ctx)
-                }else{
-                    Function("${identifier}_${index}", owner as Interface, ctx)
+        }
+        //去除确定的参数
+        val params = ArrayList<FunctionParam>()
+        for (i in normalArgs.indices) {
+            if (normalArgs[i] !is MCFPPValue<*>) {
+                params.add(normalParams[i])
+            }else{
+                cf.excludedArgIndex.add(i.toByte())
+            }
+        }
+        cf.normalParams = params
+        cf.commands.clear()
+        cf.identifier = this.identifier + "_" + compiledFunctions.size
+        compiledFunctions[values] = cf
+        cf.ast = null
+        cf.runInFunction {
+            val qwq = buildString {
+                for ((index, np) in normalParams.withIndex()) {
+                    append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
                 }
             }
-            Companion.OwnerType.TEMPLATE -> {
-                Function("${identifier}_${index}", owner as DataTemplate, isStatic, ctx)
-            }
-            Companion.OwnerType.BASIC -> {
-                //拓展函数的编译在ExtensionGenericFunction中进行
-                nullFunction
-            }
+            addComment(qwq)
+            MCFPPImVisitor().visitFunctionBody(ast!!)
         }
-        compiledFunction.returnType = returnType
-        //传递参数信息
-        compiledFunction.normalParamTypeList.addAll(normalParamTypeList)
-        compiledFunction.normalParams.addAll(normalParams)
-        //传递参数变量
-        for (i in normalParams.indices) {
-            val r = field.getVar(normalParams[i].identifier)!!
-            compiledFunction.field.putVar(normalParams[i].identifier, r, false)
-        }
-        for (i in readOnlyParams.indices) {
-            var r = field.getVar(readOnlyParams[i].identifier)!!
-            r = r.assignedBy(readOnlyArgs[i])
-            r.isConst = true
-            if(r is MCFPPTypeVar){
-                compiledFunction.field.putType(readOnlyParams[i].identifier, r.value)
-            }
-            compiledFunction.field.putVar(readOnlyParams[i].identifier, r, false)
-        }
-        index ++
-        //编译这个函数
-        MCFPPImVisitor().visitFunctionBody(ctx, compiledFunction)
-        if(compiledFunction.returnType !=  MCFPPBaseType.Void && !compiledFunction.hasReturnStatement){
-            LogProcessor.error("A 'return' expression required in function: " + compiledFunction.namespaceID)
-        }
-        //注册这个函数
-        GlobalField.localNamespaces[namespace]!!.field.addFunction(compiledFunction, false)
-        //传递函数的返回值
-        this.returnVar = compiledFunction.returnVar
-        return compiledFunction
+        return cf
     }
 
     override fun isSelf(key: String, readOnlyArgs: List<Var<*>>, normalArgs: List<Var<*>>): Boolean {

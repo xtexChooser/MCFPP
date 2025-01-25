@@ -27,13 +27,14 @@ import java.util.*
  */
 open class ScoreBool : BaseBool, OnScoreboard {
 
-
     final override var name: String
 
     /**
      * 此bool变量依托的记分板
      */
     var boolObject: SbObject = SbObject.MCFPP_boolean
+
+    override var type: MCFPPType = MCFPPBaseType.Bool
 
     /**
      * 创建一个bool类型的变量。它的mc名和变量所在的域容器有关。
@@ -60,8 +61,6 @@ open class ScoreBool : BaseBool, OnScoreboard {
     constructor(b: ScoreBool) : super(b){
         this.name = b.name
     }
-
-    override var type: MCFPPType = MCFPPBaseType.Bool
 
     @Override
     override fun doAssignedBy(b: Var<*>) : ScoreBool {

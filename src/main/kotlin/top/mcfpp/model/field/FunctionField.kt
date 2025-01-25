@@ -1,8 +1,6 @@
 package top.mcfpp.model.field
 
-import org.jetbrains.annotations.Nullable
 import top.mcfpp.core.lang.Var
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.type.MCFPPType
 
 /**
@@ -32,19 +30,12 @@ open class FunctionField : IFieldWithVar, IFieldWithType {
     var parent : IField?
 
     /**
-     * 这个缓存在哪一个容器中
-     */
-    @Nullable
-    var container: FieldContainer? = GlobalField
-
-    /**
      * 创建一个缓存，并指定它的父级
      * @param parent 父级缓存。若没有则设置为null
-     * @param cacheContainer 此缓存所在的容器
      */
-    constructor(parent: IField?, cacheContainer: FieldContainer?) {
+    @Suppress("ConvertSecondaryConstructorToPrimary")
+    constructor(parent: IField?) {
         this.parent = parent
-        container = cacheContainer
     }
 
 
@@ -174,7 +165,7 @@ open class FunctionField : IFieldWithVar, IFieldWithType {
          * @param functionField 原来的域
          */
         fun clone(functionField: FunctionField): FunctionField {
-            val newFunctionField = FunctionField(functionField.parent,null)
+            val newFunctionField = FunctionField(functionField.parent)
             //变量复制
             for (key in functionField.vars.keys) {
                 val `var`: Var<*>? = functionField.vars[key]

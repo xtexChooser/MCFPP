@@ -13,7 +13,7 @@ import top.mcfpp.model.generic.Generic
 import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.splitNamespaceID
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -27,7 +27,7 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
             currSelector = visitJvmAccessExpression(ctx.jvmAccessExpression())
             if(currSelector is UnknownVar){
                 val typeStr = ctx.jvmAccessExpression().text
-                val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
+                val type = MCFPPType.parseFromString(typeStr, Function.currFunction.field)
                 if(type == null){
                     LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
                 }else{
@@ -36,7 +36,7 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
             }
         }else{
             val typeStr = ctx.type().text
-            val type = MCFPPType.parseFromIdentifier(typeStr, Function.currFunction.field)
+            val type = MCFPPType.parseFromString(typeStr, Function.currFunction.field)
             if(type == null){
                 if(ctx.selector().size == 0){
                     LogProcessor.error(TextTranslator.VARIABLE_NOT_DEFINED.translate(currSelector!!.identifier))
@@ -152,7 +152,7 @@ open class McfppLeftExprVisitor : mcfppParserBaseVisitor<Var<*>>(){
             normalArgs.add(arg)
         }
         //获取函数
-        val p = StringHelper.splitNamespaceID(ctx.namespaceID().text)
+        val p = ctx.namespaceID().text.splitNamespaceID()
         val func = if(currSelector == null){
             GlobalField.getFunction(p.first, p.second, readOnlyArgs, normalArgs)
         }else{

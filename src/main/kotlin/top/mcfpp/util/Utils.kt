@@ -1,14 +1,9 @@
 package top.mcfpp.util
 
 import net.querz.nbt.tag.IntArrayTag
-import top.mcfpp.Project
 import top.mcfpp.antlr.mcfppParser
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-import java.io.Serializable
-import java.util.UUID
+import java.io.*
+import java.util.*
 import kotlin.system.exitProcess
 
 object Utils {
@@ -18,6 +13,7 @@ object Utils {
      *
      * @param e 异常信息
      */
+    @Suppress("NOTHING_TO_INLINE")
     inline fun stopCompile(e : Exception?){
         e?.printStackTrace()
         exitProcess(2)
@@ -137,6 +133,7 @@ object Utils {
         return bytes.joinToString("") { String.format("%02X", it) }
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun<T> fromByteArrayString(str: String): T{
         // 将字符串转换为字节数组
         val bytes = ByteArray(str.length / 2)

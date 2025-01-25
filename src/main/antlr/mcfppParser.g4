@@ -32,12 +32,11 @@ options {
     tokenVocab = mcfppLexer;
 }
 
-//TODO 类型别名和导入库文件的语句顺序不用这么严格
 //一个mcfpp文件
 compilationUnit
     :   namespaceDeclaration?
         importDeclaration*
-        topStatement
+        //TODO topStatement
         typeDeclaration*
         EOF
     ;
@@ -75,14 +74,19 @@ declarations
     |   objectTemplateDeclaration
     |   extensionFunctionDeclaration
     |   interfaceDeclaration
-    |   globalDeclaration
+    |   namespaceFieldDeclaration
     |   enumDeclaration
     |   annotation
     ;
 
-//全局声明
-globalDeclaration
-    :   GLOBAL '{' (doc_comment? fieldDeclaration ';')* '}'
+//命名空间变量声明
+namespaceFieldDeclaration
+    :   fieldModifier? type namespaceFieldDeclarationExpression (',' namespaceFieldDeclarationExpression)*
+    |   fieldModifier? VAR Identifier '=' value
+    ;
+
+namespaceFieldDeclarationExpression
+    :   Identifier ( '=' value)?
     ;
 
 //类声明
@@ -180,8 +184,6 @@ templateMember
     :   templateFunctionDeclaration
     |   templateFieldDeclaration
     |   templateConstructorDeclaration
-    |   innerTemplateDeclaration
-    |   innerTemplateListDeclaration
     |   annotation
     ;
 
@@ -199,14 +201,6 @@ singleTemplateFieldType
 
 unionTemplateFieldType
     :   '(' type (PIPE type)* ')' QUEST?
-    ;
-
-innerTemplateDeclaration
-    :   DATA Identifier (COLON className (',' className)*)? templateBody
-    ;
-
-innerTemplateListDeclaration
-    :   LIST '<' DATA '>' Identifier (COLON className (',' className)*)? templateBody
     ;
 
 //接口声明
@@ -568,6 +562,11 @@ typeWithoutExcl
     |   className readOnlyArgs?
     |   Identifier
     |   unionTemplateType
+    |   anonymousTemplateType
+    ;
+
+anonymousTemplateType
+    :   DATA (COLON className (',' className)*)? templateBody
     ;
 
 unionTemplateType

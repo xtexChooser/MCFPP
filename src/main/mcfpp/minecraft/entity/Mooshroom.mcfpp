@@ -1,10 +1,10 @@
 data Mooshroom: EntityData, CreatureData, AIMobData, GrowableData, AnimalData {
     @Name<"Stew_Effects">
-    list<data> stew_effects {
+    list<data {
         int duration;
 
         string id;
-    }
+    }> stew_effects;
 
     @Name<"Type">
     string type;

@@ -1,4 +1,3 @@
-
 import java.nio.file.Files
 import java.util.Optional
 
@@ -47,6 +46,7 @@ dependencies {
     implementation(kotlin("reflect"))
     testImplementation(kotlin("script-runtime"))
     implementation("com.google.guava:guava:33.2.0-jre")
+    implementation("com.esotericsoftware:kryo:5.6.2")
 }
 
 tasks.shadowJar {

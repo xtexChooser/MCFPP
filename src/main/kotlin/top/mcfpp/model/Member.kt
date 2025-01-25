@@ -1,14 +1,17 @@
 package top.mcfpp.model
 
+import top.mcfpp.model.Member.AccessModifier
+import java.io.Serializable
+
 /**
  * 一个类的成员。类的成员拥有三种访问级别，即[私有][AccessModifier.PRIVATE]、[保护][AccessModifier.PROTECTED]和[公开][AccessModifier.PUBLIC]。
  * 具体细则和java一致。
  *
  * 成员在编译器读取类的声明的时候，即被添加到类的成员缓存中。
  */
-interface Member {
+interface Member: Serializable {
 
-    enum class AccessModifier {
+    enum class AccessModifier: Serializable {
         /**
          * 公开的，所有类都可以访问
          */

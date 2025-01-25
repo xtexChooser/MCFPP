@@ -46,18 +46,17 @@ open class DataTemplate : FieldContainer, CompoundData {
 
     constructor(identifier: String, namespace: String = Project.currNamespace){
         this.identifier = identifier
-        field = CompoundDataField(ArrayList() ,this)
+        field = CompoundDataField(ArrayList())
         this.namespace = namespace
     }
 
     /**
      * 获取这个类对于的classType
      */
-    override val getType: () -> MCFPPDataTemplateType = {
+    override fun getType(): MCFPPDataTemplateType =
         MCFPPDataTemplateType(this,
-            parent.filterIsInstance<DataTemplate>().map { it.getType() }
+            ArrayList(parent.filterIsInstance<DataTemplate>().map { it.getType() })
         )
-    }
 
     /**
      * 检查给定复合标签是否符合此数据模板
@@ -121,11 +120,11 @@ open class DataTemplate : FieldContainer, CompoundData {
     }
 
     override fun extends(compoundData: CompoundData): CompoundData {
-        super.extends(compoundData)
         if(parent.contains(compoundData)){
             LogProcessor.warn("Already extends template '${compoundData.identifier}'")
             return this
         }
+        super.extends(compoundData)
         //把所有成员都塞进去
         compoundData.field.forEachVar {
             val b = field.getVar(it.identifier) != null
@@ -151,7 +150,7 @@ open class DataTemplate : FieldContainer, CompoundData {
 
     fun getConstructorByString(normalParams: List<String>): DataTemplateConstructor?{
         return getConstructorByType(
-            ArrayList(normalParams.map { MCFPPType.parseFromIdentifier(it, field)?: MCFPPBaseType.Any })
+            ArrayList(normalParams.map { MCFPPType.parseFromString(it, field)?: MCFPPBaseType.Any })
         )
     }
 

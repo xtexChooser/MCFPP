@@ -15,21 +15,21 @@ import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.MCFloat
 import top.mcfpp.core.lang.UnresolvedVar
 import top.mcfpp.core.lang.Var
-import top.mcfpp.io.LibReader
-import top.mcfpp.io.LibWriter
+import top.mcfpp.io.LibBinReader
+import top.mcfpp.io.LibBinWriter
 import top.mcfpp.io.MCFPPFile
 import top.mcfpp.lib.SbObject
 import top.mcfpp.model.Native
 import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.function.Function
+import top.mcfpp.model.function.NativeFunction
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.Utils
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
 import java.net.URLClassLoader
-import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.jar.JarFile
@@ -74,18 +74,6 @@ object Project {
 
     lateinit var mcfppInit : Function
 
-    val mcfppSystemTick: Function = Function("sys.tick","mcfpp", null).apply {
-        commands.addAll(
-            arrayOf(
-                //指针清理
-                Command("execute as @e[type=marker,tag=mcfpp_ptr] if score @s ${SbObject.MCFPP_POINTER_COUNTER} matches ..0 run kill @s"),
-                //内存泄露检查
-                Command("execute if data storage mcfpp:system stack_frame[0] run tellraw @a {\"text\":\"[MCFPP]Stack Leak\"}"),
-                Command("execute if data storage mcfpp:system stack_frame[0] run data modify storage mcfpp:system stack_frame set value []"),
-            )
-        )
-    }
-
     /**
      * 常量池
      */
@@ -98,15 +86,25 @@ object Project {
 
     var compileStage = 0
 
+    @Suppress("MemberVisibilityCanBePrivate")
     const val PRE_INIT = 0
+    @Suppress("MemberVisibilityCanBePrivate")
     const val INIT = PRE_INIT + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val READ_LIB = INIT + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val INDEX_TYPE = READ_LIB + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val RESOLVE_FIELD = INDEX_TYPE + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val RUN_ANNOTATION = RESOLVE_FIELD + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val COMPILE = RUN_ANNOTATION + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val OPTIMIZATION = COMPILE + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val GEN_INDEX = OPTIMIZATION + 1
+    @Suppress("MemberVisibilityCanBePrivate")
     const val GEN_DATAPACK = GEN_INDEX + 1
 
     /**
@@ -116,7 +114,19 @@ object Project {
 
     var classLoader: ClassLoader = Thread.currentThread().contextClassLoader
 
-    val files = ArrayList<MCFPPFile>()
+    private val files = ArrayList<MCFPPFile>()
+
+    val mcfppSystemTick: Function = Function("sys.tick","mcfpp", null).apply {
+        commands.addAll(
+            arrayOf(
+                //指针清理
+                Command("execute as @e[type=marker,tag=mcfpp_ptr] if score @s ${SbObject.MCFPP_POINTER_COUNTER} matches ..0 run kill @s"),
+                //内存泄露检查
+                Command("execute if data storage mcfpp:system stack_frame[0] run tellraw @a {\"text\":\"[MCFPP]Stack Leak\"}"),
+                Command("execute if data storage mcfpp:system stack_frame[0] run data modify storage mcfpp:system stack_frame set value []"),
+            )
+        )
+    }
 
     /**
      * 初始化
@@ -264,17 +274,13 @@ object Project {
         }
         //默认的
         if(!CompileSettings.ignoreStdLib){
-            val inputStream = ResourceReader::class.java.classLoader.getResourceAsStream("lib/.mclib")
+            val inputStream = ResourceReader::class.java.classLoader.getResourceAsStream("lib/bin.mclib")
 
             if (inputStream == null) {
-                LogProcessor.error("Cannot find lib file at: lib/.mclib")
+                LogProcessor.error("Cannot find lib file at: lib/bin.mclib")
                 return
             }
-
-            // 读取文件内容
-            val fileContent = String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
-            // 输出文件内容
-            LibReader.readFromString(fileContent)
+            LibBinReader.readFromStream(inputStream)
         }
         //写入缓存
         for (include in config.includes) {
@@ -283,13 +289,10 @@ object Project {
             if(file.exists()){
                 try {
                     JarFile(filePath).use { jarFile ->
-                        val jarEntry = jarFile.getJarEntry("lib/.mclib")
+                        val jarEntry = jarFile.getJarEntry("lib/bin.mclib")
                         if (jarEntry != null) {
-                            jarFile.getInputStream(jarEntry).use { inputStream ->
-                                // 读取文件内容
-                                val fileContent = String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
-                                // 输出文件内容
-                                LibReader.readFromString(fileContent)
+                            jarFile.getInputStream(jarEntry).use {
+                                LibBinReader.readFromStream(it)
                             }
                         } else {
                             LogProcessor.error("Cannot find lib file at: ${file.absolutePath}")
@@ -310,6 +313,17 @@ object Project {
                         if(v is UnresolvedVar){
                             c.field.putVar(c.identifier, v.resolve(c), true)
                         }
+                    }
+                }
+            }
+            namespace.field.forEachFunction { f ->
+                run {
+                    if(f is NativeFunction){
+                        //找到方法
+                        val clazz = f.javaMethodName.substringBeforeLast(".")
+                        val methodName = f.javaMethodName.substringAfterLast(".")
+                        val clazzObject = Class.forName(clazz)
+                        f.javaMethod = clazzObject.getMethod(methodName)
                     }
                 }
             }
@@ -522,7 +536,7 @@ object Project {
      */
     fun genIndex() {
         compileStage++
-        LibWriter.write(config.targetPath!!.absolutePathString())
+        LibBinWriter.write(config.targetPath!!.absolutePathString())
         stageProcessor[compileStage].forEach { it() }
     }
 }

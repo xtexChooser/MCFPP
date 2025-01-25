@@ -19,6 +19,7 @@ import top.mcfpp.model.field.GlobalField
 import top.mcfpp.model.generic.Generic
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.SerializableFunctionBodyContext
 import top.mcfpp.util.StringHelper.toSnakeCase
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
@@ -102,7 +103,7 @@ import java.lang.reflect.Method
  *
  * @see InternalFunction
  */
-open class Function : Member, FieldContainer, Serializable, WithDocument {
+open class Function : Member, FieldContainer, WithDocument {
 
     /**
      * 函数的返回类型
@@ -125,7 +126,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
     /**
      * 包含所有命令的列表
      */
-    var commands: CommandList
+    @Transient
+    var commands = CommandList()
 
     /**
      * 函数的名字
@@ -202,6 +204,31 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      */
     val innerFunction: ArrayList<Function> = ArrayList()
 
+    var excludedArgIndex: HashSet<Byte> = hashSetOf()
+
+    /**
+     * 含有缺省参数
+     */
+    protected var hasDefaultValue = false
+
+    /**
+     * 函数的语法树。当语法树为空的时候，函数会被直接编译而不做编译期常量优化
+     */
+    var ast: SerializableFunctionBodyContext? = null
+
+    var context: FunctionContext = FunctionContext()
+
+    open val compiledFunctions: HashMap<List<Any?>, Function> = HashMap()
+
+    val staticRefValue: HashMap<String, Var<*>> = HashMap()
+
+    override var isFinal: Boolean = false
+
+    @Transient
+    override var document: Document = Document()
+
+    val annotations: ArrayList<Annotation> = ArrayList()
+
     /**
      * 在什么东西里面
      */
@@ -216,15 +243,10 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         }
 
     /**
-     * 含有缺省参数
+     * 获取这个函数的命名空间id，即xxx:xxx形式。可以用于命令
+     * @return 函数的命名空间id
      */
-    protected var hasDefaultValue = false
-
     open val namespaceID: String
-        /**
-         * 获取这个函数的命名空间id，即xxx:xxx形式。可以用于命令
-         * @return 函数的命名空间id
-         */
         get() {
             val re: StringBuilder = if(ownerType == OwnerType.NONE){
                 StringBuilder("$namespace:$identifier")
@@ -306,23 +328,6 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         }
 
     /**
-     * 函数的语法树。当语法树为空的时候，函数会被直接编译而不做编译期常量优化
-     */
-    var ast: FunctionBodyContext? = null
-
-    var context: FunctionContext = FunctionContext()
-
-    open val compiledFunctions: HashMap<List<Any?>, Function> = HashMap()
-
-    val staticRefValue: HashMap<String, Var<*>> = HashMap()
-
-    override var isFinal: Boolean = false
-
-    override var document: Document = Document()
-
-    val annotations: ArrayList<Annotation> = ArrayList()
-
-    /**
      * 创建一个全局函数，它有指定的命名空间
      * @param identifier 函数的标识符
      * @param namespace 函数的命名空间
@@ -331,11 +336,11 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         this.identifier = identifier
         commands = CommandList()
         normalParams = ArrayList()
-        field = FunctionField(null, this)
+        field = FunctionField(null)
         isStatic = false
         ownerType = OwnerType.NONE
         this.namespace = namespace
-        this.ast = context
+        this.ast = context?.let { SerializableFunctionBodyContext(it) }
     }
 
     /**
@@ -350,8 +355,8 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         ownerType = OwnerType.CLASS
         owner = cls
         this.isStatic = isStatic
-        field = FunctionField(cls.field, this)
-        this.ast = context
+        field = FunctionField(cls.field)
+        this.ast = context?.let { SerializableFunctionBodyContext(it) }
     }
 
     /**
@@ -367,10 +372,10 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         ownerType = OwnerType.CLASS
         owner = itf
         this.isStatic = false
-        field = FunctionField(null,this)
+        field = FunctionField(null)
         this.isAbstract = true
         this.accessModifier = Member.AccessModifier.PUBLIC
-        this.ast = context
+        this.ast = context?.let { SerializableFunctionBodyContext(it) }
     }
 
     /**
@@ -379,16 +384,15 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      */
     constructor(name: String, template: DataTemplate, isStatic: Boolean, context: FunctionBodyContext?) {
         this.identifier = name
-        commands = CommandList()
         normalParams = ArrayList()
         namespace = template.namespace
         ownerType = OwnerType.TEMPLATE
         owner = template
         this.isStatic = isStatic
-        field = FunctionField(template.field, this)
+        field = FunctionField(template.field)
         this.returnType = returnType
         this.returnVar = buildReturnVar(returnType)
-        this.ast = context
+        this.ast = context?.let { SerializableFunctionBodyContext(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -401,7 +405,6 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         this.ownerType = function.ownerType
         this.isStatic = function.isStatic
         this.field = function.field.clone()
-        this.field.container = this
         this.returnType = function.returnType
         this.returnVar = function.returnVar.clone()
         this.isAbstract = function.isAbstract
@@ -510,66 +513,70 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         }
     }
 
+    open fun compile(args: List<Var<*>>): Function{
+        //函数参数已知条件下的编译
+        val values = args.map { if (it is MCFPPValue<*>) it.value else null }
+        compiledFunctions[values]?.let { return it }
+        val cf = Function(this)
+        //去除原来的function在编译的时候添加的变量
+        for (v in ArrayList(cf.field.allVars).subList(cf.normalParams.size, cf.field.allVars.size)) {
+            cf.field.removeVar(v.identifier)
+        }
+        //替换变量
+        for (i in values.indices) {
+            if (values[i] != null) {
+                cf.field.putVar(
+                    normalParams[i].identifier,
+                    cf.field.getVar(normalParams[i].identifier)!!.assignedBy(args[i]),
+                    true
+                )
+            }
+        }
+        //去除确定的参数
+        val params = ArrayList<FunctionParam>()
+        for (i in args.indices) {
+            if (args[i] !is MCFPPValue<*>) {
+                params.add(normalParams[i])
+            }else{
+                cf.excludedArgIndex.add(i.toByte())
+            }
+        }
+        cf.normalParams = params
+        cf.commands.clear()
+        cf.identifier = this.identifier + "_" + compiledFunctions.size
+        compiledFunctions[values] = cf
+        cf.ast = null
+        cf.runInFunction {
+            val qwq = buildString {
+                for ((index, np) in normalParams.withIndex()) {
+                    append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
+                }
+            }
+            addComment(qwq)
+            MCFPPImVisitor().visitFunctionBody(ast!!)
+        }
+        return cf
+    }
+
     /**
      * @param normalArgs 函数的参数列表
      * @param caller 函数的调用者
      */
     open fun invoke(normalArgs: ArrayList<Var<*>>, caller: CanSelectMember?): Var<*>{
         if(ast != null){
-            //函数参数已知条件下的编译
-            val values = normalArgs.map { if(it is MCFPPValue<*>) it.value else null }
-            if(values.any { it != null }){
-                if(compiledFunctions.containsKey(values)){
-                    return compiledFunctions[values]!!.invoke(normalArgs, caller)
-                }
-                val cf = Function(this)
-                for (v in ArrayList(cf.field.allVars).subList(cf.normalParams.size, cf.field.allVars.size)){
-                    cf.field.removeVar(v.identifier)
-                }
-                for (i in values.indices) {
-                    if(values[i] != null){
-                        cf.field.putVar(
-                            normalParams[i].identifier,
-                            cf.field.getVar(normalParams[i].identifier)!!.assignedBy(normalArgs[i]),
-                            true
-                        )
-                    }
-                }
-                //去除确定的参数
-                val args = ArrayList<Var<*>>()
-                val params = ArrayList<FunctionParam>()
-                for (i in normalArgs.indices){
-                    if(normalArgs[i] !is MCFPPValue<*>){
-                        params.add(normalParams[i])
-                        args.add(normalArgs[i])
-                    }
-                }
-                cf.normalParams = params
-                cf.commands.clear()
-                cf.identifier = this.identifier + "_" + compiledFunctions.size
-                compiledFunctions[values] = cf
-                cf.ast = null
-                cf.runInFunction {
-                    val qwq = buildString {
-                        for ((index, np) in normalParams.withIndex()){
-                            append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
-                        }
-                    }
-                    addComment(qwq)
-                    MCFPPImVisitor().visitFunctionBody(ast!!)
-                }
-                return cf.invoke(args, caller)
-            }
+            return compile(normalArgs).invoke(normalArgs, caller)
         }
+        //参数排除
+        val args = normalArgs.filterIndexed { index, _ -> index.toByte() !in excludedArgIndex }
         when(caller){
-            is MCFPPType, is DataTemplateObject, null -> invoke(normalArgs)
-            is ClassPointer -> invoke(normalArgs, caller)
-            is Var<*> -> invoke(normalArgs, caller)
+            is MCFPPType, is DataTemplateObject, null -> invoke(args)
+            is ClassPointer -> invoke(args, caller)
+            is Var<*> -> invoke(args, caller)
         }
         return returnVar
     }
 
-    protected open fun invoke(normalArgs: ArrayList<Var<*>>){
+    protected open fun invoke(normalArgs: List<Var<*>>){
         //变量进栈
         fieldStore()
         //给函数开栈
@@ -598,7 +605,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param normalArgs
      * @param caller
      */
-    protected open fun invoke(normalArgs: ArrayList<Var<*>>, caller: Var<*>){
+    protected open fun invoke(normalArgs: List<Var<*>>, caller: Var<*>){
         //变量进栈
         fieldStore()
         //基本类型
@@ -632,7 +639,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @see top.mcfpp.antlr.MCFPPExprVisitor.visitVar
      */
     @InsertCommand
-    protected open fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
+    protected open fun invoke(normalArgs: List<Var<*>>, callerClassP: ClassPointer) {
         //变量进栈
         fieldStore()
         //给函数开栈
@@ -641,7 +648,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
         argPass(normalArgs)
         callerClassP.stackIndex ++
         //函数调用的命令
-        if(callerClassP is ClassPointerConcrete){
+        if(callerClassP is ClassPointerConcrete || callerClassP.clazz.children.isEmpty()){
             addCommands(Commands.selectRun(callerClassP,Command.build("function $namespaceID")))
         }else{
             addCommands(Commands.selectRun(callerClassP,Command.build("function mcfpp.dynamic:function with entity @s data.functions.$identifier")))
@@ -667,7 +674,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param normalArgs 传入的参数
      * @param data 数据模板的实例
      */
-    protected open fun invoke(normalArgs: ArrayList<Var<*>>, data: DataTemplateObject){
+    protected open fun invoke(normalArgs: List<Var<*>>, data: DataTemplateObject){
         //变量进栈
         fieldStore()
         //给函数开栈
@@ -696,7 +703,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param normalArgs
      */
     @InsertCommand
-    open fun argPass(normalArgs: ArrayList<Var<*>>){
+    open fun argPass(normalArgs: List<Var<*>>){
         val tempArgs = normalArgs.map { it.getTempVar() }.toCollection(ArrayList())
         for (i in this.normalParams.indices) {
             if(i >= tempArgs.size){
@@ -719,7 +726,7 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
      * @param args
      */
     @InsertCommand
-    open fun staticArgRef(args: ArrayList<Var<*>>){
+    open fun staticArgRef(args: List<Var<*>>){
         var hasAddComment = false
         for (i in 0 until normalParams.size) {
             if (normalParams[i].isStatic) {
@@ -1060,6 +1067,6 @@ open class Function : Member, FieldContainer, Serializable, WithDocument {
 /**
  * 描述一个函数执行的上下文。函数执行的上下文包括函数的执行者，执行坐标等。
  */
-class FunctionContext{
+class FunctionContext: Serializable{
     var caller: CanSelectMember? = null
 }

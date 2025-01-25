@@ -1,4 +1,4 @@
 data Creaking: EntityData, CreatureData, AIMobData {
     @Name<"Home_Pos">
-    IntArray home_pos;
+    IntArray homePos;
 }

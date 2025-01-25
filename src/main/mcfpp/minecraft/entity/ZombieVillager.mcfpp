@@ -6,22 +6,22 @@ data ZombieVillager: EntityData, CreatureData, AIMobData, ZombieData{
     IntArray conversionPlayer;
 
     @Name<"Offers">
-    data offers {
+    data {
         @Name<"Recipes">
         list<VillagerRecipe> recipes;
-    }
+    } offers;
 
     @Name<"Gossips">
     list<VillagerGossip> gossips;
 
     @Name<"VillagerData">
-    data villagerData {
+    data {
         int level;
 
         string profession;
 
         string type;
-    }
+    } villagerData;
 
     @Name<"Xp">
     int xp;

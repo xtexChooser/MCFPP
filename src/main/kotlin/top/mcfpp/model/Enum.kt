@@ -5,8 +5,8 @@ import net.querz.nbt.tag.IntTag
 import net.querz.nbt.tag.StringTag
 import net.querz.nbt.tag.Tag
 import top.mcfpp.lib.SbObject
-import top.mcfpp.type.MCFPPEnumType
 import top.mcfpp.model.field.GlobalField
+import top.mcfpp.type.MCFPPEnumType
 import top.mcfpp.util.LogProcessor
 
 class Enum(identifier: String, namespace: String) : CompoundData(identifier, namespace){
@@ -20,9 +20,7 @@ class Enum(identifier: String, namespace: String) : CompoundData(identifier, nam
     /**
      * 获取这个枚举对应的enumType
      */
-    override val getType: () -> MCFPPEnumType = {
-        MCFPPEnumType(this)
-    }
+    override fun getType() = MCFPPEnumType(this)
 
     init {
         GlobalField.scoreboards[namespaceID] = sbObject

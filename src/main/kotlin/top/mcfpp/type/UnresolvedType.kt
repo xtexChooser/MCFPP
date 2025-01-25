@@ -17,7 +17,7 @@ class UnresolvedType(type: String) : MCFPPType() {
     }
 
     fun resolve(typeScope: IFieldWithType): MCFPPType {
-        return parseFromIdentifier(originalTypeString, typeScope)?: run {
+        return parseFromString(originalTypeString, typeScope)?: run {
             LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(originalTypeString))
             MCFPPBaseType.Any
         }

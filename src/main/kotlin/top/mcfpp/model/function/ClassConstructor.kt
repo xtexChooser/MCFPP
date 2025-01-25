@@ -4,7 +4,8 @@ import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.command.Command
 import top.mcfpp.command.Commands
-import top.mcfpp.core.lang.*
+import top.mcfpp.core.lang.ClassPointer
+import top.mcfpp.core.lang.Var
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
 import top.mcfpp.type.MCFPPType
@@ -13,13 +14,8 @@ import java.util.*
 /**
  * 一个构造函数。它是一个特殊的成员方法，将会在类的初始化阶段之后调用。
  */
-open class ClassConstructor
-    (
-    /**
-     * 此构造函数对应的类。
-     */
-    var target: Class
-) : Function("_init_" + target.identifier.lowercase(Locale.getDefault()) + "_" + target.constructors.size, target, false, context = null) {
+open class ClassConstructor(var target: Class)
+    : Function("init_${target.identifier.lowercase(Locale.getDefault())}_${target.constructors.size}", target, false, context = null) {
 
     private val leadFunction: Function
     init {
@@ -81,12 +77,12 @@ open class ClassConstructor
 
     /**
      * 调用构造函数。类的实例的实体的生成，类的初始化（preinit和init函数），自身的调用和地址分配都在此方法进行。
-     * @param args 函数的参数
+     * @param normalArgs 函数的参数
      * @param callerClassP 构造方法将要构建的对象的临时指针
      */
     @Override
     @InsertCommand
-    override fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
+    override fun invoke(normalArgs: List<Var<*>>, callerClassP: ClassPointer) {
         //参数传递
         argPass(normalArgs)
         addCommand("execute in minecraft:overworld summon ${target.baseEntity} run function " + leadFunction.namespaceID)

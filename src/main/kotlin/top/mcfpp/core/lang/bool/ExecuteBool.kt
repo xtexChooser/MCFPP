@@ -8,6 +8,7 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
+import java.io.Serializable
 
 class ExecuteBool(): BaseBool(), MCFPPValue<ArrayList<AbstractBoolPart>> {
 
@@ -122,7 +123,7 @@ class ExecuteBool(): BaseBool(), MCFPPValue<ArrayList<AbstractBoolPart>> {
     override fun getFromStack() {}
 }
 
-interface AbstractBoolPart{
+interface AbstractBoolPart: Serializable {
 
     var negation: Boolean
 

@@ -3,7 +3,6 @@ package top.mcfpp.model.function
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.antlr.*
 import top.mcfpp.core.lang.*
-import top.mcfpp.type.MCFPPBaseType
 
 /**
  * 内联函数。
@@ -16,7 +15,7 @@ class InlineFunction : Function {
 
     constructor(name: String, namespace: String, context: mcfppParser.FunctionBodyContext) : super(name, namespace, context = context)
 
-    override fun argPass(normalArgs: ArrayList<Var<*>>) {
+    override fun argPass(normalArgs: List<Var<*>>) {
         for (i in this.normalParams.indices) {
             if(i >= normalArgs.size){
                 field.putVar(this.normalParams[i].identifier, this.normalParams[i].defaultVar!!, true)
@@ -32,7 +31,7 @@ class InlineFunction : Function {
      * @param normalArgs
      * @param caller
      */
-    override fun invoke(normalArgs: ArrayList<Var<*>>, caller: Var<*>){
+    override fun invoke(normalArgs: List<Var<*>>, caller: Var<*>){
         //基本类型
         addComment("[Inline Function ${this.namespaceID}]")
         //传入this参数
@@ -59,7 +58,7 @@ class InlineFunction : Function {
      * @see top.mcfpp.antlr.MCFPPExprVisitor.visitVar
      */
     @InsertCommand
-    override fun invoke(normalArgs: ArrayList<Var<*>>, callerClassP: ClassPointer) {
+    override fun invoke(normalArgs: List<Var<*>>, callerClassP: ClassPointer) {
         //基本类型
         addComment("[Inline Function ${this.namespaceID}]")
         //参数传递

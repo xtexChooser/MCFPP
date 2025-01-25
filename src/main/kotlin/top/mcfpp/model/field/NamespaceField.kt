@@ -34,13 +34,15 @@ open class NamespaceField(
     private val simpleFieldWithType: SimpleFieldWithType = SimpleFieldWithType(),
     private val simpleFieldWithEnum: SimpleFieldWithEnum = SimpleFieldWithEnum(),
     private val simpleFieldWithObject: SimpleFieldWithObject = SimpleFieldWithObject(),
-    private val simpleFieldWithAnnotation: SimpleFieldWithAnnotation = SimpleFieldWithAnnotation()
+    private val simpleFieldWithAnnotation: SimpleFieldWithAnnotation = SimpleFieldWithAnnotation(),
+    private val simpleFieldWithVar: SimpleFieldWithVar = SimpleFieldWithVar()
     )
     : IFieldWithClass, IFieldWithFunction, IFieldWithTemplate, IFieldWithInterface,
     IFieldWithType by simpleFieldWithType,
     IFieldWithEnum by simpleFieldWithEnum,
     IFieldWithObject by simpleFieldWithObject,
-    IFieldWithAnnotation by simpleFieldWithAnnotation
+    IFieldWithAnnotation by simpleFieldWithAnnotation,
+    IFieldWithVar by simpleFieldWithVar
 {
     /**
      * 变量
@@ -52,45 +54,20 @@ open class NamespaceField(
      */
     private var functions: ArrayList<Function> = ArrayList()
 
-    override fun forEachFunction(operation: (Function) -> Any?){
-        for (function in functions){
-            operation(function)
-        }
-    }
-
     /**
      * 类
      */
     private var classes: ArrayListMultimap<String, Class> = ArrayListMultimap.create()
-
-
-    override fun forEachClass(operation: (Class) -> Any?){
-        for (`class` in classes.values()){
-            operation(`class`)
-        }
-    }
 
     /**
      * 模板
      */
     private var template: HashMap<String, DataTemplate> = HashMap()
 
-    override fun forEachTemplate(operation: (DataTemplate) -> Any?){
-        for (t in template.values){
-            operation(t)
-        }
-    }
-
     /**
      * 接口
      */
     private var interfaces: HashMap<String, Interface> = HashMap()
-
-    override fun forEachInterface(operation: (Interface) -> Any?){
-        for(`interface` in interfaces.values){
-            operation(`interface`)
-        }
-    }
 
     /**
      * 父级域。命名空间的父级域应当是全局
@@ -119,6 +96,12 @@ open class NamespaceField(
     }
 
     //region function
+
+    override fun forEachFunction(operation: (Function) -> Any?){
+        for (function in functions){
+            operation(function)
+        }
+    }
     /**
      * 根据所给的函数名和参数获取一个函数
      * @param key 函数名
@@ -170,6 +153,13 @@ open class NamespaceField(
     //endregion
 
     //region class
+
+    override fun forEachClass(operation: (Class) -> Any?){
+        for (`class` in classes.values()){
+            operation(`class`)
+        }
+    }
+
     /**
      * 根据所给的id获取一个类
      *
@@ -247,6 +237,13 @@ open class NamespaceField(
     //endregion
 
     //region template
+
+    override fun forEachTemplate(operation: (DataTemplate) -> Any?){
+        for (t in template.values){
+            operation(t)
+        }
+    }
+
     /**
      * 向域中添加一个模板
      *
@@ -317,6 +314,13 @@ open class NamespaceField(
     //endregion
 
     //region interface
+
+    override fun forEachInterface(operation: (Interface) -> Any?){
+        for(`interface` in interfaces.values){
+            operation(`interface`)
+        }
+    }
+
     /**
      * 向域中添加一个接口
      *

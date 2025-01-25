@@ -26,12 +26,8 @@ class NativeFunction : Function, Native {
     /**
      * 要调用的java方法
      */
+    @Transient
     var javaMethod: Method
-
-    /**
-     * 引用的java方法的类名。包含包路径。可能不存在
-     */
-    var javaClassName: String?
 
     /**
      * 引用的java方法名。
@@ -51,7 +47,15 @@ class NativeFunction : Function, Native {
      */
     constructor(name: String, namespace: String = Project.currNamespace, javaMethod: Method = Companion::defaultNativeFunction.javaMethod!!) : super(name, namespace, context = null) {
         this.javaMethod = javaMethod
-        this.javaClassName = null
+        this.javaMethodName = name
+    }
+
+    constructor(name: String, namespace: String = Project.currNamespace, javaMethodString: String): super(name, namespace, context = null){
+        //找到方法
+        val clazz = javaMethodString.substringBeforeLast(".")
+        val methodName = javaMethodString.substringAfterLast(".")
+        val clazzObject = Class.forName(clazz)
+        javaMethod = clazzObject.getMethod(methodName)
         this.javaMethodName = name
     }
 
@@ -130,7 +134,7 @@ class NativeFunction : Function, Native {
 
     @Override
     override fun toString(containClassName: Boolean, containNamespace: Boolean): String {
-        return super.toString(containClassName,containNamespace ) + "->" + javaClassName + "." + javaMethodName
+        return super.toString(containClassName,containNamespace ) + "->" + javaMethodName
     }
 
     fun isSelf(key: String, readOnlyParams: List<MCFPPType>, normalParams: List<MCFPPType>) : Boolean{
@@ -205,6 +209,15 @@ class NativeFunction : Function, Native {
         }
     }
 
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + javaMethod.hashCode()
+        result = 31 * result + javaMethodName.hashCode()
+        result = 31 * result + readOnlyParams.hashCode()
+        result = 31 * result + caller.hashCode()
+        return result
+    }
+
     companion object {
 
         private val primitiveTypes: MutableMap<String, Class<*>> = HashMap()
@@ -220,6 +233,7 @@ class NativeFunction : Function, Native {
             primitiveTypes["void"] = Void::class.java
         }
 
+        @Suppress("UNUSED_PARAMETER")
         private fun defaultNativeFunction(vararg args: Any?){
             LogProcessor.error("A nativeFunction hadn't linked to a java method.")
         }

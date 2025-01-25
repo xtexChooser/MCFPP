@@ -4,7 +4,6 @@ import org.jetbrains.annotations.Nullable
 import top.mcfpp.core.lang.DataTemplateObject
 import top.mcfpp.core.lang.OnScoreboard
 import top.mcfpp.core.lang.Var
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.accessor.Property
 import top.mcfpp.model.function.Function
 import top.mcfpp.model.function.UnknownFunction
@@ -28,38 +27,14 @@ class CompoundDataField : IFieldWithFunction, IFieldWithVar, IFieldWithType, IFi
     private val types : HashMap<String, MCFPPType> = HashMap()
 
     /**
-     *
+     * 属性
      */
     private val property: HashMap<String, Property> = HashMap()
-
-    /**
-     * 遍历每一个字段
-     *
-     * @param action 要对字段执行的操作
-     * @receiver
-     */
-    override fun forEachVar(action: (Var<*>) -> Unit){
-        for (`var` in vars.values){
-            action(`var`)
-        }
-    }
 
     /**
      * 方法
      */
     private var functions: ArrayList<Function> = ArrayList()
-
-    /**
-     * 遍历每一个方法
-     *
-     * @param operation 要对方法进行的操作
-     * @receiver
-     */
-    override fun forEachFunction(operation: (Function) -> Any?){
-        for (function in functions){
-            operation(function)
-        }
-    }
 
     /**
      * 父级域。
@@ -68,19 +43,11 @@ class CompoundDataField : IFieldWithFunction, IFieldWithVar, IFieldWithType, IFi
     var parent: ArrayList<IField?>
 
     /**
-     * 这个域在哪一个容器中
-     */
-    @Nullable
-    var container: FieldContainer? = null
-
-    /**
      * 创建一个域，并指定它的父级
      * @param parent 父级域。若没有则设置为null
-     * @param cacheContainer 此域所在的容器
      */
-    constructor(parent: ArrayList<IField?>, cacheContainer: FieldContainer?) {
+    constructor(parent: ArrayList<IField?>) {
         this.parent = parent
-        container = cacheContainer
     }
 
     /**
@@ -100,6 +67,30 @@ class CompoundDataField : IFieldWithFunction, IFieldWithVar, IFieldWithType, IFi
         types.putAll(field.types)
         //属性
         property.putAll(field.property)
+    }
+
+    /**
+     * 遍历每一个字段
+     *
+     * @param action 要对字段执行的操作
+     * @receiver
+     */
+    override fun forEachVar(action: (Var<*>) -> Unit){
+        for (`var` in vars.values){
+            action(`var`)
+        }
+    }
+
+    /**
+     * 遍历每一个方法
+     *
+     * @param operation 要对方法进行的操作
+     * @receiver
+     */
+    override fun forEachFunction(operation: (Function) -> Any?){
+        for (function in functions){
+            operation(function)
+        }
     }
 
     //region Var<*>

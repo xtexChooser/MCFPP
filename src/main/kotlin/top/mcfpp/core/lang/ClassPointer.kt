@@ -15,7 +15,7 @@ import top.mcfpp.model.function.UnknownFunction
 import top.mcfpp.type.MCFPPClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.splitNamespaceID
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -32,16 +32,20 @@ import java.util.*
  */
 open class ClassPointer : Var<ClassPointer>{
 
-    /**
-     * 指针对应的类的类型
-     */
-    val clazz: Class
-        get() = (type as MCFPPClassType).cls
+    var isNull : Boolean = true
+
+    var instanceField: CompoundDataField
 
     /**
      * 指针对应的类的标识符
      */
     override lateinit var type: MCFPPType
+
+    /**
+     * 指针对应的类的类型
+     */
+    val clazz: Class
+        get() = (type as MCFPPClassType).cls
 
     val tag: String
         /**
@@ -49,10 +53,6 @@ open class ClassPointer : Var<ClassPointer>{
          * @return 返回它的tag
          */
         get() = clazz.namespace + "_class_" + clazz.identifier + "_pointer"
-
-    var isNull : Boolean = true
-
-    var instanceField: CompoundDataField
 
     /**
      * 创建一个指针
@@ -153,7 +153,7 @@ open class ClassPointer : Var<ClassPointer>{
             buildCastErrorVar(type)
         }
         //TODO: 这里有问题，class类型的问题
-        val namespace = StringHelper.splitNamespaceID(type.typeName)
+        val namespace = type.typeName.splitNamespaceID()
         val c = GlobalField.getClass(namespace.first, namespace.second)
         if(c == null){
             LogProcessor.error("Undefined class: $type")
@@ -242,6 +242,7 @@ open class ClassPointer : Var<ClassPointer>{
     }
 }
 
+//TODO 已知类的类指针，不用考虑多态
 class ClassPointerConcrete: ClassPointer, MCFPPValue<Class>{
 
     override lateinit var value: Class

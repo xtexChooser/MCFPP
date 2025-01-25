@@ -1,5 +1,30 @@
 namespace test;
 
+func test1(){
+    var creeper = SuperCreeper("SUPER");
+    creeper.sayHi();
+    creeper.sayName();
+}
 
-func main(){
+@Base<"creeper">
+class SuperCreeper{
+
+    string name;
+
+    constructor(string name){
+        this.name = name;
+    }
+
+    override func tick(){
+        /effect give @a[distance = ..10] speed 1 1
+    }
+
+    func sayHi(){
+        print("hi");
+    }
+
+    func sayName(){
+        print(this.name);
+    }
+
 }

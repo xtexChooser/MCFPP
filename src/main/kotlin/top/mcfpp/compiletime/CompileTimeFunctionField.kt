@@ -1,11 +1,10 @@
 package top.mcfpp.compiletime
 
 import top.mcfpp.core.lang.Var
-import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.field.FunctionField
 import top.mcfpp.model.field.IField
 
-class CompileTimeFunctionField(parent: IField?, cacheContainer: FieldContainer?): FunctionField(parent,cacheContainer)  {
+class CompileTimeFunctionField(parent: IField?): FunctionField(parent)  {
     override fun clone(): CompileTimeFunctionField {
         return clone(this)
     }
@@ -16,7 +15,7 @@ class CompileTimeFunctionField(parent: IField?, cacheContainer: FieldContainer?)
          * @param functionField 原来的域
          */
         fun clone(functionField: CompileTimeFunctionField): CompileTimeFunctionField {
-            val newFunctionField = CompileTimeFunctionField(functionField.parent,null)
+            val newFunctionField = CompileTimeFunctionField(functionField.parent)
             //变量复制
             for (key in functionField.vars.keys) {
                 val `var`: Var<*>? = functionField.vars[key]

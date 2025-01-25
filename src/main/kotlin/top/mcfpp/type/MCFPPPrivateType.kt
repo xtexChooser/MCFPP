@@ -9,7 +9,7 @@ import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.util.LogProcessor
 
-abstract class MCFPPPrivateType(parentType: List<MCFPPType> = listOf()) : MCFPPType(parentType) {
+abstract class MCFPPPrivateType(parentType: ArrayList<MCFPPType> = arrayListOf()) : MCFPPType(parentType) {
 
     abstract fun buildReturnVar(): Var<*>
 
@@ -43,7 +43,7 @@ abstract class MCFPPPrivateType(parentType: List<MCFPPType> = listOf()) : MCFPPT
         return UnknownVar(identifier)
     }
 
-    object CommandReturn: MCFPPPrivateType(parentType = listOf(MCFPPBaseType.Any)){
+    object CommandReturn: MCFPPPrivateType(parentType = arrayListOf(MCFPPBaseType.Any)){
 
         override fun buildReturnVar(): Var<*> {
             return top.mcfpp.core.lang.CommandReturn.empty

@@ -9,6 +9,7 @@ import top.mcfpp.core.lang.*
 import top.mcfpp.exception.UndefinedException
 import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.io.MCFPPFile
+import top.mcfpp.lib.NBTPath
 import top.mcfpp.model.*
 import top.mcfpp.model.Member.AccessModifier
 import top.mcfpp.model.accessor.*
@@ -19,9 +20,12 @@ import top.mcfpp.model.function.Function
 import top.mcfpp.model.generic.GenericExtensionFunction
 import top.mcfpp.model.generic.GenericFunction
 import top.mcfpp.type.MCFPPBaseType
+import top.mcfpp.type.MCFPPEnumType
+import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.splitNamespaceID
+import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.util.*
@@ -53,18 +57,81 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         return null
     }
 
-    /**
-     * 类或函数声明
-     * @param ctx the parse tree
-     * @return null
-     */
-
-    override fun visitDeclarations(ctx: mcfppParser.DeclarationsContext): Any? {
+    override fun visitNamespaceFieldDeclaration(ctx: mcfppParser.NamespaceFieldDeclarationContext): Any? {
         Project.ctx = ctx
-        if (ctx.globalDeclaration() != null) {
-            return null
+        Function.currFunction = NoStackFunction("", Function.nullFunction)
+        //变量生成
+        val fieldModifier = ctx.fieldModifier()?.text
+        val namespace = GlobalField.localNamespaces[Project.currNamespace]!!
+        if(ctx.VAR() != null){
+            //自动判断类型
+            val init: Var<*> = MCFPPExprVisitor().visitValue(ctx.value())
+            var `var` = if(fieldModifier == "import"){
+                val qwq = init.type.buildUnConcrete(ctx.Identifier().text, namespace)
+                qwq.hasAssigned = true
+                qwq
+            }else{
+                init.type.build(ctx.Identifier().text, namespace)
+            }
+            `var`.nbtPath = NBTPath.global.clone().memberIndex(`var`.identifier)
+            //变量赋值
+            `var` = `var`.assignedBy(init)
+            //一定是函数变量
+            if (!namespace.field.putVar(ctx.Identifier().text, `var`, false)) {
+                LogProcessor.error("Duplicate defined variable name:" + ctx.Identifier().text)
+            }
+            when(fieldModifier){
+                "const" -> {
+                    if(!`var`.hasAssigned){
+                        LogProcessor.error("The const field ${`var`.identifier} must be initialized.")
+                    }
+                    `var`.isConst = true
+                }
+                "dynamic" -> {
+                    LogProcessor.error("Modifier 'dynamic' cannot used in namespace field declaration")
+                }
+            }
+        }else{
+            //获取类型
+            val type = MCFPPType.parseFromContext(ctx.type(), namespace.field)?: run {
+                LogProcessor.error(TextTranslator.INVALID_TYPE_ERROR.translate(ctx.type().text))
+                MCFPPBaseType.Any
+            }
+            for (c in ctx.namespaceFieldDeclarationExpression()){
+                //函数变量，生成
+                var `var` = if(fieldModifier == "import"){
+                    val qwq = type.buildUnConcrete(c.Identifier().text, namespace)
+                    qwq.hasAssigned = true
+                    qwq
+                }else{
+                    type.build(c.Identifier().text, namespace)
+                }
+                //变量注册
+                //一定是函数变量
+                if (namespace.field.containVar(c.Identifier().text)) {
+                    LogProcessor.error("Duplicate defined variable name:" + c.Identifier().text)
+                }
+                `var`.nbtPath = NBTPath.global.clone().memberIndex(`var`.identifier)
+                //变量初始化
+                if (c.value() != null) {
+                    val init: Var<*> = MCFPPExprVisitor(if(type is MCFPPGenericClassType) type else null, if(type is MCFPPEnumType) type else null).visitValue(c.value())
+                    `var` = `var`.assignedBy(init)
+                }
+                when(fieldModifier){
+                    "const" -> {
+                        if(!`var`.hasAssigned){
+                            LogProcessor.error("The const field ${`var`.identifier} must be initialized.")
+                        }
+                        `var`.isConst = true
+                    }
+                    "dynamic" -> {
+                        LogProcessor.error("Modifier 'dynamic' cannot used in namespace field declaration")
+                    }
+                }
+                namespace.field.putVar(`var`.identifier, `var`, true)
+            }
         }
-        super.visitDeclarations(ctx)
+        Function.currFunction = Function.nullFunction
         return null
     }
 
@@ -151,7 +218,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             } }
             val clazz = namespace.field.getClass(id, types)!!
             for (p in clazz.readOnlyParams) {
-                p.type = MCFPPType.parseFromIdentifier(p.typeIdentifier, namespace.field)
+                p.type = MCFPPType.parseFromString(p.typeIdentifier, namespace.field)
             }
             return null
         }
@@ -409,10 +476,10 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 val mniRegister = method.getAnnotation(MNIFunction::class.java) ?: continue
                 //解析MNIMethod注解成员
                 val readOnlyType = mniRegister.readOnlyParams.map {
-                    MCFPPType.parseFromIdentifier(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
+                    MCFPPType.parseFromString(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
                 }
                 val normalType = mniRegister.normalParams.map {
-                    MCFPPType.parseFromIdentifier(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
+                    MCFPPType.parseFromString(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
                 }
                 //比对
                 if(nf.readOnlyParams.map { it.type } == readOnlyType && nf.normalParams.map { it.type } == normalType){
@@ -676,7 +743,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 }
             }
         }else{
-            val (nsp, id) = StringHelper.splitNamespaceID(ctx.type().typeWithoutExcl().className().text)
+            val (nsp, id) = ctx.type().typeWithoutExcl().className().text.splitNamespaceID()
             val qwq: Class? = GlobalField.getClass(nsp, id)
             if (qwq == null) {
                 val pwp = GlobalField.getTemplate(nsp, id)
@@ -749,10 +816,10 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 val mniRegister = method.getAnnotation(MNIFunction::class.java) ?: continue
                 //解析MNIMethod注解成员
                 val readOnlyType = mniRegister.readOnlyParams.map {
-                    MCFPPType.parseFromIdentifier(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
+                    MCFPPType.parseFromString(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
                 }
                 val normalType = mniRegister.normalParams.map {
-                    MCFPPType.parseFromIdentifier(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
+                    MCFPPType.parseFromString(it.split(" ", limit = 2)[0], Namespace.currNamespaceField)
                 }
                 //比对
                 if(nf.readOnlyParams.map { it.type } == readOnlyType && nf.normalParams.map { it.type } == normalType){
@@ -799,7 +866,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         typeScope = template.field
         for (c in ctx.className()){
             //是否存在继承
-            val (namespace, identifier) = StringHelper.splitNamespaceID(c.text)
+            val (namespace, identifier) = c.text.splitNamespaceID()
             val s = GlobalField.getTemplate(namespace, identifier)
             if(s == null){
                 val o = GlobalField.getObject(namespace, identifier)
@@ -817,19 +884,8 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             }
         }
         isStatic = false
-        //解析成员
-        //先解析函数和构造函数
-        for (c in ctx.templateBody().templateMemberDeclaration()) {
-            if (c!!.templateMember().templateFunctionDeclaration() != null || c.templateMember().templateConstructorDeclaration() != null) {
-                visit(c)
-            }
-        }
-        //再解析变量
-        for (c in ctx.templateBody().templateMemberDeclaration()) {
-            if (c!!.templateMember().templateFieldDeclaration() != null) {
-                visit(c)
-            }
-        }
+        visitTemplateBody(ctx.templateBody())
+        Project.ctx = ctx
         //如果没有构造函数，生成默认的构造函数
         if(template.constructors.isEmpty()){
             template.addMember(DataTemplateConstructor(DataTemplate.currTemplate!!, null))
@@ -854,7 +910,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         typeScope = objectTemplate.field
         for (c in ctx.className()){
             //是否存在继承
-            val (namespace, identifier) = StringHelper.splitNamespaceID(c.text)
+            val (namespace, identifier) = c.text.splitNamespaceID()
             val s = GlobalField.getTemplate(namespace, identifier)
             if(s == null){
                 val o = GlobalField.getObject(namespace, identifier)
@@ -871,29 +927,76 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 objectTemplate.extends(s)
             }
         }
+        visitTemplateBody(ctx.templateBody())
+        Project.ctx = ctx
         isStatic = true
-        //解析成员
-        //先解析函数
-        for (c in ctx.templateBody().templateMemberDeclaration()) {
-            if (c!!.templateMember().templateFunctionDeclaration() != null) {
-                visit(c)
-            }
-        }
-        //再解析变量
-        for (c in ctx.templateBody().templateMemberDeclaration()) {
-            if (c!!.templateMember().templateFieldDeclaration() != null) {
-                visit(c)
-            }
-        }
         DataTemplate.currTemplate = null
         currClassOrTemplate = null
         typeScope = MCFPPFile.currFile!!.field.namespaceField
         return null
     }
 
+    override fun visitAnonymousTemplateType(ctx: mcfppParser.AnonymousTemplateTypeContext?): Any {
+        Project.ctx = ctx!!
+        //注册模板
+        val template = DataTemplate(TempPool.getAnonymousTemplateIdentify())
+        val qwq = DataTemplate.currTemplate
+        DataTemplate.currTemplate = template
+        currClassOrTemplate = template
+        typeScope = template.field
+        for (c in ctx.className()){
+            //是否存在继承
+            val (namespace, identifier) = c.text.splitNamespaceID()
+            val s = GlobalField.getTemplate(namespace, identifier)
+            if(s == null){
+                val o = GlobalField.getObject(namespace, identifier)
+                if(o is ObjectDataTemplate) {
+                    template.extends(o)
+                }else{
+                    LogProcessor.error("Undefined template: " + c.text)
+                }
+            }else{
+                if(s == template){
+                    LogProcessor.error("Infinitive reference: ${template.identifier} -> $identifier")
+                }else{
+                    template.extends(s)
+                }
+            }
+        }
+        isStatic = false
+        visitTemplateBody(ctx.templateBody())
+        Project.ctx = ctx
+        //如果没有构造函数，生成默认的构造函数
+        if(template.constructors.isEmpty()){
+            template.addMember(DataTemplateConstructor(DataTemplate.currTemplate!!, null))
+        }
+        DataTemplate.currTemplate = qwq
+        currClassOrTemplate = qwq
+        typeScope = MCFPPFile.currFile!!.field.namespaceField
+        return template
+    }
+
+    override fun visitTemplateBody(ctx: mcfppParser.TemplateBodyContext): Any? {
+        Project.ctx = ctx
+        //解析成员
+        //先解析函数
+        for (c in ctx.templateMemberDeclaration()) {
+            if (c!!.templateMember().templateFunctionDeclaration() != null) {
+                visit(c)
+            }
+        }
+        //再解析变量
+        for (c in ctx.templateMemberDeclaration()) {
+            if (c!!.templateMember().templateFieldDeclaration() != null) {
+                visit(c)
+            }
+        }
+        return null
+    }
+
     override fun visitTemplateMemberDeclaration(ctx: mcfppParser.TemplateMemberDeclarationContext): Any? {
         Project.ctx = ctx
-        val m = visit(ctx.templateMember())
+        val m = visitTemplateMember(ctx.templateMember())
         val accessModifier = AccessModifier.valueOf(ctx.accessModifier()?.text?:"public".uppercase(Locale.getDefault()))
         //访问修饰符
         if(m is Member){
@@ -916,11 +1019,11 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
     override fun visitTemplateMember(ctx: mcfppParser.TemplateMemberContext): Any? {
         Project.ctx = ctx
         return if (ctx.templateFunctionDeclaration() != null) {
-            visit(ctx.templateFunctionDeclaration())
+            visitTemplateFunctionDeclaration(ctx.templateFunctionDeclaration())
         } else if (ctx.templateFieldDeclaration() != null) {
-            visit(ctx.templateFieldDeclaration())
+            visitTemplateFieldDeclaration(ctx.templateFieldDeclaration())
         } else if(ctx.templateConstructorDeclaration() != null) {
-            visit(ctx.templateConstructorDeclaration())
+            visitTemplateConstructorDeclaration(ctx.templateConstructorDeclaration())
         } else{
             return null
         }

@@ -7,7 +7,15 @@ class SimpleFieldWithVar : IFieldWithVar {
     /**
      * 变量
      */
-    protected val vars: HashMap<String, Var<*>> = HashMap()
+    private val vars: HashMap<String, Var<*>> = HashMap()
+
+    override val allVars: Collection<Var<*>>
+        /**
+         * 获取此缓存中的全部变量。不会从父缓存搜索。
+         * @return 一个包含了此缓存全部变量的集合。
+         */
+        get() = vars.values
+
     /**
      * 向此缓存中添加一个新的变量键值对。如果已存在此对象，将不会进行覆盖。
      * @param key 变量的标识符
@@ -40,14 +48,6 @@ class SimpleFieldWithVar : IFieldWithVar {
         }
         return re
     }
-
-
-    override val allVars: Collection<Var<*>>
-        /**
-         * 获取此缓存中的全部变量。不会从父缓存搜索。
-         * @return 一个包含了此缓存全部变量的集合。
-         */
-        get() = vars.values
 
     /**
      * 缓存中是否包含某个变量

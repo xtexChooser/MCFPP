@@ -1,9 +1,10 @@
 package top.mcfpp.core.lang
 
 import top.mcfpp.util.LogProcessor
+import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")
-abstract class ConcreteVar<T: ConcreteVar<T, V>, V: Any>: Var<T>, MCFPPValue<V>{
+abstract class ConcreteVar<T: ConcreteVar<T, V>, V: Serializable>: Var<T>, MCFPPValue<V>{
 
     final override var value: V
     constructor(identifier: String, value: V): super(identifier) {

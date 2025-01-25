@@ -102,10 +102,10 @@ object DatapackCreator {
             }
             //写入标签json文件
             for (tag in GlobalField.functionTags.values) {
-                LogProcessor.debug("Writing File: " + path + "\\${Project.config.name}\\data\\" + tag.namespace + "\\tags\\function\\" + tag.tag + ".json")
+                LogProcessor.debug("Writing File: " + path + "\\${Project.config.name}\\data\\" + tag.namespace + "\\tags\\function\\" + tag.identifier + ".json")
                 Files.createDirectories(Paths.get(path + "/${Project.config.name}/data/" + tag.namespace + "/tags/function"))
                 Files.write(
-                    Paths.get(path + "/${Project.config.name}/data/" + tag.namespace + "/tags/function/" + tag.tag + ".json"),
+                    Paths.get(path + "/${Project.config.name}/data/" + tag.namespace + "/tags/function/" + tag.identifier + ".json"),
                     tag.tagJSON.toByteArray()
                 )
             }

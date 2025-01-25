@@ -32,7 +32,7 @@ import top.mcfpp.util.TempPool
 class InternalFunction(prefix: String, parent: Function) : Function(TempPool.getFunctionIdentify(prefix), context = null) {
 
     init {
-        field = InternalFunctionField(parent.field,this)
+        field = InternalFunctionField(parent.field)
         setParentFunction(parent)
         ownerType = Companion.OwnerType.NONE
     }

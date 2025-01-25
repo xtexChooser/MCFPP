@@ -1,12 +1,12 @@
 package top.mcfpp.model.generic
 
 import top.mcfpp.Project
-import top.mcfpp.core.lang.Var
 import top.mcfpp.core.lang.MCFPPValue
-import top.mcfpp.model.Class
+import top.mcfpp.core.lang.Var
+import top.mcfpp.model.CompiledGenericClass
 import top.mcfpp.util.LogProcessor
 
-class ImplementedGenericClass(identifier: String, namespace: String = Project.currNamespace, val readOnlyArgs: List<Var<*>>, val parentGenericClass: GenericClass) : Class(identifier, namespace) {
+class ImplementedGenericClass(identifier: String, namespace: String = Project.currNamespace, val readOnlyArgs: List<Var<*>>, parentGenericClass: GenericClass) : CompiledGenericClass(identifier, namespace, parentGenericClass, readOnlyArgs.map { it as MCFPPValue<*> }) {
 
     init {
         extends(parentGenericClass.compile(readOnlyArgs))

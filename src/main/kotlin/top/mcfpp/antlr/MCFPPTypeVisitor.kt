@@ -15,7 +15,7 @@ import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.model.generic.GenericObjectClass
 import top.mcfpp.model.generic.ImplementedGenericClass
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.util.StringHelper
+import top.mcfpp.util.StringHelper.splitNamespaceID
 
 /**
  * 解析当前项目的类型
@@ -63,24 +63,6 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
         MCFPPFile.currFile!!.unsolvedImports[nsp] = type
     }
 
-    /**
-     * 类或函数声明
-     * <pre>
-     * `classOrFunctionDeclaration
-     * :   classDeclaration
-     * |   functionDeclaration
-     * |   nativeDeclaration
-     * ;`
-    </pre> *
-     * @param ctx the parse tree
-     * @return null
-     */
-    override fun visitDeclarations(ctx: mcfppParser.DeclarationsContext){
-        Project.ctx = ctx
-        if (ctx.globalDeclaration() != null) return
-        super.visitDeclarations(ctx)
-    }
-
     override fun visitInterfaceDeclaration(ctx: mcfppParser.InterfaceDeclarationContext){
         Project.ctx = ctx
         //注册类
@@ -95,7 +77,7 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
             val itf = Interface(id, Project.currNamespace)
             for (p in ctx.className()){
                 //是否存在继承
-                val nsn = StringHelper.splitNamespaceID(p.text)
+                val nsn = p.text.splitNamespaceID()
                 val namespace  = nsn.first
                 val identifier = nsn.second
                 val pc = GlobalField.getInterface(namespace, identifier)
@@ -139,7 +121,7 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
         if(ctx.className().size != 0){
             for (p in ctx.className()){
                 //是否存在继承
-                val qwq = StringHelper.splitNamespaceID(p.text)
+                val qwq = p.text.splitNamespaceID()
                 val identifier: String = qwq.second
                 val namespace : String? = qwq.first
                 var pc : CompoundData? = GlobalField.getClass(namespace, identifier)
@@ -184,7 +166,7 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
         if(ctx.className().size != 0){
             for (p in ctx.className()){
                 //是否存在继承
-                val qwq = StringHelper.splitNamespaceID(p.text)
+                val qwq = p.text.splitNamespaceID()
                 val identifier: String = qwq.second
                 val namespace : String? = qwq.first
                 var pc : CompoundData? = GlobalField.getClass(namespace, identifier)
@@ -238,7 +220,7 @@ class MCFPPTypeVisitor: mcfppParserBaseVisitor<Unit>() {
         if(ctx.className().size != 0){
             for (p in ctx.className()){
                 //是否存在继承
-                val qwq = StringHelper.splitNamespaceID(p.text)
+                val qwq = p.text.splitNamespaceID()
                 val identifier: String = qwq.second
                 val namespace : String? = qwq.first
                 cls.extends(Class.Companion.UndefinedClassOrInterface(identifier,namespace))

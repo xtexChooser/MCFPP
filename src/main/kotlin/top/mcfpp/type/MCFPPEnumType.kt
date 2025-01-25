@@ -8,7 +8,7 @@ import top.mcfpp.model.Enum
 
 open class MCFPPEnumType(
     var enum: Enum
-): MCFPPType(listOf(MCFPPBaseType.Any)) {
+): MCFPPType(arrayListOf(MCFPPBaseType.Any)) {
 
     override val objectData: CompoundData
         get() = enum

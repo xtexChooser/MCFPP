@@ -3,11 +3,11 @@ package top.mcfpp.antlr
 import top.mcfpp.Project
 import top.mcfpp.io.MCFPPFile
 import top.mcfpp.model.Class
-import top.mcfpp.model.ObjectClass
 import top.mcfpp.model.function.Function
+import top.mcfpp.model.generic.CompiledGenericObjectClass
 import top.mcfpp.util.LogProcessor
 
-class MCFPPGenericObjectClassFieldVisitor(val clazz: ObjectClass) : MCFPPFieldVisitor() {
+class MCFPPGenericObjectClassFieldVisitor(val clazz: CompiledGenericObjectClass) : MCFPPFieldVisitor() {
     override fun visitClassDeclaration(ctx: mcfppParser.ClassDeclarationContext): Any? {
         Project.ctx = ctx
 

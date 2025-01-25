@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import top.mcfpp.antlr.MCFPPFieldVisitor
-import top.mcfpp.antlr.MCFPPImVisitor
 import top.mcfpp.antlr.mcfppLexer
 import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.io.MCFPPFile
@@ -47,11 +46,7 @@ class LineCompiler {
         val charStream: CharStream = CharStreams.fromString(input + if(!line.endsWith(';')) ";" else "")
         val tokens = CommonTokenStream(mcfppLexer(charStream))
         val unit = mcfppParser(tokens).compilationUnit()
-        if(unit.topStatement().statement().size != 0){
-            MCFPPImVisitor().visit(unit)
-        }else{
-            MCFPPFieldVisitor().visit(unit)
-        }
+        MCFPPFieldVisitor().visit(unit)
         for (i in MCFPPFile.currFile!!.topFunction.commands){
             printOutput(i.toString())
         }

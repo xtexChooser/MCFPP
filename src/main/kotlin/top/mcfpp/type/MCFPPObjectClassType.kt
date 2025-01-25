@@ -1,37 +1,32 @@
 package top.mcfpp.type
 
+import top.mcfpp.core.lang.UnknownVar
+import top.mcfpp.core.lang.Var
 import top.mcfpp.model.Class
 import top.mcfpp.model.FieldContainer
 import top.mcfpp.model.ObjectClass
+import top.mcfpp.model.UnsolvedObjectClass
 import top.mcfpp.util.LogProcessor
-import top.mcfpp.core.lang.UnknownVar
-import top.mcfpp.core.lang.Var
 
 class MCFPPObjectClassType(
     cls: ObjectClass,
-    override var parentType: List<MCFPPType>
+    parentType: ArrayList<out MCFPPType>
 ): MCFPPClassType(cls, parentType) {
 
-    /**
-     * 获取这个类的实例的指针实体在mcfunction中拥有的tag
-     */
-    override val tag: String
-        get() {
-            if(genericType.isNotEmpty()){
-                return cls.namespace + "_object_class_" + cls.identifier + "_type[" + genericType.sortedBy { it.typeName }.joinToString("_") { it.typeName } + "]"
-            }
-            return cls.namespace + "_object_class_" + cls.identifier + "_type"
-        }
-
     override val typeName: String
-        get() = "object_class(${cls.namespace}:${cls.identifier})[${
-            genericType.joinToString("_") { it.typeName }
-        }]"
+        get() = "object_class(${cls.namespace}:${cls.identifier})"
+
+    override fun tryResolve() {
+        if(cls is UnsolvedObjectClass){
+            cls = (cls as UnsolvedObjectClass).resolve()
+        }
+    }
 
     override fun build(identifier: String, container: FieldContainer): Var<*> {
         LogProcessor.error("Cannot build var from object: $typeName}")
         return UnknownVar(identifier)
     }
+
     override fun build(identifier: String): Var<*> {
         LogProcessor.error("Cannot build var from object: $typeName")
         return UnknownVar(identifier)

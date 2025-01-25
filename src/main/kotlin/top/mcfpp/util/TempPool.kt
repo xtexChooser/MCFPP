@@ -5,7 +5,8 @@ object TempPool {
     var varCount = 0
 
     var functionCount = 0
-    
+
+    var anonymousTemplateCount = 0
     fun getVarId(): Int {
         return varCount++
     }
@@ -20,5 +21,13 @@ object TempPool {
 
     fun getFunctionIdentify(prefix: String): String {
         return "${prefix}_${getFunctionId()}"
+    }
+
+    fun getAnonymousTemplateID(): Int {
+        return anonymousTemplateCount++
+    }
+
+    fun getAnonymousTemplateIdentify(): String {
+        return "data_${getAnonymousTemplateID()}"
     }
 }

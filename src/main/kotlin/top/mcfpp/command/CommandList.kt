@@ -2,7 +2,8 @@ package top.mcfpp.command
 
 import top.mcfpp.Project
 
-class CommandList : ArrayList<Command>() {
+class CommandList: ArrayList<Command>() {
+
     fun analyzeAll(): ArrayList<String>{
         val re = ArrayList<String>()
         for (c in this){

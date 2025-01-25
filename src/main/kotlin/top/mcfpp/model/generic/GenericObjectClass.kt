@@ -4,24 +4,17 @@ import top.mcfpp.Project
 import top.mcfpp.antlr.MCFPPGenericClassImVisitor
 import top.mcfpp.antlr.MCFPPGenericObjectClassFieldVisitor
 import top.mcfpp.antlr.mcfppParser
+import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.MCFPPTypeVar
+import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.Var
-import top.mcfpp.type.MCFPPClassType
-import top.mcfpp.type.MCFPPType
 import top.mcfpp.model.Class
-import top.mcfpp.model.CompiledGenericObjectClass
-import top.mcfpp.model.ObjectClass
-import top.mcfpp.model.field.GlobalField
+import top.mcfpp.model.CompiledGenericClass
+import top.mcfpp.type.MCFPPType
+import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.MCUUID
 
-class GenericObjectClass : ObjectClass {
-
-    val ctx : mcfppParser.ClassBodyContext
-
-    val compiledClasses: HashMap<List<Var<*>>, ObjectClass> = HashMap()
-
-    var index = 0
-
-    val readOnlyParams: ArrayList<ClassParam> = ArrayList()
+open class GenericObjectClass : GenericClass {
 
     override val namespaceID : String
         get() = "$namespace:${identifier}_${readOnlyParams.joinToString("_") { it.typeIdentifier }}"
@@ -41,18 +34,22 @@ class GenericObjectClass : ObjectClass {
      * @param identifier 类的标识符
      * @param namespace 类的命名空间
      */
-    constructor(identifier: String, namespace: String = Project.currNamespace, ctx : mcfppParser.ClassBodyContext):super(identifier, namespace) {
-        this.ctx = ctx
-    }
+    @Suppress("ConvertSecondaryConstructorToPrimary")
+    constructor(identifier: String, namespace: String = Project.currNamespace, ctx : mcfppParser.ClassBodyContext):super(identifier, namespace, ctx)
 
-    fun compile(readOnlyArgs: List<Var<*>>) : Class {
-        val cls = CompiledGenericObjectClass("${identifier}_${readOnlyParams.joinToString("_") { it.typeIdentifier }}_$index", namespace, this)
+    override fun compile(readonlyArgs: List<Var<*>>) : CompiledGenericClass {
+        val cls = CompiledGenericObjectClass(
+            "${identifier}_${readOnlyParams.joinToString("_") { it.typeIdentifier }}_$index",
+            namespace,
+            this,
+            readonlyArgs.map { it as MCFPPValue<*> }
+        )
         for (parent in this.parent){
             cls.extends(parent)
         }
         //只读属性
         for (i in readOnlyParams.indices) {
-            val r = readOnlyArgs[i].clone()
+            val r = readonlyArgs[i].clone()
             r.isConst = true
             if(r is MCFPPTypeVar){
                 cls.field.putType(readOnlyParams[i].identifier, r.value)
@@ -61,17 +58,13 @@ class GenericObjectClass : ObjectClass {
         }
 
         //注册
-        val namespace = GlobalField.localNamespaces[namespace]!!
-        namespace.field.addObject(cls.identifier, cls)
         Class.currClass = cls
         MCFPPGenericObjectClassFieldVisitor(cls).visitClassDeclaration(ctx.parent as mcfppParser.ClassDeclarationContext)
         Class.currClass = cls
         MCFPPGenericClassImVisitor().visitClassBody(ctx)
         index ++
 
-        cls.getType = { MCFPPClassType(cls, this.getType().parentType) }
-
-        compiledClasses[readOnlyArgs] = cls
+        compiledClasses[readonlyArgs] = cls
 
         return cls
     }
@@ -89,5 +82,22 @@ class GenericObjectClass : ObjectClass {
             return true
         }
         return false
+    }
+}
+
+class CompiledGenericObjectClass(
+    identifier: String,
+    namespace: String = Project.currNamespace,
+    originClass: GenericObjectClass,
+    args: List<MCFPPValue<*>>
+) : CompiledGenericClass(identifier, namespace, originClass, args) {
+
+    var mcuuid: MCUUID = MCUUID.genFromString("$namespace:$identifier")
+
+    var normalClass: Class? = null
+
+    override fun newPointer(): ClassPointer {
+        LogProcessor.error("Cannot instantiate an object class")
+        return ClassPointer(this, "error_object_instance")
     }
 }

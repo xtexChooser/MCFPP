@@ -12,12 +12,13 @@ import top.mcfpp.lib.PlainChatComponent
 import top.mcfpp.model.Class
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.FieldContainer
+import top.mcfpp.util.TempPool
 
 /**
  * 类型单例
  */
 class MCFPPBaseType {
-    object Any: MCFPPType(listOf()){
+    object Any: MCFPPType(arrayListOf()){
 
         override val objectData: CompoundData
             get() = MCAny.data
@@ -31,13 +32,14 @@ class MCFPPBaseType {
         override fun build(identifier: kotlin.String, container: FieldContainer): Var<*> = MCAny(identifier)
         override fun build(identifier: kotlin.String): Var<*> = MCAny(identifier)
         override fun build(identifier: kotlin.String, clazz: Class): Var<*> = MCAny(identifier)
+        override fun build(value: kotlin.Any): Var<*> = MCAny(TempPool.getVarIdentify())
         override fun buildUnConcrete(identifier: kotlin.String, container: FieldContainer): Var<*> = MCAny(identifier)
         override fun buildUnConcrete(identifier: kotlin.String): Var<*> = MCAny(identifier)
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = MCAny(identifier)
 
     }
 
-    object Int: MCFPPType(listOf(Any)){
+    object Int: MCFPPType(arrayListOf(Any)){
 
         override val objectData: CompoundData
             get() = MCInt.data
@@ -51,13 +53,14 @@ class MCFPPBaseType {
         override fun build(identifier: kotlin.String, container: FieldContainer): Var<*> = MCIntConcrete(container, 0, identifier)
         override fun build(identifier: kotlin.String): Var<*> = MCIntConcrete(0, identifier)
         override fun build(identifier: kotlin.String, clazz: Class): Var<*> = MCIntConcrete(clazz, 0, identifier)
+        override fun build(value: kotlin.Any): Var<*> = MCIntConcrete(value as kotlin.Int)
         override fun buildUnConcrete(identifier: kotlin.String, container: FieldContainer): Var<*> = MCInt(container, identifier)
         override fun buildUnConcrete(identifier: kotlin.String): Var<*> = MCInt(identifier)
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = MCInt(clazz, identifier)
 
 
     }
-    object String: MCFPPType(listOf(Any)){
+    object String: MCFPPType(arrayListOf(Any)){
 
         override val objectData: CompoundData
             get() = MCString.data
@@ -71,12 +74,13 @@ class MCFPPBaseType {
         override fun build(identifier: kotlin.String, container: FieldContainer): Var<*> = MCStringConcrete(StringTag(""), identifier)
         override fun build(identifier: kotlin.String): Var<*> = MCStringConcrete(StringTag(""), identifier)
         override fun build(identifier: kotlin.String, clazz: Class): Var<*> = MCStringConcrete(StringTag(""), identifier)
+        override fun build(value: kotlin.Any): Var<*> = MCStringConcrete(value as StringTag)
         override fun buildUnConcrete(identifier: kotlin.String, container: FieldContainer): Var<*> = MCString(identifier)
         override fun buildUnConcrete(identifier: kotlin.String): Var<*> = MCString(identifier)
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = MCString(identifier)
     }
 
-    object Float: MCFPPType(listOf(Any)){
+    object Float: MCFPPType(arrayListOf(Any)){
 
         override val objectData: CompoundData
             get() = MCFloat.data
@@ -96,7 +100,7 @@ class MCFPPBaseType {
 
     }
 
-    object Double: MCFPPType(listOf(Any)){
+    object Double: MCFPPType(arrayListOf(Any)){
 
             override val objectData: CompoundData
                 get() = MCDouble.data
@@ -115,7 +119,7 @@ class MCFPPBaseType {
             override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = MCDouble(identifier)
     }
 
-    object Bool: MCFPPType(listOf(Any)){
+    object Bool: MCFPPType(arrayListOf(Any)){
 
         override val objectData: CompoundData
             get() = ScoreBool.data
@@ -134,7 +138,7 @@ class MCFPPBaseType {
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = ScoreBool(clazz, identifier)
     }
 
-    object Void: MCFPPType(listOf()){
+    object Void: MCFPPType(arrayListOf()){
 
         override val objectData: CompoundData
             get() = top.mcfpp.core.lang.Void.data
@@ -150,7 +154,7 @@ class MCFPPBaseType {
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = top.mcfpp.core.lang.Void
     }
 
-    object JsonText: MCFPPType(listOf(MCFPPNBTType.NBT)){
+    object JsonText: MCFPPType(arrayListOf(MCFPPNBTType.NBT)){
 
         override val objectData: CompoundData
             get() = top.mcfpp.core.lang.JsonText.data
@@ -166,7 +170,7 @@ class MCFPPBaseType {
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = JsonText(identifier)
     }
 
-    object Range: MCFPPType(listOf(Any)){
+    object Range: MCFPPType(arrayListOf(Any)){
 
         override val objectData: CompoundData
             get() = RangeVar.data
@@ -182,7 +186,7 @@ class MCFPPBaseType {
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = RangeVar(clazz, identifier)
     }
 
-    object Coordinate3: MCFPPType(listOf(Any)){
+    object Coordinate3: MCFPPType(arrayListOf(Any)){
 
         override val objectData: CompoundData
             get() = Coordinate3Var.data
@@ -198,7 +202,7 @@ class MCFPPBaseType {
         override fun buildUnConcrete(identifier: kotlin.String, clazz: Class): Var<*> = Coordinate3Var(clazz, identifier)
     }
 
-    object Coordinate2: MCFPPType(listOf(Any)){
+    object Coordinate2: MCFPPType(arrayListOf(Any)){
 
         override val objectData: CompoundData
             get() = Coordinate2Var.data

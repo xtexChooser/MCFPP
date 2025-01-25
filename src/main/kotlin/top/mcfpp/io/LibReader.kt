@@ -4,20 +4,22 @@ import com.alibaba.fastjson2.JSONArray
 import com.alibaba.fastjson2.JSONObject
 import top.mcfpp.antlr.mcfppParser
 import top.mcfpp.core.lang.UnresolvedVar
-import top.mcfpp.type.UnresolvedType
 import top.mcfpp.model.*
+import top.mcfpp.model.Enum
 import top.mcfpp.model.field.CompoundDataField
 import top.mcfpp.model.field.GlobalField
-import top.mcfpp.model.function.*
+import top.mcfpp.model.function.ClassConstructor
 import top.mcfpp.model.function.Function
+import top.mcfpp.model.function.FunctionParam
+import top.mcfpp.model.function.NativeFunction
 import top.mcfpp.model.generic.ClassParam
 import top.mcfpp.model.generic.GenericClass
 import top.mcfpp.model.generic.GenericFunction
 import top.mcfpp.model.generic.GenericObjectClass
-import top.mcfpp.util.StringHelper
+import top.mcfpp.type.UnresolvedType
+import top.mcfpp.util.StringHelper.splitNamespaceID
 import top.mcfpp.util.Utils
 import java.io.FileReader
-import top.mcfpp.model.Enum
 
 
 object LibReader{
@@ -46,7 +48,7 @@ object GlobalReader: ILibJsonReader<GlobalField> {
     override fun fromJson(jsonObject: JSONObject): GlobalField {
         val namespaces = jsonObject.getJSONArray("namespaces")
         val libNamespaceIds = ArrayList<String>()
-        for (i in 0 until namespaces.size){
+        for (i in 0..<namespaces.size){
             val namespace = namespaces.getJSONObject(i)
             val id = namespace.getString("id")
             libNamespaceIds.add(id)
@@ -74,12 +76,12 @@ object NamespaceReader: ILibJsonReader<Namespace> {
         val namespace = Namespace(id)
         currNamespace = namespace
         val functions = jsonObject.getJSONArray("functions")?: JSONArray()
-        for (i in 0 until functions.size){
+        for (i in 0..<functions.size){
             val function = functions.getJSONObject(i)
             namespace.field.addFunction(FunctionReader.fromJson(function), false)
         }
         val classes = jsonObject.getJSONArray("classes")?: JSONArray()
-        for (i in 0 until classes.size){
+        for (i in 0..<classes.size){
             val cls = ClassReader.fromJson(classes.getJSONObject(i))
             if(cls is ObjectClass){
                 namespace.field.addObject(cls.identifier, cls)
@@ -88,7 +90,7 @@ object NamespaceReader: ILibJsonReader<Namespace> {
             }
         }
         val template = jsonObject.getJSONArray("template")?: JSONArray()
-        for (i in 0 until template.size){
+        for (i in 0..<template.size){
             val t = TemplateReader.fromJson(template.getJSONObject(i))
             if(t is ObjectDataTemplate){
                 namespace.field.addObject(t.identifier, t)
@@ -97,7 +99,7 @@ object NamespaceReader: ILibJsonReader<Namespace> {
             }
         }
         val enum = jsonObject.getJSONArray("enum")?: JSONArray()
-        for (i in 0 until enum.size){
+        for (i in 0..<enum.size){
             val e = EnumReader.fromJson(enum.getJSONObject(i))
             namespace.field.addEnum(e.identifier, e)
         }
@@ -177,7 +179,7 @@ object ClassReader: ILibJsonReader<Class> {
         jsonObject.getJSONArray("parents").forEach {
             run {
                 val nspid = it.toString()
-                val qwq = StringHelper.splitNamespaceID(nspid)
+                val qwq = nspid.splitNamespaceID()
                 clazz.extends(UnknownClass(qwq.first!!, qwq.second))
             }
         }
@@ -216,7 +218,7 @@ object ObjectClassReader: ILibJsonReader<ObjectClass> {
         jsonObject.getJSONArray("parents").forEach {
             run {
                 val nspid = it.toString()
-                val qwq = StringHelper.splitNamespaceID(nspid)
+                val qwq = nspid.splitNamespaceID()
                 clazz.extends(UnknownClass(qwq.first!!, qwq.second))
             }
         }
@@ -230,13 +232,13 @@ object ObjectClassReader: ILibJsonReader<ObjectClass> {
         }
         clazz.field = CompoundDataFieldReader.fromJson(jsonObject.getJSONObject("field"))
         ClassReader.currClass = null
-        return clazz
+        return clazz as ObjectClass
     }
 }
 
 object CompoundDataFieldReader: ILibJsonReader<CompoundDataField> {
     override fun fromJson(jsonObject: JSONObject): CompoundDataField {
-        val field = CompoundDataField(ArrayList(), ClassReader.currClass?:TemplateReader.currTemplate)
+        val field = CompoundDataField(ArrayList())
         jsonObject.getJSONArray("vars").forEach {
             run {
                 val type = UnresolvedType((it as JSONObject) .getString("type"))
@@ -285,7 +287,7 @@ object TemplateReader: ILibJsonReader<DataTemplate> {
         jsonObject.getJSONArray("parents").forEach {
             run {
                 val nspid = it.toString()
-                val qwq = StringHelper.splitNamespaceID(nspid)
+                val qwq = nspid.splitNamespaceID()
                 template.extends(UnknownTemplate(qwq.first!!, qwq.second))
             }
         }
@@ -308,7 +310,7 @@ object ObjectTemplateReader: ILibJsonReader<ObjectDataTemplate> {
         jsonObject.getJSONArray("parents").forEach {
             run {
                 val nspid = it.toString()
-                val qwq = StringHelper.splitNamespaceID(nspid)
+                val qwq = nspid.splitNamespaceID()
                 template.extends(UnknownTemplate(qwq.first!!, qwq.second))
             }
         }

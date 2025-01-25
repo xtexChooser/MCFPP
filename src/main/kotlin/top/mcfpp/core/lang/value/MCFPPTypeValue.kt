@@ -1,11 +1,11 @@
 package top.mcfpp.core.lang.value
 
 import top.mcfpp.core.lang.Var
+import top.mcfpp.model.Member
+import top.mcfpp.model.function.Function
+import top.mcfpp.type.MCFPPConcreteType
 import top.mcfpp.type.MCFPPGenericParamType
 import top.mcfpp.type.MCFPPType
-import top.mcfpp.model.function.Function
-import top.mcfpp.model.Member
-import top.mcfpp.type.MCFPPConcreteType
 
 /**
  * type T;
@@ -15,7 +15,7 @@ import top.mcfpp.type.MCFPPConcreteType
 
 class MCTypeValue(
     identifier:String,
-    var parentType: List<MCFPPType>
+    var parentType: ArrayList<out MCFPPType>
 ): Var<MCTypeValue>(identifier) {
 
     /**

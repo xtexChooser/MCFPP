@@ -3,7 +3,7 @@ package top.mcfpp.model.field
 import org.jetbrains.annotations.Nullable
 import top.mcfpp.model.CompoundData
 
-interface IFieldWithObject {
+interface IFieldWithObject: IField {
     /**
      * 向域中添加一个单例
      *

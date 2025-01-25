@@ -54,6 +54,7 @@ enum class DownloadResourceType{
 }
 
 class DownloadHelper {
+    @Suppress("SameParameterValue")
     companion object{
         private fun getUri(
             source:String,
@@ -82,7 +83,7 @@ class DownloadHelper {
             return res
         }
         private fun getMcmetaSummary(
-            type: DownloadResourceType,
+            @Suppress("SameParameterValue") type: DownloadResourceType,
             version: String,
             isLatest: Boolean,
             source: String,
@@ -245,11 +246,11 @@ class Downloader(){
             var cacheUri:Path? = null
             var cacheChecksumUri: Path? = null
             if(job.cache!=null){
-                var checksumJob = job.cache.checksumJob
-                var checksumExtension = job.cache.checksumExtension
-                cacheUri = Project.config.root!!.resolve("downloader/${job.id}")
+                val checksumJob = job.cache.checksumJob
+                val checksumExtension = job.cache.checksumExtension
+                cacheUri = Project.config.root.resolve("downloader/${job.id}")
                 out.cacheUri = cacheUri
-                cacheChecksumUri = Project.config.root!!.resolve("downloader/${job.id}${checksumExtension}")
+                cacheChecksumUri = Project.config.root.resolve("downloader/${job.id}${checksumExtension}")
                 try{
                     if(Files.notExists(cacheUri.parent)){
                         Files.createDirectories(cacheUri.parent)
@@ -302,6 +303,7 @@ class Downloader(){
             }
 
             try{
+                @Suppress("DEPRECATION")
                 URL(job.uri).openStream().use {input->
                     val buffer = input.readAllBytes()
                     if(job.ttl!=null){
