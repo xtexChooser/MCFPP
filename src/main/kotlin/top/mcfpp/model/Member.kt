@@ -39,9 +39,10 @@ interface Member: Serializable {
     var accessModifier : AccessModifier
 
     /**
-     * 这个成员是否是静态的
+     * 是否是静态的。默认为否
      */
-    var isStatic: Boolean
+    val isStatic : Boolean
+        get() = parentClass() is ObjectClass || parentTemplate() is ObjectDataTemplate
 
     /**
      * 这个成员是否不可被继承

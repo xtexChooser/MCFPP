@@ -141,9 +141,9 @@ class KeybindChatComponent(val key: String) : ChatComponent() {
 class NBTChatComponent(val nbt: NBTBasedData, val interpret: Boolean = false, val separator: ChatComponent? = null) : ChatComponent() {
     override fun toCommandPart(): Command {
         val c = if(separator != null){
-            Command("{\"type\":\"nbt\",\"nbt\":\"").build(nbt.nbtPath.toCommandPart(), false).build("\",\"interpret\":$interpret,\"separator\":${separator.toCommandPart()}}", false)
+            Command("{\"type\":\"nbt\",").build(nbt.nbtPath.toChatComponentPart(), false).build(",\"interpret\":$interpret,\"separator\":${separator.toCommandPart()}}", false)
         }else{
-            Command("{\"type\":\"nbt\",\"nbt\":\"").build(nbt.nbtPath.toCommandPart(), false).build("\",\"interpret\":$interpret}", false)
+            Command("{\"type\":\"nbt\",").build(nbt.nbtPath.toChatComponentPart(), false).build(",\"interpret\":$interpret}", false)
         }
         if(styles.isNotEmpty()){
             c.build(",").build(styleToString())

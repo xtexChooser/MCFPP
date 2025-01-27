@@ -49,7 +49,7 @@ class FunctionParam(
     var isReadOnly: Boolean = false
 ): Serializable {
 
-    var typeIdentifier: String = type.typeName
+    var typeName: String = type.typeName
 
     var defaultVar: Var<*>? = null
 
@@ -154,7 +154,7 @@ class FunctionParam(
         fun ArrayList<FunctionParam>.paramToStringList(): ArrayList<String> {
             val qwq: ArrayList<String> = ArrayList()
             for (param in this) {
-                qwq.add(param.typeIdentifier)
+                qwq.add(param.typeName)
             }
             return qwq
         }

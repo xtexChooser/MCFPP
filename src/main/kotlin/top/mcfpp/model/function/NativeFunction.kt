@@ -113,8 +113,8 @@ class NativeFunction : Function, Native {
         n.caller = this.caller
         n.returnType = this.returnType
         for(np in normalParams){
-            if(genericParams[np.typeIdentifier] != null){
-                val p = FunctionParam(genericParams[np.typeIdentifier]!!, np.identifier, this, np.isStatic)
+            if(genericParams[np.typeName] != null){
+                val p = FunctionParam(genericParams[np.typeName]!!, np.identifier, this, np.isStatic)
                 n.appendNormalParam(p)
                 n.field.putVar(p.identifier, p.buildVar())
             }else{
@@ -123,8 +123,8 @@ class NativeFunction : Function, Native {
             }
         }
         for(rp in readOnlyParams){
-            if(genericParams[rp.typeIdentifier] != null){
-                n.appendReadOnlyParam(genericParams[rp.typeIdentifier]!!, rp.identifier, rp.isStatic)
+            if(genericParams[rp.typeName] != null){
+                n.appendReadOnlyParam(genericParams[rp.typeName]!!, rp.identifier, rp.isStatic)
             }else{
                 n.appendReadOnlyParam(rp.type, rp.identifier, rp.isStatic)
             }
@@ -133,8 +133,8 @@ class NativeFunction : Function, Native {
     }
 
     @Override
-    override fun toString(containClassName: Boolean, containNamespace: Boolean): String {
-        return super.toString(containClassName,containNamespace ) + "->" + javaMethodName
+    override fun toString(): String {
+        return super.toString() + "->" + javaMethodName
     }
 
     fun isSelf(key: String, readOnlyParams: List<MCFPPType>, normalParams: List<MCFPPType>) : Boolean{

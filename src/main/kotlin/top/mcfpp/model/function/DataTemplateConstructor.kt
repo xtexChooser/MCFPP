@@ -9,7 +9,11 @@ import top.mcfpp.model.DataTemplate
 import top.mcfpp.type.MCFPPType
 import java.util.*
 
-class DataTemplateConstructor(val data: DataTemplate, ctx: FunctionBodyContext?): Function("_init_" + data.identifier.lowercase(Locale.getDefault()) + "_" + data.constructors.size, data, false, ctx) {
+class DataTemplateConstructor(val data: DataTemplate, ctx: FunctionBodyContext?): Function(
+    "_init_" + data.identifier.lowercase(Locale.getDefault()) + "_" + data.constructors.size,
+    data,
+    ctx
+) {
 
     fun addParamsFromContext(ctx: mcfppParser.NormalParamsContext) {
         val n = ctx.parameterList()?:return

@@ -60,7 +60,7 @@ open class ClassPointer : Var<ClassPointer>{
      * @param identifier 标识符
      */
     @Suppress("LeakingThis")
-    constructor(clazz: Class, identifier: String) {
+    constructor(clazz: Class, identifier: String): super(identifier) {
         this.type = clazz.getType()
         this.identifier = identifier
         instanceField = clazz.field
@@ -185,7 +185,9 @@ open class ClassPointer : Var<ClassPointer>{
         return if(member == null){
             Pair(null, true)
         }else{
-            Pair(PropertyVar(member, v!!, this), accessModifier >= member.accessModifier)
+            v!!.parent = this
+            v.nbtPath = clazz.getFieldPath(v.identifier)
+            Pair(PropertyVar(member, v, this), accessModifier >= member.accessModifier)
         }
     }
 

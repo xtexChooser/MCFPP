@@ -6,6 +6,9 @@ import top.mcfpp.Project
 import top.mcfpp.core.lang.ClassPointer
 import top.mcfpp.core.lang.MCAny
 import top.mcfpp.core.lang.MCFPPValue
+import top.mcfpp.core.lang.SelectorVar
+import top.mcfpp.lib.EntitySelector
+import top.mcfpp.lib.EntitySource
 import top.mcfpp.lib.NBTPath
 import top.mcfpp.lib.StorageSource
 import top.mcfpp.model.field.GlobalField
@@ -17,6 +20,7 @@ import top.mcfpp.type.MCFPPClassType
 import top.mcfpp.type.MCFPPGenericClassType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
+import top.mcfpp.util.StringHelper.toSnakeCase
 
 /**
  * 一个类，即实体模板。在mcfpp中一个类通常类似下面的样子
@@ -91,6 +95,7 @@ open class Class : CompoundData {
             if(!silentBaseEntity.contains(value) && !isStaticClass){
                 isStaticClass = true
             }
+            field = value
         }
 
     private val invalidBaseEntity = listOf("player", "leash_knot", "lightning_bolt", "fishing_bobber", "creaking_transient")
@@ -104,9 +109,11 @@ open class Class : CompoundData {
     constructor(identifier: String, namespace: String = Project.currNamespace) {
         this.identifier = identifier
         this.namespace = namespace
-        classPreInit = Function("_class_preinit_$identifier", this, false, context = null).apply {
+        classPreInit = Function("_class_preinit_${identifier.toSnakeCase()}", this, context = null).apply {
             accessModifier = Member.AccessModifier.COMPILE_PRIVATE
             isFinal = true
+            owner = this@Class
+            ownerType = Function.Companion.OwnerType.CLASS
         }
         field.addFunction(classPreInit,true)
     }
@@ -154,6 +161,10 @@ open class Class : CompoundData {
         }
     }
 
+    fun hasConstructor(constructor: ClassConstructor): Boolean {
+        return constructors.contains(constructor)
+    }
+
     /**
      * 创建这个类的一个指针
      * @return 创建的指针
@@ -199,11 +210,23 @@ open class Class : CompoundData {
         return super.isSub(compoundData)
     }
 
+    fun getFieldPath(identifier: String): NBTPath {
+        return if(baseEntity == ENTITY_ITEM_DISPLAY){
+            NBTPath(EntitySource(SelectorVar(EntitySelector(EntitySelector.Companion.SelectorType.SELF))))
+                .memberIndex("item.components.\"minecraft:custom_data\".mcfppData")
+                .memberIndex(identifier)
+        }else{
+            NBTPath(EntitySource(SelectorVar(EntitySelector(EntitySelector.Companion.SelectorType.SELF))))
+                .memberIndex("data")
+                .memberIndex(identifier)
+        }
+    }
+
     companion object {
 
         val baseClass = Class("Object","mcfpp.lang").apply {
-            addMember(Function("tick", this, false, context = null))
-            addMember(Function("load", this, false, context = null))
+            addMember(Function("tick", this, context = null))
+            addMember(Function("load", this, context = null))
             extends(MCAny.data)
         }
 

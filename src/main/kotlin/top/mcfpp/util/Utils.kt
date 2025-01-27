@@ -44,6 +44,10 @@ object Utils {
     fun getVersion(version: String): Int {
         return when (version) {
 
+            "1.21.4" -> {
+                61
+            }
+
             "1.21", "1.21.1" -> {
                 48
             }
@@ -97,7 +101,7 @@ object Utils {
             }
 
             else -> {
-                48
+                64
             }
         }
     }

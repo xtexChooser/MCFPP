@@ -28,7 +28,11 @@ class GenericFunction : Function, Generic<Function> {
      * 创建一个函数，并指定它所属的类。
      * @param identifier 函数的标识符
      */
-    constructor(identifier: String, cls: Class, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(identifier, cls, isStatic, ctx)
+    constructor(identifier: String, cls: Class, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(
+        identifier,
+        cls,
+        ctx
+    )
 
     /**
      * 创建一个函数，并指定它所属的接口。接口的函数总是抽象并且公开的
@@ -40,7 +44,11 @@ class GenericFunction : Function, Generic<Function> {
      * 创建一个函数，并指定它所属的结构体。
      * @param name 函数的标识符
      */
-    constructor(name: String, template: DataTemplate, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(name, template, isStatic, ctx)
+    constructor(name: String, template: DataTemplate, isStatic: Boolean, ctx: mcfppParser.FunctionBodyContext) : super(
+        name,
+        template,
+        ctx
+    )
 
     override fun invoke(readOnlyArgs: ArrayList<Var<*>>, normalArgs: ArrayList<Var<*>>, caller: CanSelectMember?): Var<*> {
         return compile(readOnlyArgs + normalArgs).invoke(normalArgs, caller)
@@ -115,7 +123,7 @@ class GenericFunction : Function, Generic<Function> {
         cf.runInFunction {
             val qwq = buildString {
                 for ((index, np) in normalParams.withIndex()) {
-                    append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
+                    append("${np.typeName} ${np.identifier} = ${values[index]}, ")
                 }
             }
             addComment(qwq)

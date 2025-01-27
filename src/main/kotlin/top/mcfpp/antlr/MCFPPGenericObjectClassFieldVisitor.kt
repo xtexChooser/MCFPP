@@ -39,7 +39,7 @@ class MCFPPGenericObjectClassFieldVisitor(val clazz: CompiledGenericObjectClass)
             }
         }
         if(il != null){
-            LogProcessor.error("Class $clazz must either be declared abstract or implement abstract method ${il!!.nameWithNamespace}")
+            LogProcessor.error("Class $clazz must either be declared abstract or implement abstract method ${il!!}")
         }
         Class.currClass = null
         typeScope = MCFPPFile.currFile!!.field.namespaceField

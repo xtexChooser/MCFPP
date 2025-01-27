@@ -71,6 +71,7 @@ public class System {
     @InsertCommand
     @MNIFunction(normalParams = {"nbt n"})
     public static void print(@NotNull NBTBasedData var){
+        var = var.getTempVar();
         if(var instanceof NBTBasedDataConcrete varC){
             Function.Companion.addCommand("tellraw @a \"" + NBTUtil.INSTANCE.toJava(varC.getValue()) + "\"");
         }else {
@@ -81,6 +82,7 @@ public class System {
     @InsertCommand
     @MNIFunction(normalParams = {"string s"})
     public static void print(@NotNull MCString var) {
+        var = var.getTempVar();
         if(var instanceof MCStringConcrete varC){
             Function.Companion.addCommand("tellraw @a \"" + varC.getValue().getValue() + "\"");
         }else{

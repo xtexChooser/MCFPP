@@ -1,6 +1,12 @@
 {
 	"values":[
-		"mcfppu3aload",
-		"mcfppu3ainit"
+		{
+			"identifier":"load/load",
+			"namespace":"mcfpp"
+		},
+		{
+			"identifier":"init/init",
+			"namespace":"mcfpp"
+		}
 	]
 }

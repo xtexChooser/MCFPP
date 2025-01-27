@@ -2,6 +2,10 @@ package top.mcfpp.util
 
 object StringHelper {
 
+    fun Char.isLegal(): Boolean {
+        return isLowerCase() || isDigit() || arrayOf('_','-','/','.').contains(this)
+    }
+
     fun String.toSnakeCase(): String {
         val s = StringBuilder("")
         for (c in this.withIndex()) {

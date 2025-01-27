@@ -2,8 +2,9 @@ package top.mcfpp.model.function
 
 import top.mcfpp.Project
 import top.mcfpp.antlr.mcfppParser.FunctionBodyContext
+import top.mcfpp.lib.NamespaceID
 import top.mcfpp.model.CompoundData
-import top.mcfpp.util.StringHelper.toSnakeCase
+import top.mcfpp.model.ObjectClass
 
 open class ExtensionFunction: Function {
 
@@ -15,39 +16,24 @@ open class ExtensionFunction: Function {
         this.owner = owner
     }
 
-    override val namespaceID: String
-        /**
-         * 获取这个函数的命名空间id，即xxx:xxx形式。可以用于命令
-         * @return 函数的命名空间id
-         */
+    override val namespaceID: NamespaceID
         get() {
-            val re: StringBuilder =
-                if(isStatic){
-                    StringBuilder("$namespace:${owner!!.identifier}/ex_static/$identifier")
+            val n = if(ownerType == Companion.OwnerType.NONE){
+                NamespaceID(namespace, identifier)
+            }else{
+                if(parentClass() is ObjectClass){
+                    NamespaceID(namespace, owner!!.identifier)
+                        .appendIdentifier("ex_static", false)
                 }else{
-                    StringBuilder("$namespace:${owner!!.identifier}/ex/$identifier")
+                    NamespaceID(namespace, owner!!.identifier)
+                        .appendIdentifier("ex")
                 }
-            for (p in normalParams) {
-                re.append("_").append(p.typeIdentifier)
             }
-            return re.toString().toSnakeCase()
-        }
-
-    /**
-     * 获取这个函数的不带有命名空间的id。仍然包含了参数信息
-     */
-    override val nameWithNamespace: String
-        get() {
-            val re: StringBuilder =
-                if(isStatic){
-                    StringBuilder("${owner!!.identifier}/ex_static/$identifier")
-                }else{
-                    StringBuilder("${owner!!.identifier}/ex/$identifier")
-                }
+            val re = StringBuilder(identifier)
             for (p in normalParams) {
-                re.append("_").append(p.typeIdentifier)
+                re.append("_").append(p.typeName)
             }
-            return re.toString().toSnakeCase()
+            return n.appendIdentifier(re.toString())
         }
 
     /**

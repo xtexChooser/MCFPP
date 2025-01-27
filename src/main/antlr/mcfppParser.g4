@@ -230,7 +230,7 @@ functionDeclaration
     ;
 
 extensionFunctionDeclaration
-    :   STATIC? FUNCTION (type '.')? Identifier functionParams (ARROW functionReturnType)? '{' functionBody '}'
+    :   FUNCTION (type '.')? Identifier functionParams (ARROW functionReturnType)? '{' functionBody '}'
     ;
 
 //枚举

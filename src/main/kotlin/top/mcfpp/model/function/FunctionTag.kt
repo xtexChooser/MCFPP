@@ -29,7 +29,7 @@ class FunctionTag(namespace: String?, var identifier: String): Serializable {
             val json = JSONObject()
             val values = JSONArray()
             for (f in functions) {
-                values.add(f.namespaceID)
+                values.add(f.namespaceID.toString())
             }
             json["values"] = values
             return json.toString(JSONWriter.Feature.PrettyFormat)

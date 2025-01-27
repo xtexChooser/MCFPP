@@ -44,7 +44,7 @@ class MCFPPGenericClassFieldVisitor(val clazz: Class) : MCFPPFieldVisitor() {
                 }
             }
             if(il != null){
-                LogProcessor.error("Class ${Class.currClass} must either be declared abstract or implement abstract method ${il!!.nameWithNamespace}")
+                LogProcessor.error("Class ${Class.currClass} must either be declared abstract or implement abstract method ${il!!}")
             }
         }
         Class.currClass = null

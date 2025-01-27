@@ -234,14 +234,18 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         //解析类中的成员
         //先解析函数和构造函数
         for (c in ctx.classBody().classMemberDeclaration()) {
-            c!!
-            if (c.classMember() != null && (c.classMember().classFunctionDeclaration() != null || c.classMember().abstractClassFunctionDeclaration() != null)) {
+            if (c.classMember() != null
+                && (c.classMember().classFunctionDeclaration() != null
+                        || c.classMember().abstractClassFunctionDeclaration() != null
+                        || c.classMember().nativeClassFunctionDeclaration() != null
+                        || c.classMember().classConstructorDeclaration() != null)
+            ) {
                 visit(c)
             }
         }
         //再解析变量
         for (c in ctx.classBody().classMemberDeclaration()) {
-            if (c!!.classMember() != null && c.classMember().classFieldDeclaration() != null) {
+            if (c.classMember() != null && c.classMember().classFieldDeclaration() != null) {
                 visit(c)
             }
         }
@@ -261,7 +265,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
                 }
             }
             if(il != null){
-                LogProcessor.error("Class ${Class.currClass} must either be declared abstract or implement abstract method ${il!!.nameWithNamespace}")
+                LogProcessor.error("Class ${Class.currClass} must either be declared abstract or implement abstract method ${il!!}")
             }
         }
         Class.currClass = null
@@ -298,14 +302,18 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         //解析类中的成员
         //先解析函数和构造函数
         for (c in ctx.classBody().classMemberDeclaration()) {
-            c!!
-            if (c.classMember() != null && (c.classMember().classFunctionDeclaration() != null || c.classMember().abstractClassFunctionDeclaration() != null)) {
+            if (c.classMember() != null
+                && (c.classMember().classFunctionDeclaration() != null
+                        || c.classMember().abstractClassFunctionDeclaration() != null
+                        || c.classMember().nativeClassFunctionDeclaration() != null
+                        || c.classMember().classConstructorDeclaration() != null)
+                ) {
                 visit(c)
             }
         }
         //再解析变量
         for (c in ctx.classBody().classMemberDeclaration()) {
-            if (c!!.classMember() != null && c.classMember().classFieldDeclaration() != null) {
+            if (c.classMember() != null && c.classMember().classFieldDeclaration() != null) {
                 visit(c)
             }
         }
@@ -334,8 +342,10 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             m.accessModifier = AccessModifier.valueOf((ctx.accessModifier()?.text?:"public").uppercase(Locale.getDefault()))
             if (m !is ClassConstructor) {
                 Class.currClass!!.addMember(m)
+            }else{
+                Class.currClass!!.addConstructor(m)
             }
-        }else if(m is Pair<*,*>){//Pair<Var, Property>
+        }else if(m is Pair<*,*>){//Pair<out Var<*>?, out Property?>
             val v = m.first as Var<*>?
             val p = m.second as Property?
             if(v == null || p == null) return null
@@ -351,13 +361,13 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
     override fun visitClassMember(ctx: mcfppParser.ClassMemberContext): Any? {
         Project.ctx = ctx
         return if (ctx.nativeClassFunctionDeclaration() != null) {
-            visit(ctx.nativeClassFunctionDeclaration())
+            visitNativeClassFunctionDeclaration(ctx.nativeClassFunctionDeclaration())
         } else if (ctx.classFunctionDeclaration() != null) {
-            visit(ctx.classFunctionDeclaration())
+            visitClassFunctionDeclaration(ctx.classFunctionDeclaration())
         } else if (ctx.classFieldDeclaration() != null) {
-            visit(ctx.classFieldDeclaration())
+            visitClassFieldDeclaration(ctx.classFieldDeclaration())
         } else if (ctx.classConstructorDeclaration() != null) {
-            visit(ctx.classConstructorDeclaration())
+            visitClassConstructorDeclaration(ctx.classConstructorDeclaration())
         }else{
             return null
         }
@@ -383,7 +393,6 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             Function(
                 ctx.Identifier().text,
                 Class.currClass!!,
-                Class.currClass!! is ObjectClass,
                 ctx.functionBody()
             )
         }
@@ -425,7 +434,6 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         val f = Function(
             ctx.Identifier().text,
             Class.currClass!!,
-            false,
             null
         )
         f.returnType = if(ctx.functionReturnType()?.type() != null){
@@ -509,7 +517,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
         //创建构造函数对象，注册函数
         val f = ClassConstructor(Class.currClass!!)
         f.addParamsFromContext(ctx.normalParams())
-        if(!Class.currClass!!.addConstructor(f)){
+        if(Class.currClass!!.hasConstructor(f)){
             LogProcessor.error("Already defined constructor:  constructor(" + ctx.normalParams().text + ") in class " + Class.currClass)
         }
         return f
@@ -618,7 +626,7 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
     override fun visitFunctionDeclaration(ctx: mcfppParser.FunctionDeclarationContext): Any? {
         Project.ctx = ctx
         //创建函数对象
-        val identifier : String = ctx.Identifier().text
+        val identifier = ctx.Identifier().text
         val f = if(ctx.functionParams()?.readOnlyParams() != null && ctx.functionParams().readOnlyParams().parameterList().parameter().size != 0){
             GenericFunction(identifier, Project.currNamespace, ctx.functionBody())
         }else {
@@ -776,7 +784,6 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             MCFPPBaseType.Void
         }
         f.ownerType = ownerType
-        f.isStatic = ctx.STATIC() != null
         f.addParamsFromContext(ctx.functionParams())
         val field = data.field
         //注册函数
@@ -1043,7 +1050,6 @@ open class MCFPPFieldVisitor : mcfppParserBaseVisitor<Any?>() {
             Function(
                 ctx.Identifier().text,
                 DataTemplate.currTemplate!!,
-                DataTemplate.currTemplate is ObjectDataTemplate,
                 ctx.functionBody()
             )
         }

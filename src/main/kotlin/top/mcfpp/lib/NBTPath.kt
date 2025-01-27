@@ -101,8 +101,8 @@ class NBTPath(var source: NBTSource): Serializable {
         return other.isParentOf(this)
     }
 
-    fun toCommandPart(): Command{
-        val cmd = source.toCommand()
+    fun pathToCommandPart(): Command {
+        val cmd = Command()
         for (path in pathList.withIndex()){
             if(path.index == 0 && path.value !is MemberPath){
                 LogProcessor.warn("Invalid nbt path: $path")
@@ -113,9 +113,9 @@ class NBTPath(var source: NBTSource): Serializable {
                     val value = path.value as MemberPath
                     if(path.index == 0){
                         if(value.value is MCStringConcrete){
-                            cmd.build((value.value as MCStringConcrete).value.value, true)
+                            cmd.build((value.value as MCStringConcrete).value.value, false)
                         }else{
-                            cmd.buildMacro(value.value, true)
+                            cmd.buildMacro(value.value, false)
                         }
                     }else{
                         if(value.value is MCStringConcrete){
@@ -150,6 +150,15 @@ class NBTPath(var source: NBTSource): Serializable {
             }
         }
         return cmd
+    }
+
+    fun toCommandPart(): Command{
+        return source.toCommand().build(pathToCommandPart())
+    }
+
+    fun toChatComponentPart(): Command{
+        return Command("\"nbt\":\"").build(pathToCommandPart(), false).build("\",", false)
+            .build(source.toChatComponentPart())
     }
 
     fun clone(): NBTPath{

@@ -79,6 +79,7 @@ object GlobalField : FieldContainer, IField {
         scoreboards[SbObject.MCFPP_default.name] = SbObject.MCFPP_default
         scoreboards[SbObject.MCFPP_INIT.name] = SbObject.MCFPP_INIT
         scoreboards[SbObject.MCFPP_TEMP.name] = SbObject.MCFPP_TEMP
+        scoreboards[SbObject.MCFPP_POINTER_COUNTER.name] = SbObject.MCFPP_POINTER_COUNTER
 
         localNamespaces["default"] = Namespace("default")
 
@@ -364,7 +365,6 @@ object GlobalField : FieldContainer, IField {
     }
 
     fun mergeInfo(info: GlobalFieldInfo){
-
         for((id, namespace) in info.localNamespaces){
             if(stdNamespaces.containsKey(id)) {
                 stdNamespaces[id]!!.merge(namespace.get())
@@ -374,7 +374,13 @@ object GlobalField : FieldContainer, IField {
                 libNamespaces[id] = namespace.get()
             }
         }
-        functionTags.putAll(info.functionTags.mapValues { it.value.get() })
+        for (tag in info.functionTags){
+            if(functionTags.containsKey(tag.key)){
+                functionTags[tag.key]!!.functions.addAll(tag.value.get().functions)
+            }else{
+                functionTags[tag.key] = tag.value.get()
+            }
+        }
         scoreboards.putAll(info.scoreboards)
     }
 
@@ -389,7 +395,7 @@ object GlobalField : FieldContainer, IField {
             namespace.field.forEachFunction { s ->
                 run {
                     if (s is NativeFunction) {
-                        println(s.namespaceID + " = " + s.javaMethodName )
+                        println(s.namespaceID.toString() + " = " + s.javaMethodName )
                     } else {
                         val n = StringBuilder("")
                         for(tag in s.tags){
@@ -406,7 +412,6 @@ object GlobalField : FieldContainer, IField {
                                     println("\t" + c)
                                 }
                             }
-
                         }
                     }
                 }

@@ -642,7 +642,7 @@ class MCFPPExprVisitor(private var defaultGenericClassType : MCFPPGenericClassTy
 
     override fun visitNbtValue(ctx: mcfppParser.NbtValueContext): Var<*> {
         if(ctx.LineString() != null) {
-            return NBTBasedDataConcrete(StringTag(ctx.LineString().text))
+            return MCStringConcrete(StringTag(ctx.LineString().text))
         }else if(ctx.nbtBool() != null){
             return NBTBasedDataConcrete(BoolTag(ctx.nbtBool().text == "true"))
         }else if(ctx.nbtByte() != null){

@@ -4,23 +4,19 @@ import net.querz.nbt.tag.StringTag
 import top.mcfpp.annotations.InsertCommand
 import top.mcfpp.command.Commands
 import top.mcfpp.core.lang.JsonTextConcrete
-import top.mcfpp.core.lang.MCAnyConcrete
 import top.mcfpp.core.lang.MCFPPValue
 import top.mcfpp.core.lang.Var
-import top.mcfpp.exception.VariableConverseException
 import top.mcfpp.lib.NBTChatComponent
 import top.mcfpp.lib.PlainChatComponent
 import top.mcfpp.model.CompoundData
 import top.mcfpp.model.Member
 import top.mcfpp.model.function.Function
 import top.mcfpp.type.MCFPPBaseType
-import top.mcfpp.type.MCFPPNBTType
 import top.mcfpp.type.MCFPPType
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.TempPool
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
-import java.util.*
 
 /**
  * string表示一个字符串。要声明一个字符串，应该使用string类型，例如string abc = "abc"。
@@ -65,8 +61,6 @@ open class MCString : NBTBasedData {
         TODO("Not yet implemented")
     }
 
-    @Override
-    @Throws(VariableConverseException::class)
     override fun doAssignedBy(b: Var<*>): MCString {
         when (b) {
             is MCString -> return assignCommand(b)
@@ -90,7 +84,11 @@ open class MCString : NBTBasedData {
                 if(this is MCStringConcrete){
                     JsonTextConcrete(PlainChatComponent(this.value.value))
                 }else{
-                    JsonTextConcrete(NBTChatComponent(this, false))
+                    if(parentClass() != null && (parent as Var<*>).identifier != "this") {
+                        JsonTextConcrete(NBTChatComponent(getTempVar(), false))
+                    }else{
+                        JsonTextConcrete(NBTChatComponent(this, false))
+                    }
                 }
             }
             else -> re
@@ -172,6 +170,11 @@ open class MCString : NBTBasedData {
             }) as MCString
     }
 
+    override fun getTempVar(): MCString {
+        val temp = MCString()
+        temp.isTemp = true
+        return temp.assignCommand(this)
+    }
 
     companion object {
         val data = CompoundData("string","mcfpp")
@@ -209,13 +212,9 @@ class MCStringConcrete: MCString, MCFPPValue<StringTag> {
         return MCString(this)
     }
 
-    @Override
-    override fun explicitCast(type: MCFPPType): Var<*> {
-        return when(type){
-            MCFPPBaseType.String -> this
-            MCFPPNBTType.NBT -> NBTBasedDataConcrete(value)
-            MCFPPBaseType.Any -> MCAnyConcrete(this)
-            else -> throw VariableConverseException()
+    override fun getTempVar(): MCString {
+        return MCStringConcrete(value).apply {
+            isTemp = true
         }
     }
 }

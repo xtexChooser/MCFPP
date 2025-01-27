@@ -12,6 +12,7 @@ import top.mcfpp.antlr.mcfppParser.FunctionBodyContext
 import top.mcfpp.command.*
 import top.mcfpp.core.lang.*
 import top.mcfpp.doc.Document
+import top.mcfpp.lib.NamespaceID
 import top.mcfpp.model.*
 import top.mcfpp.model.annotation.Annotation
 import top.mcfpp.model.field.FunctionField
@@ -20,7 +21,6 @@ import top.mcfpp.model.generic.Generic
 import top.mcfpp.type.*
 import top.mcfpp.util.LogProcessor
 import top.mcfpp.util.SerializableFunctionBodyContext
-import top.mcfpp.util.StringHelper.toSnakeCase
 import top.mcfpp.util.TextTranslator
 import top.mcfpp.util.TextTranslator.translate
 import java.io.Serializable
@@ -190,11 +190,6 @@ open class Function : Member, FieldContainer, WithDocument {
     override var accessModifier: Member.AccessModifier = Member.AccessModifier.PUBLIC
 
     /**
-     * 是否是静态的。默认为否
-     */
-    override var isStatic : Boolean
-
-    /**
      * 所在的复合类型（类/结构体/基本类型）。如果不是成员，则为null
      */
     var owner : CompoundData? = null
@@ -242,45 +237,38 @@ open class Function : Member, FieldContainer, WithDocument {
             }
         }
 
+    val identifierWithParamType : String
+        get() {
+            val re = StringBuilder(identifier)
+            for (p in normalParams) {
+                re.append("_").append(p.typeName)
+            }
+            return re.toString()
+        }
+
     /**
      * 获取这个函数的命名空间id，即xxx:xxx形式。可以用于命令
      * @return 函数的命名空间id
      */
-    open val namespaceID: String
+    open val namespaceID: NamespaceID
         get() {
-            val re: StringBuilder = if(ownerType == OwnerType.NONE){
-                StringBuilder("$namespace:$identifier")
+            val re = StringBuilder()
+            for (p in normalParams) {
+                re.append("_").append(p.typeName)
+            }
+            val n = if(ownerType == OwnerType.NONE){
+                NamespaceID(namespace, identifier + re)
             }else{
                 if(parentClass() is ObjectClass){
-                    StringBuilder("$namespace:${owner!!.identifier}/static/$identifier")
+                    NamespaceID(namespace, owner!!.identifier)
+                        .appendIdentifier("static", false)
+                        .appendIdentifier(identifier + re)
                 }else{
-                    StringBuilder("$namespace:${owner!!.identifier}/$identifier")
+                    NamespaceID(namespace, owner!!.identifier)
+                        .appendIdentifier(identifier + re)
                 }
             }
-            for (p in normalParams) {
-                re.append("_").append(p.typeIdentifier)
-            }
-            return re.toString().toSnakeCase()
-        }
-
-    /**
-     * 获取这个函数的不带有命名空间的id。仍然包含了参数信息
-     */
-    open val nameWithNamespace: String
-        get() {
-            val re: StringBuilder = if(ownerType == OwnerType.NONE){
-                StringBuilder(identifier)
-            }else{
-                if(parentClass() is ObjectClass){
-                    StringBuilder("${owner!!.identifier}/static/$identifier")
-                }else{
-                    StringBuilder("${owner!!.identifier}/$identifier")
-                }
-            }
-            for (p in normalParams) {
-                re.append("_").append(p.typeIdentifier)
-            }
-            return re.toString().toSnakeCase()
+            return n
         }
 
     /**
@@ -337,7 +325,6 @@ open class Function : Member, FieldContainer, WithDocument {
         commands = CommandList()
         normalParams = ArrayList()
         field = FunctionField(null)
-        isStatic = false
         ownerType = OwnerType.NONE
         this.namespace = namespace
         this.ast = context?.let { SerializableFunctionBodyContext(it) }
@@ -347,14 +334,13 @@ open class Function : Member, FieldContainer, WithDocument {
      * 创建一个函数，并指定它所属的类。
      * @param identifier 函数的标识符
      */
-    constructor(identifier: String, cls: Class, isStatic: Boolean, context: FunctionBodyContext?) {
+    constructor(identifier: String, cls: Class, context: FunctionBodyContext?) {
         this.identifier = identifier
         commands = CommandList()
         normalParams = ArrayList()
         namespace = cls.namespace
         ownerType = OwnerType.CLASS
         owner = cls
-        this.isStatic = isStatic
         field = FunctionField(cls.field)
         this.ast = context?.let { SerializableFunctionBodyContext(it) }
     }
@@ -371,7 +357,6 @@ open class Function : Member, FieldContainer, WithDocument {
         namespace = itf.namespace
         ownerType = OwnerType.CLASS
         owner = itf
-        this.isStatic = false
         field = FunctionField(null)
         this.isAbstract = true
         this.accessModifier = Member.AccessModifier.PUBLIC
@@ -382,13 +367,12 @@ open class Function : Member, FieldContainer, WithDocument {
      * 创建一个函数，并指定它所属的结构体。
      * @param name 函数的标识符
      */
-    constructor(name: String, template: DataTemplate, isStatic: Boolean, context: FunctionBodyContext?) {
+    constructor(name: String, template: DataTemplate, context: FunctionBodyContext?) {
         this.identifier = name
         normalParams = ArrayList()
         namespace = template.namespace
         ownerType = OwnerType.TEMPLATE
         owner = template
-        this.isStatic = isStatic
         field = FunctionField(template.field)
         this.returnType = returnType
         this.returnVar = buildReturnVar(returnType)
@@ -403,7 +387,6 @@ open class Function : Member, FieldContainer, WithDocument {
         this.namespace = function.namespace
         this.owner = function.owner
         this.ownerType = function.ownerType
-        this.isStatic = function.isStatic
         this.field = function.field.clone()
         this.returnType = function.returnType
         this.returnVar = function.returnVar.clone()
@@ -549,7 +532,7 @@ open class Function : Member, FieldContainer, WithDocument {
         cf.runInFunction {
             val qwq = buildString {
                 for ((index, np) in normalParams.withIndex()) {
-                    append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
+                    append("${np.typeName} ${np.identifier} = ${values[index]}, ")
                 }
             }
             addComment(qwq)
@@ -833,33 +816,30 @@ open class Function : Member, FieldContainer, WithDocument {
     }
 
     override fun toString(): String {
-        return toString(true, true)
-    }
-
-    /**
-     * 返回由函数的类（如果有），函数的标识符，函数的返回值以及函数的形参类型组成的字符串
-     *
-     * 类的命名空间:类名@方法名(参数)
-     * @return
-     */
-    open fun toString(containClassName: Boolean, containNamespace: Boolean): String {
-        //类名
-        val clsName = if(containClassName && owner != null) owner!!.identifier else ""
         //参数
-        val paramStr = StringBuilder()
+        val paramStr = StringBuilder(returnType.typeName).append(" ")
+        //命名空间
+        paramStr.append(this.namespace).append(":")
+        //类名
+        if(owner != null) {
+            paramStr.append(owner!!.identifier)
+            if(isStatic){
+                paramStr.append(".Object")
+            }
+            paramStr.append(":")
+        }
+        paramStr.append("${identifier}(")
         for (i in normalParams.indices) {
             if(normalParams[i].isStatic){
                 paramStr.append("static ")
             }
-            paramStr.append("${normalParams[i].typeIdentifier} ${normalParams[i].identifier}")
+            paramStr.append("${normalParams[i].typeName} ${normalParams[i].identifier}")
             if (i != normalParams.size - 1) {
                 paramStr.append(",")
             }
         }
-        if(containNamespace){
-            return "$namespace:$clsName$identifier($paramStr)"
-        }
-        return "$returnType $clsName$identifier($paramStr)"
+        paramStr.append(")")
+        return paramStr.toString()
     }
 
     override fun hashCode(): Int {

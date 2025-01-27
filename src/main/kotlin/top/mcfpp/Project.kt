@@ -120,7 +120,7 @@ object Project {
         commands.addAll(
             arrayOf(
                 //指针清理
-                Command("execute as @e[type=marker,tag=mcfpp_ptr] if score @s ${SbObject.MCFPP_POINTER_COUNTER} matches ..0 run kill @s"),
+                Command("execute as @e[type=marker,tag=mcfpp_gc] if score @s ${SbObject.MCFPP_POINTER_COUNTER} matches ..0 run kill @s"),
                 //内存泄露检查
                 Command("execute if data storage mcfpp:system stack_frame[0] run tellraw @a {\"text\":\"[MCFPP]Stack Leak\"}"),
                 Command("execute if data storage mcfpp:system stack_frame[0] run data modify storage mcfpp:system stack_frame set value []"),
@@ -463,7 +463,7 @@ object Project {
             n.field.forEachObject { c->
                 run {
                     if(c is ObjectClass){
-                        //浮点数临时marker实体
+                        //单例实体
                         Function.addCommand("summon marker 0 0 0 {" +
                                 "Tags:[${c.tag}]," +
                                 "UUID:${c.mcuuid.uuidSNBT}}"

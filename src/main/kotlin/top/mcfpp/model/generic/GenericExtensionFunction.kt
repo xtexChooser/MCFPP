@@ -98,7 +98,7 @@ class GenericExtensionFunction: ExtensionFunction, Generic<ExtensionFunction> {
         cf.runInFunction {
             val qwq = buildString {
                 for ((index, np) in normalParams.withIndex()) {
-                    append("${np.typeIdentifier} ${np.identifier} = ${values[index]}, ")
+                    append("${np.typeName} ${np.identifier} = ${values[index]}, ")
                 }
             }
             addComment(qwq)

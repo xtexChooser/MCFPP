@@ -30,7 +30,7 @@ object Commands {
      * @return 生成的命令
      */
     fun function(function: Function): Command {
-        return Command.build("function").build(function.namespaceID,function.namespaceID)
+        return Command.build("function").build(function.namespaceID.toString(),function.namespaceID.toString())
     }
 
     /**
@@ -255,19 +255,12 @@ object Commands {
         val final = when(a){
             is ClassPointer -> {
                 if(a.identifier == "this"){
-                    if(a.clazz.baseEntity != Class.ENTITY_MARKER && a.clazz.baseEntity != Class.ENTITY_ITEM_DISPLAY){
-                        val qwq = arrayOf(Command.build("execute on passengers as entity @n[tag=${a.tag}_data]"))
-                        if(hasExecuteRun){
-                            qwq.last().build("run", "run")
-                        }
-                        return qwq
-                    }
                     return arrayOf(Command())
                 }
                 val qwq = if(a.clazz.baseEntity != Class.ENTITY_MARKER && a.clazz.baseEntity != Class.ENTITY_ITEM_DISPLAY){
                     arrayOf(
                         Command.build("data modify entity ${ClassPointer.tempItemEntityUUID} Thrower set from storage mcfpp:system stack_frame[${a.stackIndex}].${a.identifier}"),
-                        Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin on passengers as entity @n[tag=${a.tag}_data]")
+                        Command.build("execute as ${ClassPointer.tempItemEntityUUID} on origin on passengers as @n[tag=${a.tag}_data]")
                     )
                 }else{
                     arrayOf(

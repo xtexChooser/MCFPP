@@ -1,6 +1,12 @@
 {
 	"values":[
-		"mcfppu3atick",
-		"mcfppu3asys.tick"
+		{
+			"identifier":"tick/tick",
+			"namespace":"mcfpp"
+		},
+		{
+			"identifier":"sys.tick/sys.tick",
+			"namespace":"mcfpp"
+		}
 	]
 }

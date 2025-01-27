@@ -217,7 +217,7 @@ object FunctionParamWriter: ILibJsonWriter<FunctionParam> {
     override fun toJson(t: FunctionParam): JSONObject {
         val json = JSONObject()
         json["id"] = t.identifier
-        json["type"] = t.typeIdentifier
+        json["type"] = t.typeName
         json["isStatic"] = t.isStatic
         return json
     }

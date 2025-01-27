@@ -53,8 +53,8 @@ object DatapackCreator {
         LogProcessor.debug("Copy libs...")
         //复制库
         for (lib in Project.config.includes){
-            val filePath = if(!lib.endsWith("/.mclib")) {
-                "$lib/.mclib"
+            val filePath = if(!lib.endsWith("/bin.mclib")) {
+                "$lib/bin.mclib"
             }else{
                 lib
             }
@@ -116,7 +116,7 @@ object DatapackCreator {
 
     private fun genFunction(currPath: String, f: Function){
         if (f is Native) return
-        LogProcessor.debug("Writing File: $currPath\\${f.nameWithNamespace}.mcfunction")
+        LogProcessor.debug("Writing File: $currPath\\${f.identifierWithParamType.toSnakeCase()}.mcfunction")
         f.commands.analyzeAll()
         val path = if(f is ExtensionFunction){
             "$currPath\\ex"
@@ -124,12 +124,12 @@ object DatapackCreator {
             currPath
         }
         Files.createDirectories(Paths.get(path))
-        Files.write(Paths.get("$path\\${f.identifier}.mcfunction"), f.cmdStr.toByteArray())
+        Files.write(Paths.get("$path\\${f.identifierWithParamType.toSnakeCase()}.mcfunction"), f.cmdStr.toByteArray())
         if(f.compiledFunctions.isNotEmpty()){
             for (cf in f.compiledFunctions.values) {
-                LogProcessor.debug("Writing File: $currPath\\${cf.identifier}.mcfunction")
+                LogProcessor.debug("Writing File: $currPath\\${cf.identifierWithParamType.toSnakeCase()}.mcfunction")
                 f.commands.analyzeAll()
-                Files.write(Paths.get("$path\\${f.identifier}.mcfunction"), cf.cmdStr.toByteArray())
+                Files.write(Paths.get("$path\\${f.identifierWithParamType.toSnakeCase()}.mcfunction"), cf.cmdStr.toByteArray())
             }
         }
     }
@@ -139,9 +139,9 @@ object DatapackCreator {
         val path = if(f is ExtensionFunction) "$currPath\\ex" else currPath
         Files.createDirectories(Paths.get(path))
         for (cf in f.compiledFunctions.values) {
-            LogProcessor.debug("Writing File: $currPath\\${cf.identifier}.mcfunction")
+            LogProcessor.debug("Writing File: $currPath\\${cf.identifierWithParamType.toSnakeCase()}.mcfunction")
             f.commands.analyzeAll()
-            Files.write(Paths.get("$path\\${f.identifier}.mcfunction"), cf.cmdStr.toByteArray())
+            Files.write(Paths.get("$path\\${f.identifierWithParamType.toSnakeCase()}.mcfunction"), cf.cmdStr.toByteArray())
         }
     }
 
